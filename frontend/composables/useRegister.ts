@@ -32,8 +32,16 @@ export function useRegister() {
       state.confirmPassword,
     );
 
+    const termsError = !state.acceptTerms
+      ? "You must accept the Terms of Service and Privacy Policy"
+      : "";
+
     const validationError =
-      fullNameError || emailError || passwordError || confirmPasswordError;
+      fullNameError ||
+      emailError ||
+      passwordError ||
+      confirmPasswordError ||
+      termsError;
 
     if (validationError) {
       dispatch({
@@ -52,6 +60,7 @@ export function useRegister() {
         email: state.email.trim(),
         password: state.password,
         confirmPassword: state.confirmPassword,
+        acceptTerms: state.acceptTerms,
       });
 
       router.push(`/verify-email?email=${encodeURIComponent(state.email)}`);

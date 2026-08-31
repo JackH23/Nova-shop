@@ -55,6 +55,12 @@ const User = sequelize.define(
             type: DataTypes.DATE,
             allowNull: true,
         },
+
+        // Store when the user accepted the terms and policy
+        termsAcceptedAt: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
     },
     {
         tableName: "users",

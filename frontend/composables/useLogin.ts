@@ -46,9 +46,16 @@ export function useLogin() {
       const response = await authService.login({
         email: state.email.trim(),
         password: state.password,
+        rememberMe: state.rememberMe,
       });
 
-      localStorage.setItem("token", response.token);
+      if (state.rememberMe) {
+        localStorage.setItem("token", response.token);
+        sessionStorage.removeItem("token");
+      } else {
+        sessionStorage.setItem("token", response.token);
+        localStorage.removeItem("token");
+      }
 
       router.push("/");
     } catch (error) {

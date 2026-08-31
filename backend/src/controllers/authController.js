@@ -9,12 +9,20 @@ const register = async (req, res) => {
             email,
             password,
             confirmPassword,
+            acceptTerms,
         } = req.body;
 
         // Check required fields
         if (!fullName || !email || !password || !confirmPassword) {
             return res.status(400).json({
                 message: "All fields are required",
+            });
+        }
+
+        // User must accept terms and policy
+        if (acceptTerms !== true) {
+            return res.status(400).json({
+                message: "You must accept the terms and policy",
             });
         }
 
@@ -58,6 +66,7 @@ const register = async (req, res) => {
             password: hashedPassword,
             verificationCode,
             verificationCodeExpiresAt,
+            termsAcceptedAt: new Date(),
         });
 
         return res.status(201).json({
@@ -79,7 +88,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, rememberMe } = req.body;
 
         // Check required fields
         if (!email || !password) {
@@ -120,7 +129,7 @@ const login = async (req, res) => {
             },
             process.env.JWT_SECRET,
             {
-                expiresIn: "1h",
+                expiresIn: rememberMe === true ? "30d" : "1h",
             }
         );
 

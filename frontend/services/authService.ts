@@ -5,6 +5,7 @@ export interface RegisterData {
   email: string;
   password: string;
   confirmPassword: string;
+  acceptTerms: boolean;
 }
 
 export interface VerifyEmailData {
@@ -15,6 +16,7 @@ export interface VerifyEmailData {
 export interface LoginData {
   email: string;
   password: string;
+  rememberMe: boolean;
 }
 
 export interface ResendVerificationCodeData {

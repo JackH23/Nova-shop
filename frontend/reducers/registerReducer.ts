@@ -3,6 +3,7 @@ export type RegisterState = {
   email: string;
   password: string;
   confirmPassword: string;
+  acceptTerms: boolean;
   loading: boolean;
   error: string;
 };
@@ -12,6 +13,7 @@ export const initialRegisterState: RegisterState = {
   email: "",
   password: "",
   confirmPassword: "",
+  acceptTerms: false,
   loading: false,
   error: "",
 };
@@ -24,6 +26,10 @@ export type RegisterAction =
         "fullName" | "email" | "password" | "confirmPassword"
       >;
       value: string;
+    }
+  | {
+      type: "SET_ACCEPT_TERMS";
+      value: boolean;
     }
   | {
       type: "SET_LOADING";
@@ -46,6 +52,12 @@ export function registerReducer(
       return {
         ...state,
         [action.field]: action.value,
+      };
+
+    case "SET_ACCEPT_TERMS":
+      return {
+        ...state,
+        acceptTerms: action.value,
       };
 
     case "SET_LOADING":

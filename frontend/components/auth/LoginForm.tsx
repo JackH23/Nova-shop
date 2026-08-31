@@ -78,6 +78,13 @@ export default function LoginForm() {
         <input
           type="checkbox"
           name="remember"
+          checked={state.rememberMe}
+          onChange={(event) =>
+            dispatch({
+              type: "SET_REMEMBER_ME",
+              value: event.target.checked,
+            })
+          }
           className="h-4 w-4 rounded border-slate-300 accent-indigo-600"
         />
 

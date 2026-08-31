@@ -1,11 +1,21 @@
 import Link from "next/link";
 
-export default function TermsCheckbox() {
+type TermsCheckboxProps = {
+  checked: boolean;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+export default function TermsCheckbox({
+  checked,
+  onChange,
+}: TermsCheckboxProps) {
   return (
     <label className="flex cursor-pointer items-start gap-2 text-xs text-slate-500">
       <input
         type="checkbox"
         name="terms"
+        checked={checked}
+        onChange={onChange}
         className="mt-[1px] h-4 w-4 rounded border-slate-300 accent-indigo-600"
       />
 

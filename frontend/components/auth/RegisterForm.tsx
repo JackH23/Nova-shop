@@ -19,6 +19,7 @@ export default function RegisterForm() {
     email,
     password,
     confirmPassword,
+    acceptTerms,
     loading,
     error,
   } = state;
@@ -91,7 +92,15 @@ export default function RegisterForm() {
       />
 
       {/* Terms */}
-      <TermsCheckbox />
+      <TermsCheckbox
+        checked={acceptTerms}
+        onChange={(event) =>
+          dispatch({
+            type: "SET_ACCEPT_TERMS",
+            value: event.target.checked,
+          })
+        }
+      />
 
       {/* Error */}
       {error && (
