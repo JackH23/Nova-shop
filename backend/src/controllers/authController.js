@@ -1,0 +1,462 @@
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+
+const register = async (req, res) => {
+    try {
+        const {
+            fullName,
+            email,
+            password,
+            confirmPassword,
+        } = req.body;
+
+        // Check required fields
+        if (!fullName || !email || !password || !confirmPassword) {
+            return res.status(400).json({
+                message: "All fields are required",
+            });
+        }
+
+        // Check passwords match
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                message: "Passwords do not match",
+            });
+        }
+
+        // Check if email already exists
+        const existingUser = await User.findOne({
+            where: { email },
+        });
+
+        if (existingUser) {
+            return res.status(409).json({
+                message: "Email already registered",
+            });
+        }
+
+        // Hash password before saving
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Generate 6-digit verification code
+        const verificationCode = Math.floor(
+            100000 + Math.random() * 900000
+        ).toString();
+
+        console.log("Email verification code:", verificationCode);
+
+        // Verification code expires in 10 minutes
+        const verificationCodeExpiresAt = new Date(
+            Date.now() + 10 * 60 * 1000
+        );
+
+        // Create user
+        const user = await User.create({
+            fullName,
+            email,
+            password: hashedPassword,
+            verificationCode,
+            verificationCodeExpiresAt,
+        });
+
+        return res.status(201).json({
+            message: "Account created successfully",
+            user: {
+                id: user.id,
+                fullName: user.fullName,
+                email: user.email,
+            },
+        });
+    } catch (error) {
+        console.error("Register error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Check required fields
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and password are required",
+            });
+        }
+
+        // Find user by email
+        const user = await User.findOne({
+            where: { email },
+        });
+
+        // User does not exist
+        if (!user) {
+            return res.status(401).json({
+                message: "Invalid email or password",
+            });
+        }
+
+        // Compare entered password with hashed password
+        const isPasswordCorrect = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        if (!isPasswordCorrect) {
+            return res.status(401).json({
+                message: "Invalid email or password",
+            });
+        }
+
+        // Create JWT token
+        const token = jwt.sign(
+            {
+                id: user.id,
+                email: user.email,
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "1h",
+            }
+        );
+
+        return res.status(200).json({
+            message: "Login successful",
+            token,
+            user: {
+                id: user.id,
+                fullName: user.fullName,
+                email: user.email,
+            },
+        });
+    } catch (error) {
+        console.error("Login error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+const verifyEmail = async (req, res) => {
+    try {
+        const { email, code } = req.body;
+
+        // Check required fields
+        if (!email || !code) {
+            return res.status(400).json({
+                message: "Email and verification code are required",
+            });
+        }
+
+        // Find user
+        const user = await User.findOne({
+            where: { email },
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        // Already verified
+        if (user.isVerified) {
+            return res.status(400).json({
+                message: "Email is already verified",
+            });
+        }
+
+        // Check verification code
+        if (user.verificationCode !== String(code)) {
+            return res.status(400).json({
+                message: "Invalid verification code",
+            });
+        }
+
+        // Check expiration
+        if (
+            !user.verificationCodeExpiresAt ||
+            new Date() > user.verificationCodeExpiresAt
+        ) {
+            return res.status(400).json({
+                message: "Verification code has expired",
+            });
+        }
+
+        // Mark account as verified
+        user.isVerified = true;
+        user.verificationCode = null;
+        user.verificationCodeExpiresAt = null;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Email verified successfully",
+        });
+    } catch (error) {
+        console.error("Verify email error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+const resendVerificationCode = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Check email
+        if (!email) {
+            return res.status(400).json({
+                message: "Email is required",
+            });
+        }
+
+        // Find user
+        const user = await User.findOne({
+            where: { email },
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        // Already verified
+        if (user.isVerified) {
+            return res.status(400).json({
+                message: "Email is already verified",
+            });
+        }
+
+        // Generate new 6-digit verification code
+        const verificationCode = Math.floor(
+            100000 + Math.random() * 900000
+        ).toString();
+
+        // New code expires in 10 minutes
+        const verificationCodeExpiresAt = new Date(
+            Date.now() + 10 * 60 * 1000
+        );
+
+        // Replace old verification code
+        user.verificationCode = verificationCode;
+        user.verificationCodeExpiresAt =
+            verificationCodeExpiresAt;
+
+        await user.save();
+
+        console.log(
+            "New email verification code:",
+            verificationCode
+        );
+
+        return res.status(200).json({
+            message: "Verification code resent successfully",
+        });
+    } catch (error) {
+        console.error(
+            "Resend verification code error:",
+            error
+        );
+
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Check email
+        if (!email) {
+            return res.status(400).json({
+                message: "Email is required",
+            });
+        }
+
+        // Find user
+        const user = await User.findOne({
+            where: { email },
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        // Generate 6-digit reset code
+        const resetCode = Math.floor(
+            100000 + Math.random() * 900000
+        ).toString();
+
+        // Code expires in 10 minutes
+        const resetCodeExpiresAt = new Date(
+            Date.now() + 10 * 60 * 1000
+        );
+
+        // Save reset code
+        user.resetCode = resetCode;
+        user.resetCodeExpiresAt = resetCodeExpiresAt;
+
+        await user.save();
+
+        console.log("Password reset code:", resetCode);
+
+        return res.status(200).json({
+            message: "Password reset code generated successfully",
+        });
+    } catch (error) {
+        console.error("Forgot password error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+const verifyResetCode = async (req, res) => {
+    try {
+        const { email, code } = req.body;
+
+        // Check required fields
+        if (!email || !code) {
+            return res.status(400).json({
+                message: "Email and reset code are required",
+            });
+        }
+
+        // Find user
+        const user = await User.findOne({
+            where: { email },
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        // Check reset code
+        if (!user.resetCode || user.resetCode !== String(code)) {
+            return res.status(400).json({
+                message: "Invalid reset code",
+            });
+        }
+
+        // Check expiration
+        if (
+            !user.resetCodeExpiresAt ||
+            new Date() > user.resetCodeExpiresAt
+        ) {
+            return res.status(400).json({
+                message: "Reset code has expired",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Reset code verified successfully",
+        });
+    } catch (error) {
+        console.error("Verify reset code error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+const resetPassword = async (req, res) => {
+    try {
+        const {
+            email,
+            code,
+            password,
+            confirmPassword,
+        } = req.body;
+
+        // Check required fields
+        if (!email || !code || !password || !confirmPassword) {
+            return res.status(400).json({
+                message: "All fields are required",
+            });
+        }
+
+        // Check passwords match
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                message: "Passwords do not match",
+            });
+        }
+
+        // Find user
+        const user = await User.findOne({
+            where: { email },
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        // Check reset code again
+        if (!user.resetCode || user.resetCode !== String(code)) {
+            return res.status(400).json({
+                message: "Invalid reset code",
+            });
+        }
+
+        // Check reset code expiration again
+        if (
+            !user.resetCodeExpiresAt ||
+            new Date() > user.resetCodeExpiresAt
+        ) {
+            return res.status(400).json({
+                message: "Reset code has expired",
+            });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Update password
+        user.password = hashedPassword;
+
+        // Reset code can only be used once
+        user.resetCode = null;
+        user.resetCodeExpiresAt = null;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Password reset successfully",
+        });
+    } catch (error) {
+        console.error("Reset password error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+module.exports = {
+    register,
+    login,
+    verifyEmail,
+    resendVerificationCode,
+    forgotPassword,
+    verifyResetCode,
+    resetPassword,
+};
