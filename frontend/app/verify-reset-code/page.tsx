@@ -1,21 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useVerifyResetCode } from "@/composables/useVerifyResetCode";
+import VerifyResetCodeForm from "@/components/auth/VerifyResetCodeForm";
 
 export default function VerifyResetCodePage() {
-
-  const searchParams = useSearchParams();
-
-  const email = searchParams.get("email") || "";
-
-  const {
-    state,
-    dispatch,
-    handleSubmit,
-    handleResendCode,
-  } = useVerifyResetCode(email);
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#f8f9ff] px-4">
@@ -47,63 +33,7 @@ export default function VerifyResetCodePage() {
         </div>
 
         {/* Form */}
-        <form
-          className="space-y-5"
-          onSubmit={handleSubmit}
-        >
-          <div>
-            <label
-              htmlFor="code"
-              className="mb-1 block text-xs font-semibold text-slate-800"
-            >
-              Verification code
-            </label>
-
-            <input
-              id="code"
-              name="code"
-              type="text"
-              inputMode="numeric"
-              placeholder="Enter your code"
-              value={state.code}
-              onChange={(event) =>
-                dispatch({
-                  type: "SET_CODE",
-                  value: event.target.value,
-                })
-              }
-              className="h-11 w-full border border-slate-300 bg-white px-3 text-center text-lg font-semibold tracking-[0.4em] text-slate-900 outline-none transition placeholder:text-sm placeholder:font-normal placeholder:tracking-normal placeholder:text-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-            />
-
-            {state.error && (
-              <p className="mt-2 text-xs text-red-500">
-                {state.error}
-              </p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            disabled={state.loading}
-            className="h-11 w-full bg-indigo-600 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {state.loading ? "Verifying..." : "Verify Code"}
-          </button>
-        </form>
-
-        {/* Resend */}
-        <div className="mt-5 text-center text-xs text-slate-500">
-          Didn&apos;t receive the code?{" "}
-
-          <button
-            type="button"
-            onClick={handleResendCode}
-            disabled={state.loading}
-            className="font-medium text-indigo-600 hover:underline disabled:opacity-60"
-          >
-            Resend Code
-          </button>
-        </div>
+        <VerifyResetCodeForm />
 
         {/* Back */}
         <div className="mt-5 text-center">

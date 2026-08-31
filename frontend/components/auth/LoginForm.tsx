@@ -5,6 +5,7 @@ import AuthInput from "./AuthInput";
 import PasswordInput from "./PasswordInput";
 import SubmitButton from "./SubmitButton";
 import { useLogin } from "@/composables/useLogin";
+import FormError from "@/components/auth/FormError";
 
 export default function LoginForm() {
 
@@ -19,16 +20,9 @@ export default function LoginForm() {
       className="space-y-4"
       onSubmit={handleSubmit}
     >
-      {/* Error message - static for layout testing */}
-      {state.error && (
-        <div className="flex items-center gap-3 rounded-md border border-red-300 bg-red-100 px-4 py-3 text-sm text-red-700">
-          <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
-            !
-          </div>
 
-          <span>{state.error}</span>
-        </div>
-      )}
+      {/* Error message */}
+      <FormError message={state.error} />
 
       {/* Email */}
       <AuthInput

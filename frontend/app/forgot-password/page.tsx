@@ -1,17 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import AuthInput from "@/components/auth/AuthInput";
-import SubmitButton from "@/components/auth/SubmitButton";
-import { useForgotPassword } from "@/composables/useForgotPassword";
+import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 
 export default function ForgotPasswordPage() {
-
-  const {
-    state,
-    dispatch,
-    handleSubmit,
-  } = useForgotPassword();
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#f8f9ff]">
@@ -43,35 +33,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         {/* Form */}
-        <form
-          className="space-y-5"
-          onSubmit={handleSubmit}
-        >
-          <AuthInput
-            id="email"
-            name="email"
-            label="Email address"
-            type="email"
-            placeholder="name@company.com"
-            value={state.email}
-            onChange={(event) =>
-              dispatch({
-                type: "SET_EMAIL",
-                value: event.target.value,
-              })
-            }
-          />
-
-          {state.error && (
-            <p className="text-xs text-red-500">
-              {state.error}
-            </p>
-          )}
-
-          <SubmitButton disabled={state.loading}>
-            {state.loading ? "Sending..." : "Send Reset Code"}
-          </SubmitButton>
-        </form>
+        <ForgotPasswordForm />
 
         {/* Back to login */}
         <div className="mt-6 text-center">

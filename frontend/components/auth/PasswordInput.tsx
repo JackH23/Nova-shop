@@ -43,7 +43,7 @@ export default function PasswordInput({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
-          className="h-11 w-full border border-slate-300 bg-white px-3 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          className="password-input h-11 w-full border border-slate-300 bg-white px-3 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
         />
 
         <button

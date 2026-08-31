@@ -1,23 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import PasswordInput from "@/components/auth/PasswordInput";
-import SubmitButton from "@/components/auth/SubmitButton";
-import { useResetPassword } from "@/composables/useResetPassword";
+import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
 
 export default function ResetPasswordPage() {
-
-  const searchParams = useSearchParams();
-
-  const email = searchParams.get("email") || "";
-  const code = searchParams.get("code") || "";
-
-  const {
-    state,
-    dispatch,
-    handleSubmit,
-  } = useResetPassword(email, code);
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#f8f9ff] px-4">
@@ -49,50 +33,7 @@ export default function ResetPasswordPage() {
         </div>
 
         {/* Reset password form */}
-        <form
-          className="space-y-4"
-          onSubmit={handleSubmit}
-        >
-          {/* New password */}
-          <PasswordInput
-            id="password"
-            name="password"
-            label="New password"
-            showStrength
-            value={state.password}
-            onChange={(event) =>
-              dispatch({
-                type: "SET_PASSWORD",
-                value: event.target.value,
-              })
-            }
-          />
-
-          {/* Confirm password */}
-          <PasswordInput
-            id="confirmPassword"
-            name="confirmPassword"
-            label="Confirm new password"
-            value={state.confirmPassword}
-            onChange={(event) =>
-              dispatch({
-                type: "SET_CONFIRM_PASSWORD",
-                value: event.target.value,
-              })
-            }
-          />
-
-          {state.error && (
-            <p className="text-xs text-red-500">
-              {state.error}
-            </p>
-          )}
-
-          {/* Submit */}
-          <SubmitButton disabled={state.loading}>
-            {state.loading ? "Resetting..." : "Reset Password"}
-          </SubmitButton>
-        </form>
+        <ResetPasswordForm />
 
         {/* Back to login */}
         <div className="mt-6 text-center">
