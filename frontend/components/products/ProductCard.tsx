@@ -1,23 +1,29 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useProductCart } from "@/composables/useProductCart";
+import type { Product } from "@/lib/products";
 
 type ProductCardProps = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  discount?: number;
+  product: Product;
 };
 
 export default function ProductCard({
-  id,
-  name,
-  description,
-  price,
-  image,
-  discount,
+  product,
 }: ProductCardProps) {
+  const {
+    handleAddToCart,
+  } = useProductCart(product);
+
+  const {
+    id,
+    name,
+    description,
+    price,
+    image,
+    discount,
+  } = product;
   return (
     <div className="group overflow-hidden bg-white">
       {/* Product image */}
@@ -58,6 +64,7 @@ export default function ProductCard({
 
           <button
             type="button"
+            onClick={handleAddToCart}
             className="rounded bg-[#3324d8] px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-[#271bb7]"
           >
             🛒 Add

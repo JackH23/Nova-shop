@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useCart } from "@/composables/useCart";
 import {
   Search,
   Heart,
@@ -13,6 +14,7 @@ import {
 export default function Navbar() {
 
   const pathname = usePathname();
+  const { cartCount } = useCart();
 
   const [isVisible, setIsVisible] = useState(true);
 
@@ -140,15 +142,19 @@ export default function Navbar() {
             </button>
 
             {/* Cart */}
-            <button
-              type="button"
+            <Link
+              href="/cart"
               className="relative text-[#3324d8] transition hover:opacity-70"
               aria-label="Cart"
             >
               <ShoppingCart size={20} strokeWidth={1.8} />
 
-              <span className="absolute -right-1 -top-1 h-1.5 w-1.5 rounded-full bg-red-500" />
-            </button>
+              {cartCount > 0 && (
+                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
 
             {/* User */}
             <button

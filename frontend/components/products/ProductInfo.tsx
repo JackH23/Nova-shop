@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useCart } from "@/composables/useCart";
+import { useProductCart } from "@/composables/useProductCart";
 import type { Product } from "@/lib/products";
 
 type ProductInfoProps = {
@@ -26,32 +25,18 @@ const colors = [
   },
 ];
 
-export default function ProductInfo({
-  product,
-}: ProductInfoProps) {
-  const [quantity, setQuantity] = useState(1);
-  const [selectedColor, setSelectedColor] = useState("white");
-  const { addToCart } = useCart();
+export default function ProductInfo({ product }: ProductInfoProps) {
+  const {
+    quantity,
+    selectedColor,
+    setSelectedColor,
+    decreaseQuantity,
+    increaseQuantity,
+    handleAddToCart,
+  } = useProductCart(product);
 
   const selectedColorName =
-    colors.find((color) => color.id === selectedColor)?.name ??
-    "Matte White";
-
-  const decreaseQuantity = () => {
-    setQuantity((current) => Math.max(1, current - 1));
-  };
-
-  const increaseQuantity = () => {
-    setQuantity((current) => current + 1);
-  };
-
-  const handleAddToCart = () => {
-    addToCart(
-      product,
-      quantity,
-      selectedColor,
-    );
-  };
+    colors.find((color) => color.id === selectedColor)?.name ?? "Matte White";
 
   return (
     <div className="flex flex-col">
@@ -61,13 +46,9 @@ export default function ProductInfo({
           New Release
         </span>
 
-        <span className="font-medium text-slate-800">
-          ⭐ 4.8
-        </span>
+        <span className="font-medium text-slate-800">⭐ 4.8</span>
 
-        <span className="text-slate-500">
-          (124 Reviews)
-        </span>
+        <span className="text-slate-500">(124 Reviews)</span>
       </div>
 
       {/* Product name */}
@@ -90,10 +71,7 @@ export default function ProductInfo({
       {/* Color selection */}
       <div>
         <p className="text-sm text-slate-700">
-          Color:{" "}
-          <span className="font-medium">
-            {selectedColorName}
-          </span>
+          Color: <span className="font-medium">{selectedColorName}</span>
         </p>
 
         <div className="mt-3 flex gap-3">

@@ -35,12 +35,7 @@ export default function ProductList() {
         {paginatedProducts.map((product) => (
           <ProductCard
             key={product.id}
-            id={product.id}
-            name={product.name}
-            description={product.description}
-            price={product.price}
-            image={product.image}
-            discount={product.discount}
+            product={product}
           />
         ))}
       </div>
