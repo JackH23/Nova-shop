@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import LoginForm from "@/components/auth/LoginForm";
 import GoogleButton from "@/components/auth/GoogleButton";

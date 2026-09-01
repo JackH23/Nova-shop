@@ -23,7 +23,7 @@ const User = sequelize.define(
 
         password: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
 
         // Check whether email has been verified
@@ -60,6 +60,20 @@ const User = sequelize.define(
         termsAcceptedAt: {
             type: DataTypes.DATE,
             allowNull: true,
+        },
+
+        // Authentication method: local or google
+        authProvider: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: "local",
+        },
+
+        // Google account unique ID
+        googleId: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true,
         },
     },
     {

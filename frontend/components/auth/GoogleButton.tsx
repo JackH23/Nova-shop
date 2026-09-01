@@ -1,3 +1,38 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import Script from "next/script";
+import { useGoogleAuth } from "@/composables/useGoogleAuth";
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: {
+              credential: string;
+            }) => void;
+          }) => void;
+
+          renderButton: (
+            element: HTMLElement,
+            options: {
+              type?: string;
+              theme?: string;
+              size?: string;
+              text?: string;
+              shape?: string;
+              width?: number;
+            }
+          ) => void;
+        };
+      };
+    };
+  }
+}
+
 type GoogleButtonProps = {
   text?: string;
 };
@@ -5,35 +40,82 @@ type GoogleButtonProps = {
 export default function GoogleButton({
   text = "Continue with Google",
 }: GoogleButtonProps) {
+  const buttonRef = useRef<HTMLDivElement>(null);
+
+  const {
+    loading,
+    error,
+    handleGoogleLogin,
+  } = useGoogleAuth();
+
+  const initializeGoogle = () => {
+    const clientId =
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+    if (
+      !clientId ||
+      !window.google ||
+      !buttonRef.current
+    ) {
+      return;
+    }
+
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+
+      callback: (response) => {
+        handleGoogleLogin(
+          response.credential,
+          false
+        );
+      },
+    });
+
+    buttonRef.current.innerHTML = "";
+
+    window.google.accounts.id.renderButton(
+      buttonRef.current,
+      {
+        type: "standard",
+        theme: "outline",
+        size: "large",
+        text: "continue_with",
+        shape: "rectangular",
+        width: 339,
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (window.google) {
+      initializeGoogle();
+    }
+  }, []);
+
   return (
-    <button
-      type="button"
-      className="flex h-11 w-full items-center justify-center gap-2 border border-slate-300 bg-white text-sm font-medium text-slate-800 transition hover:bg-slate-50"
-    >
-      {/* Google icon */}
-      <svg width="18" height="18" viewBox="0 0 24 24">
-        <path
-          fill="#4285F4"
-          d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.92h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.24c1.9-1.75 2.98-4.33 2.98-7.38Z"
-        />
+    <>
+      <Script
+        src="https://accounts.google.com/gsi/client"
+        strategy="afterInteractive"
+        onLoad={initializeGoogle}
+      />
 
-        <path
-          fill="#34A853"
-          d="M12 22c2.7 0 4.97-.9 6.63-2.39l-3.24-2.51c-.9.6-2.05.96-3.39.96-2.61 0-4.82-1.76-5.61-4.13H3.04v2.59A10 10 0 0 0 12 22Z"
-        />
+      <div
+        ref={buttonRef}
+        className="flex w-full justify-center"
+      />
 
-        <path
-          fill="#FBBC05"
-          d="M6.39 13.93A6.02 6.02 0 0 1 6.08 12c0-.67.11-1.32.31-1.93V7.48H3.04A10 10 0 0 0 2 12c0 1.61.39 3.14 1.04 4.52l3.35-2.59Z"
-        />
+      {loading && (
+        <p className="mt-2 text-center text-sm text-slate-500">
+          Signing in with Google...
+        </p>
+      )}
 
-        <path
-          fill="#EA4335"
-          d="M12 5.94c1.47 0 2.79.51 3.83 1.5l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.48l3.35 2.59C7.18 7.7 9.39 5.94 12 5.94Z"
-        />
-      </svg>
-
-      {text}
-    </button>
+      {error && (
+        <p className="mt-2 text-center text-sm text-red-600">
+          {error}
+        </p>
+      )}
+    </>
   );
 }

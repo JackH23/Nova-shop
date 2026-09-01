@@ -1,6 +1,11 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const { OAuth2Client } = require("google-auth-library");
+
+const googleClient = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID
+);
 
 const register = async (req, res) => {
     try {
@@ -460,6 +465,107 @@ const resetPassword = async (req, res) => {
     }
 };
 
+const googleLogin = async (req, res) => {
+    try {
+        const { credential, rememberMe } = req.body;
+
+        if (!credential) {
+            return res.status(400).json({
+                message: "Google credential is required",
+            });
+        }
+
+        // Verify the credential with Google
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+
+        if (!payload || !payload.email) {
+            return res.status(401).json({
+                message: "Invalid Google account",
+            });
+        }
+
+        const {
+            sub: googleId,
+            email,
+            name,
+            email_verified: emailVerified,
+        } = payload;
+
+        if (!emailVerified) {
+            return res.status(401).json({
+                message: "Google email is not verified",
+            });
+        }
+
+        // Find account using email
+        let user = await User.findOne({
+            where: { email },
+        });
+
+        if (!user) {
+            // First Google login = create account
+            user = await User.create({
+                fullName: name || email,
+                email,
+                password: null,
+                googleId,
+                authProvider: "google",
+                isVerified: true,
+            });
+        } else if (!user.googleId) {
+            // Existing account with the same verified email:
+            // link Google to the existing account.
+            user.googleId = googleId;
+
+            // Keep "local" if the account already has a password.
+            if (!user.password) {
+                user.authProvider = "google";
+            }
+
+            user.isVerified = true;
+
+            await user.save();
+        } else if (user.googleId !== googleId) {
+            return res.status(409).json({
+                message: "This email is already linked to another Google account",
+            });
+        }
+
+        // Generate the same JWT used by normal login
+        const token = jwt.sign(
+            {
+                id: user.id,
+                email: user.email,
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: rememberMe === true ? "30d" : "1h",
+            }
+        );
+
+        return res.status(200).json({
+            message: "Google login successful",
+            token,
+            user: {
+                id: user.id,
+                fullName: user.fullName,
+                email: user.email,
+            },
+        });
+    } catch (error) {
+        console.error("Google login error:", error);
+
+        return res.status(401).json({
+            message: "Google authentication failed",
+        });
+    }
+};
+
 module.exports = {
     register,
     login,
@@ -468,4 +574,5 @@ module.exports = {
     forgotPassword,
     verifyResetCode,
     resetPassword,
+    googleLogin,
 };

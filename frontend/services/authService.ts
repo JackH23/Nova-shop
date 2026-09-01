@@ -19,6 +19,11 @@ export interface LoginData {
   rememberMe: boolean;
 }
 
+export interface GoogleLoginData {
+  credential: string;
+  rememberMe: boolean;
+}
+
 export interface ResendVerificationCodeData {
   email: string;
 }
@@ -65,6 +70,13 @@ export const authService = {
 
   login: (data: LoginData) => {
     return apiRequest("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  googleLogin: (data: GoogleLoginData) => {
+    return apiRequest("/auth/google", {
       method: "POST",
       body: JSON.stringify(data),
     });
