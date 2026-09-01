@@ -628,21 +628,34 @@ const googleLogin = async (req, res) => {
             });
         }
 
-        // Generate the same JWT used by normal login
-        const token = jwt.sign(
+        // Generate access token
+        const accessToken = jwt.sign(
             {
                 id: user.id,
                 email: user.email,
             },
             process.env.JWT_SECRET,
             {
-                expiresIn: rememberMe === true ? "30d" : "1h",
+                expiresIn: "1m",
+            }
+        );
+
+        // Generate refresh token
+        const refreshToken = jwt.sign(
+            {
+                id: user.id,
+                email: user.email,
+            },
+            process.env.JWT_REFRESH_SECRET,
+            {
+                expiresIn: rememberMe === true ? "30d" : "1d",
             }
         );
 
         return res.status(200).json({
             message: "Google login successful",
-            token,
+            accessToken,
+            refreshToken,
             user: {
                 id: user.id,
                 fullName: user.fullName,
