@@ -10,13 +10,18 @@ export type CartItem = {
 };
 
 export function useCart() {
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     const updateCartCount = () => {
-      const cart: CartItem[] = JSON.parse(localStorage.getItem("cart") || "[]");
+      const storedCart: CartItem[] = JSON.parse(
+        localStorage.getItem("cart") || "[]",
+      );
 
-      const totalQuantity = cart.reduce(
+      setCart(storedCart);
+
+      const totalQuantity = storedCart.reduce(
         (total, item) => total + item.quantity,
         0,
       );
@@ -98,6 +103,7 @@ export function useCart() {
   };
 
   return {
+    cart,
     cartCount,
     addToCart,
     updateQuantity,
