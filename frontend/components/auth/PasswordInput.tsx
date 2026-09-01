@@ -24,6 +24,15 @@ export default function PasswordInput({
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
+  const password = value ?? "";
+
+  const strength = [
+    password.length >= 8,
+    /[A-Z]/.test(password),
+    /[0-9]/.test(password),
+    /[^A-Za-z0-9]/.test(password),
+  ].filter(Boolean).length;
+
   return (
     <div>
       {label && (
@@ -59,10 +68,16 @@ export default function PasswordInput({
       {/* Password strength */}
       {showStrength && (
         <div className="mt-1.5 grid grid-cols-4 gap-1">
-          <div className="h-[3px] rounded-full bg-indigo-100" />
-          <div className="h-[3px] rounded-full bg-indigo-100" />
-          <div className="h-[3px] rounded-full bg-indigo-100" />
-          <div className="h-[3px] rounded-full bg-indigo-100" />
+          {[1, 2, 3, 4].map((level) => (
+            <div
+              key={level}
+              className={`h-[3px] rounded-full transition-colors ${
+                strength >= level
+                  ? "bg-indigo-500"
+                  : "bg-indigo-100"
+              }`}
+            />
+          ))}
         </div>
       )}
     </div>

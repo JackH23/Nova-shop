@@ -19,6 +19,10 @@ export interface LoginData {
   rememberMe: boolean;
 }
 
+export interface RefreshTokenData {
+  refreshToken: string;
+}
+
 export interface GoogleLoginData {
   credential: string;
   rememberMe: boolean;
@@ -70,6 +74,13 @@ export const authService = {
 
   login: (data: LoginData) => {
     return apiRequest("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  refreshToken: (data: RefreshTokenData) => {
+    return apiRequest("/auth/refresh-token", {
       method: "POST",
       body: JSON.stringify(data),
     });

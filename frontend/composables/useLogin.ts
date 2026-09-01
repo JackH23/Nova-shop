@@ -50,14 +50,34 @@ export function useLogin() {
       });
 
       if (state.rememberMe) {
-        localStorage.setItem("token", response.token);
-        sessionStorage.removeItem("token");
+        localStorage.setItem(
+          "accessToken",
+          response.accessToken
+        );
+
+        localStorage.setItem(
+          "refreshToken",
+          response.refreshToken
+        );
+
+        sessionStorage.removeItem("accessToken");
+        sessionStorage.removeItem("refreshToken");
       } else {
-        sessionStorage.setItem("token", response.token);
-        localStorage.removeItem("token");
+        sessionStorage.setItem(
+          "accessToken",
+          response.accessToken
+        );
+
+        sessionStorage.setItem(
+          "refreshToken",
+          response.refreshToken
+        );
+
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
       }
 
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       dispatch({
         type: "SET_ERROR",
