@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useCart, type CartItem as CartItemType } from "@/composables/useCart";
+import PageContainer from "@/components/common/PageContainer";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 
@@ -28,7 +29,7 @@ export default function CartContent() {
   }, []);
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <PageContainer>
       <h1 className="text-3xl font-bold text-slate-950">Your Cart</h1>
 
       <p className="mt-2 text-sm text-slate-500">
@@ -63,6 +64,6 @@ export default function CartContent() {
 
         <CartSummary cart={cart} />
       </div>
-    </section>
+    </PageContainer>
   );
 }

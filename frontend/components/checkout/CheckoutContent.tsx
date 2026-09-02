@@ -6,6 +6,7 @@ import CheckoutSummary from "./CheckoutSummary";
 import { useCart } from "@/composables/useCart";
 import { useState } from "react";
 import CheckoutSteps, { type CheckoutStep } from "./CheckoutSteps";
+import PageContainer from "@/components/common/PageContainer";
 import DeliveryMethod from "./DeliveryMethod";
 
 export default function CheckoutContent() {
@@ -14,7 +15,7 @@ export default function CheckoutContent() {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <PageContainer>
         {/* Checkout steps */}
         <CheckoutSteps step={step} />
 
@@ -45,7 +46,7 @@ export default function CheckoutContent() {
             />
           </div>
         </div>
-      </div>
+      </PageContainer>
     </main>
   );
 }

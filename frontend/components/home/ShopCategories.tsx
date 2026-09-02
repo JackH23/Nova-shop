@@ -3,54 +3,50 @@ import Link from "next/link";
 
 export default function ShopCategories() {
   return (
-    <section className="px-4 py-10 md:px-8 lg:px-10">
-      <div className="mx-auto max-w-[1440px]">
-        {/* Header */}
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-950">
-            Shop by Category
-          </h2>
+    <section>
+      {/* Header */}
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-lg font-bold text-slate-950">Shop by Category</h2>
 
-          <Link
-            href="/categories"
-            className="text-xs font-medium text-[#3324d8] hover:underline"
-          >
-            View All
-          </Link>
-        </div>
+        <Link
+          href="/categories"
+          className="text-xs font-medium text-[#3324d8] hover:underline"
+        >
+          View All
+        </Link>
+      </div>
 
-        {/* Categories */}
-        <div className="grid gap-4 md:h-[570px] md:grid-cols-2">
-          {/* Electronics - Left */}
+      {/* Categories */}
+      <div className="grid gap-4 md:h-[570px] md:grid-cols-2">
+        {/* Electronics - Left */}
+        <CategoryCard
+          name="Electronics"
+          image="/images/categories/electronics.jpg"
+          href="/categories/electronics"
+        />
+
+        {/* Right */}
+        <div className="grid gap-4 md:grid-rows-[1fr_1fr]">
+          {/* Fashion */}
           <CategoryCard
-            name="Electronics"
-            image="/images/categories/electronics.jpg"
-            href="/categories/electronics"
+            name="Fashion"
+            image="/images/categories/fashion.jpg"
+            href="/categories/clothing"
           />
 
-          {/* Right */}
-          <div className="grid gap-4 md:grid-rows-[1fr_1fr]">
-            {/* Fashion */}
+          {/* Home + Beauty */}
+          <div className="grid grid-cols-2 gap-4">
             <CategoryCard
-              name="Fashion"
-              image="/images/categories/fashion.jpg"
-              href="/categories/clothing"
+              name="Home"
+              image="/images/categories/home.jpg"
+              href="/categories/home-garden"
             />
 
-            {/* Home + Beauty */}
-            <div className="grid grid-cols-2 gap-4">
-              <CategoryCard
-                name="Home"
-                image="/images/categories/home.jpg"
-                href="/categories/home-garden"
-              />
-
-              <CategoryCard
-                name="Beauty"
-                image="/images/categories/beauty.jpg"
-                href="/categories/beauty"
-              />
-            </div>
+            <CategoryCard
+              name="Beauty"
+              image="/images/categories/beauty.jpg"
+              href="/categories/beauty"
+            />
           </div>
         </div>
       </div>
@@ -64,11 +60,7 @@ type CategoryCardProps = {
   href: string;
 };
 
-function CategoryCard({
-  name,
-  image,
-  href,
-}: CategoryCardProps) {
+function CategoryCard({ name, image, href }: CategoryCardProps) {
   return (
     <Link
       href={href}

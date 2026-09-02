@@ -102,7 +102,11 @@ export default function Navbar() {
 
             <Link
               href="/deals"
-              className="transition hover:text-[#3324d8]"
+              className={`flex h-full items-center border-b-2 transition ${
+                pathname.startsWith("/deals")
+                  ? "border-[#4b3cf0] text-[#3324d8]"
+                  : "border-transparent text-slate-800 hover:text-[#3324d8]"
+              }`}
             >
               Deals
             </Link>

@@ -6,6 +6,7 @@ import type { Product } from "@/lib/products";
 import CategoryFilters from "./CategoryFilters";
 import Pagination from "@/components/common/Pagination";
 import ProductSort from "./ProductSort";
+import PageContainer from "@/components/common/PageContainer";
 
 type CategoryProductListProps = {
   category: string;
@@ -31,7 +32,7 @@ export default function CategoryProductList({
   } = usePagination(products);
 
   return (
-    <section className="mx-auto max-w-[1440px] px-4 py-10 md:px-8 lg:px-10">
+    <PageContainer>
       {/* Breadcrumb */}
       <p className="text-xs text-slate-400">
         Home / Categories / {categoryName}
@@ -93,6 +94,6 @@ export default function CategoryProductList({
           )}
         </div>
       </div>
-    </section>
+    </PageContainer>
   );
 }

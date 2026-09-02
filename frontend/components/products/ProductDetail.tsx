@@ -2,6 +2,7 @@ import Link from "next/link";
 import ProductGallery from "./ProductGallery";
 import ProductInfo from "./ProductInfo";
 import ProductTabs from "./ProductTabs";
+import PageContainer from "@/components/common/PageContainer";
 
 import type { Product } from "@/lib/products";
 
@@ -11,7 +12,7 @@ type ProductDetailProps = {
 
 export default function ProductDetail({ product }: ProductDetailProps) {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <PageContainer>
       {/* Back to products */}
       <Link
         href="/products"
@@ -27,6 +28,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       </div>
 
       <ProductTabs />
-    </section>
+    </PageContainer>
   );
 }
