@@ -7,6 +7,7 @@ export type Product = {
   discount?: number;
   category: string;
   stock: number;
+  rating?: number;
 };
 
 export const products: Product[] = [
@@ -20,6 +21,7 @@ export const products: Product[] = [
     discount: 15,
     category: "clothing",
     stock: 10,
+    rating: 3.8,
   },
   {
     id: 11,
@@ -31,6 +33,7 @@ export const products: Product[] = [
     discount: 25,
     category: "electronics",
     stock: 5,
+    rating: 3.6,
   },
   {
     id: 12,
@@ -42,6 +45,7 @@ export const products: Product[] = [
     discount: 20,
     category: "electronics",
     stock: 15,
+    rating: 3.2,
   },
   {
     id: 13,
@@ -53,6 +57,7 @@ export const products: Product[] = [
     discount: 30,
     category: "clothing",
     stock: 20,
+    rating: 3.7,
   },
   {
     id: 14,
@@ -63,6 +68,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1543076447-215ad9ba6923?w=800",
     category: "clothing",
     stock: 10,
+    rating: 4.6,
   },
   {
     id: 15,
@@ -74,6 +80,7 @@ export const products: Product[] = [
     discount: 10,
     category: "home-garden",
     stock: 8,
+    rating: 4.1,
   },
   {
     id: 16,
@@ -85,6 +92,7 @@ export const products: Product[] = [
     discount: 40,
     category: "home-garden",
     stock: 12,
+    rating: 4.4,
   },
   {
     id: 17,
@@ -95,6 +103,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=800",
     category: "home-garden",
     stock: 15,
+    rating: 4.0,
   },
   {
     id: 18,
@@ -106,6 +115,7 @@ export const products: Product[] = [
     discount: 15,
     category: "home-garden",
     stock: 25,
+    rating: 4.2,
   },
   {
     id: 19,
@@ -117,6 +127,7 @@ export const products: Product[] = [
     discount: 20,
     category: "electronics",
     stock: 20,
+    rating: 4.3,
   },
   {
     id: 20,
@@ -129,6 +140,7 @@ export const products: Product[] = [
     discount: 25,
     category: "electronics",
     stock: 5,
+    rating: 4.5,
   },
   {
     id: 21,
@@ -139,6 +151,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800",
     category: "electronics",
     stock: 15,
+    rating: 4.1,
   },
   {
     id: 22,
@@ -150,6 +163,7 @@ export const products: Product[] = [
     discount: 10,
     category: "clothing",
     stock: 20,
+    rating: 4.4,
   },
   {
     id: 23,
@@ -160,6 +174,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800",
     category: "clothing",
     stock: 30,
+    rating: 4.2,
   },
   {
     id: 24,
@@ -171,6 +186,7 @@ export const products: Product[] = [
     discount: 30,
     category: "home-garden",
     stock: 10,
+    rating: 4.3,
   },
 ];
 

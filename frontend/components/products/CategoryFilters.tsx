@@ -21,6 +21,9 @@ type CategoryFiltersProps = {
   showDiscount?: boolean;
   minDiscount?: number;
   onDiscountChange?: (discount: number) => void;
+  showRating?: boolean;
+  minRating?: number;
+  onRatingChange?: (rating: number) => void;
 };
 
 const categories = [
@@ -69,6 +72,10 @@ export default function CategoryFilters({
   showDiscount = false,
   minDiscount = 0,
   onDiscountChange,
+
+  showRating = false,
+  minRating = 0,
+  onRatingChange,
 }: CategoryFiltersProps) {
   if (variant === "deals") {
     return (
@@ -245,6 +252,43 @@ export default function CategoryFilters({
                     {discount.label}
                   </label>
                 ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Rating */}
+        {showRating && (
+          <>
+            <div className="my-5 border-t border-slate-200" />
+
+            <div>
+              <h3 className="text-xs font-semibold text-slate-900">Rating</h3>
+
+              <div className="mt-3 space-y-3">
+                <label className="flex items-center gap-2 text-xs text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={minRating === 4}
+                    onChange={() => onRatingChange?.(minRating === 4 ? 0 : 4)}
+                    className="accent-indigo-600"
+                  />
+
+                  <span className="text-amber-500">★★★★★</span>
+                  <span>4 & Up</span>
+                </label>
+
+                <label className="flex items-center gap-2 text-xs text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={minRating === 3}
+                    onChange={() => onRatingChange?.(minRating === 3 ? 0 : 3)}
+                    className="accent-indigo-600"
+                  />
+
+                  <span className="text-amber-500">★★★★☆</span>
+                  <span>3 & Up</span>
+                </label>
               </div>
             </div>
           </>

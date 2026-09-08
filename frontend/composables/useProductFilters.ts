@@ -12,6 +12,8 @@ export function useProductFilters(initialCategory = "all") {
   const [onSale, setOnSale] = useState(false);
   const [category, setCategory] = useState(initialCategory);
   const [minDiscount, setMinDiscount] = useState(20);
+  // Rating filter
+  const [minRating, setMinRating] = useState(0);
 
   // Reset price
   const resetPrice = () => {
@@ -31,6 +33,7 @@ export function useProductFilters(initialCategory = "all") {
     resetAvailability();
     setCategory("all");
     setMinDiscount(20);
+    setMinRating(0);
   };
 
   return {
@@ -45,6 +48,10 @@ export function useProductFilters(initialCategory = "all") {
     onSale,
     setInStock,
     setOnSale,
+
+    // Rating
+    minRating,
+    setMinRating,
 
     // Category
     category,

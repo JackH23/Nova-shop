@@ -11,12 +11,10 @@ export default function NewArrivalsPage() {
     maxPrice,
     setMinPrice,
     setMaxPrice,
-    inStock,
-    onSale,
-    setInStock,
-    setOnSale,
     category,
     setCategory,
+    minRating,
+    setMinRating,
   } = useProductFilters();
 
   return (
@@ -36,11 +34,11 @@ export default function NewArrivalsPage() {
           maxPrice={maxPrice}
           onMinPriceChange={setMinPrice}
           onMaxPriceChange={setMaxPrice}
-          inStock={inStock}
-          onSale={onSale}
-          onInStockChange={setInStock}
-          onOnSaleChange={setOnSale}
           onCategoryChange={setCategory}
+          showAvailability={false}
+          showRating={true}
+          minRating={minRating}
+          onRatingChange={setMinRating}
         />
 
         {/* Right */}
@@ -48,8 +46,7 @@ export default function NewArrivalsPage() {
           minPrice={minPrice}
           maxPrice={maxPrice}
           category={category}
-          inStock={inStock}
-          onSale={onSale}
+          minRating={minRating}
         />
       </div>
     </PageContainer>

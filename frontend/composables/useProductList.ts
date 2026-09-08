@@ -9,6 +9,7 @@ type UseProductListProps = {
   onSale?: boolean;
   category?: string;
   minDiscount?: number;
+  minRating?: number;
 };
 
 export function useProductList({
@@ -19,7 +20,9 @@ export function useProductList({
   onSale = false,
   category = "all",
   minDiscount = 0,
+  minRating = 0,
 }: UseProductListProps) {
+  
   const filteredProducts = products.filter((product) => {
     const matchesPrice =
       product.price >= minPrice &&
@@ -39,12 +42,17 @@ export function useProductList({
       minDiscount === 0 ||
       (product.discount ?? 0) >= minDiscount;
 
+    const matchesRating =
+      minRating === 0 ||
+      (product.rating ?? 0) >= minRating;
+
     return (
       matchesPrice &&
       matchesInStock &&
       matchesOnSale &&
       matchesCategory &&
-      matchesDiscount
+      matchesDiscount &&
+      matchesRating
     );
   });
 
