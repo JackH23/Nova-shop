@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import DealsFilters from "@/components/deals/DealsFilters";
 
 type CategoryFiltersProps = {
   activeCategory?: string;
+  variant?: "default" | "deals";
 };
 
 const categories = [
@@ -31,15 +33,18 @@ const categories = [
 
 export default function CategoryFilters({
   activeCategory = "all",
+  variant = "default",
 }: CategoryFiltersProps) {
+  if (variant === "deals") {
+    return <DealsFilters />;
+  }
+
   return (
     <aside className="w-full shrink-0 md:w-[220px]">
       <div className="rounded-md border border-slate-200 bg-white p-5">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-950">
-            Filters
-          </h2>
+          <h2 className="text-sm font-semibold text-slate-950">Filters</h2>
 
           <Link
             href="/categories"
@@ -51,9 +56,7 @@ export default function CategoryFilters({
 
         {/* Category */}
         <div className="mt-5">
-          <h3 className="text-xs font-semibold text-slate-900">
-            Category
-          </h3>
+          <h3 className="text-xs font-semibold text-slate-900">Category</h3>
 
           <div className="mt-3 space-y-3">
             {categories.map((category) => (
@@ -84,9 +87,7 @@ export default function CategoryFilters({
 
         {/* Price Range */}
         <div>
-          <h3 className="text-xs font-semibold text-slate-900">
-            Price Range
-          </h3>
+          <h3 className="text-xs font-semibold text-slate-900">Price Range</h3>
 
           <input
             type="range"
@@ -111,9 +112,7 @@ export default function CategoryFilters({
 
         {/* Availability */}
         <div>
-          <h3 className="text-xs font-semibold text-slate-900">
-            Availability
-          </h3>
+          <h3 className="text-xs font-semibold text-slate-900">Availability</h3>
 
           <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
             <input
@@ -125,10 +124,7 @@ export default function CategoryFilters({
           </label>
 
           <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
-            <input
-              type="checkbox"
-              className="accent-indigo-600"
-            />
+            <input type="checkbox" className="accent-indigo-600" />
             On Sale
           </label>
         </div>
