@@ -58,7 +58,7 @@ export default function ProductCard({
           <button
             type="button"
             onClick={handleAdd}
-            className="rounded bg-[#3324d8] px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-[#271bb7]"
+            className="rounded bg-[#3324d8] px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-[#271bb7] cursor-pointer"
           >
             🛒 Add
           </button>

@@ -121,7 +121,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         <button
           type="button"
           onClick={handleAddToCart}
-          className="h-11 flex-1 rounded-md bg-indigo-600 px-6 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          className="h-11 flex-1 rounded-md bg-indigo-600 px-6 text-sm font-semibold text-white transition hover:bg-indigo-700 cursor-pointer"
         >
           Add to Cart
         </button>
