@@ -24,6 +24,7 @@ export default function ProductsPage() {
       <div className="flex flex-col gap-10 md:flex-row">
         {/* Left filters */}
         <CategoryFilters
+          activeCategory="all"
           minPrice={minPrice}
           maxPrice={maxPrice}
           onMinPriceChange={setMinPrice}

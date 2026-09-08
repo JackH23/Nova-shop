@@ -42,6 +42,7 @@ export default function CategoryProductList({
     maxPrice,
     inStock,
     onSale,
+    category,
   });
 
   return (

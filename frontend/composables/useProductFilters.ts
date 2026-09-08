@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function useProductFilters() {
+export function useProductFilters(initialCategory = "all") {
   // Price filter
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(500);
@@ -10,6 +10,7 @@ export function useProductFilters() {
   // Availability filter
   const [inStock, setInStock] = useState(false);
   const [onSale, setOnSale] = useState(false);
+  const [category, setCategory] = useState("all");
 
   // Reset price
   const resetPrice = () => {
@@ -27,6 +28,7 @@ export function useProductFilters() {
   const resetFilters = () => {
     resetPrice();
     resetAvailability();
+    setCategory("all");
   };
 
   return {
@@ -41,6 +43,10 @@ export function useProductFilters() {
     onSale,
     setInStock,
     setOnSale,
+
+    // Category
+    category,
+    setCategory,
 
     // Reset
     resetPrice,

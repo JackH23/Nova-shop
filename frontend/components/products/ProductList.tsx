@@ -11,6 +11,7 @@ type ProductListProps = {
   maxPrice?: number;
   inStock?: boolean;
   onSale?: boolean;
+  category?: string;
 };
 
 export default function ProductList({
@@ -18,6 +19,7 @@ export default function ProductList({
   maxPrice = 500,
   inStock = false,
   onSale = false,
+  category = "all",
 }: ProductListProps) {
 
   const {
@@ -31,6 +33,7 @@ export default function ProductList({
     maxPrice,
     inStock,
     onSale,
+    category,
   });
 
   return (

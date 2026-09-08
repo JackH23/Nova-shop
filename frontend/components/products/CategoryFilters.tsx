@@ -15,6 +15,7 @@ type CategoryFiltersProps = {
   onSale?: boolean;
   onInStockChange?: (checked: boolean) => void;
   onOnSaleChange?: (checked: boolean) => void;
+  onCategoryChange?: (category: string) => void;
 };
 
 const categories = [
@@ -26,22 +27,23 @@ const categories = [
   {
     label: "Electronics",
     value: "electronics",
-    href: "/categories/electronics",
+    href: "/categories?category=electronics",
   },
   {
     label: "Clothing",
     value: "clothing",
-    href: "/categories/clothing",
+    href: "/categories?category=clothing",
   },
   {
     label: "Home & Garden",
     value: "home-garden",
-    href: "/categories/home-garden",
+    href: "/categories?category=home-garden",
   },
 ];
 
 export default function CategoryFilters({
   activeCategory = "all",
+  onCategoryChange,
   variant = "default",
   minPrice = 0,
   maxPrice = 500,
@@ -92,6 +94,12 @@ export default function CategoryFilters({
                 key={category.value}
                 href={category.href}
                 className="flex items-center gap-2 text-xs text-slate-600"
+                onClick={(e) => {
+                  if (onCategoryChange) {
+                    e.preventDefault();
+                    onCategoryChange(category.value);
+                  }
+                }}
               >
                 <span
                   className={`flex h-4 w-4 items-center justify-center rounded-sm border ${

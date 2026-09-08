@@ -16,13 +16,15 @@ export default function CategoriesPage() {
     onSale,
     setInStock,
     setOnSale,
+    category,
+    setCategory,
   } = useProductFilters();
 
   return (
     <PageContainer>
       <div className="flex flex-col gap-6 md:flex-row">
         <CategoryFilters
-          activeCategory="all"
+          activeCategory={category}
           minPrice={minPrice}
           maxPrice={maxPrice}
           onMinPriceChange={setMinPrice}
@@ -31,10 +33,11 @@ export default function CategoriesPage() {
           onSale={onSale}
           onInStockChange={setInStock}
           onOnSaleChange={setOnSale}
+          onCategoryChange={setCategory}
         />
 
         <CategoryProductList
-          category="all"
+          category={category}
           products={products}
           minPrice={minPrice}
           maxPrice={maxPrice}

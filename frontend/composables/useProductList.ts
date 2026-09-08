@@ -7,6 +7,7 @@ type UseProductListProps = {
   maxPrice?: number;
   inStock?: boolean;
   onSale?: boolean;
+  category?: string;
 };
 
 export function useProductList({
@@ -15,6 +16,7 @@ export function useProductList({
   maxPrice = 500,
   inStock = false,
   onSale = false,
+  category = "all",
 }: UseProductListProps) {
   const filteredProducts = products.filter((product) => {
     const matchesPrice =
@@ -27,10 +29,15 @@ export function useProductList({
     const matchesOnSale =
       !onSale || (product.discount ?? 0) > 0;
 
+    const matchesCategory =
+      category === "all" ||
+      product.category === category;
+
     return (
       matchesPrice &&
       matchesInStock &&
-      matchesOnSale
+      matchesOnSale &&
+      matchesCategory
     );
   });
 
