@@ -30,3 +30,51 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
 }
+
+/* Add to cart toast - slide from top */
+@keyframes toast-slide-down {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -100px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.toast-slide-down {
+  animation: toast-slide-down 0.25s ease-out forwards;
+}
+
+/* Cart toast progress bar */
+@keyframes toast-progress {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+.toast-progress {
+  animation: toast-progress 1.5s linear forwards;
+}
+
+@keyframes toast-slide-up {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -100px);
+  }
+}
+
+.toast-slide-up {
+  animation: toast-slide-up 0.25s ease-in forwards;
+}

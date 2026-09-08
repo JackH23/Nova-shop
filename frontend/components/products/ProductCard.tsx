@@ -7,23 +7,16 @@ import type { Product } from "@/lib/products";
 
 type ProductCardProps = {
   product: Product;
+  onProductAdded?: (product: Product) => void;
 };
 
 export default function ProductCard({
   product,
+  onProductAdded,
 }: ProductCardProps) {
-  const {
-    handleAddToCart,
-  } = useProductCart(product);
+  const { handleAdd } = useProductCart(product, onProductAdded);
 
-  const {
-    id,
-    name,
-    description,
-    price,
-    image,
-    discount,
-  } = product;
+  const { id, name, description, price, image, discount } = product;
   return (
     <div className="group overflow-hidden bg-white">
       {/* Product image */}
@@ -64,7 +57,7 @@ export default function ProductCard({
 
           <button
             type="button"
-            onClick={handleAddToCart}
+            onClick={handleAdd}
             className="rounded bg-[#3324d8] px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-[#271bb7]"
           >
             🛒 Add

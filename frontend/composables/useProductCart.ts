@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useCart } from "@/composables/useCart";
 import type { Product } from "@/lib/products";
 
-export function useProductCart(product: Product) {
+export function useProductCart(
+  product: Product,
+  onProductAdded?: (product: Product) => void,
+) {
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState("white");
 
@@ -26,6 +29,11 @@ export function useProductCart(product: Product) {
     );
   };
 
+  const handleAdd = () => {
+    handleAddToCart();
+    onProductAdded?.(product);
+  };
+
   return {
     quantity,
     selectedColor,
@@ -33,5 +41,6 @@ export function useProductCart(product: Product) {
     decreaseQuantity,
     increaseQuantity,
     handleAddToCart,
+    handleAdd,
   };
 }

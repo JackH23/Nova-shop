@@ -13,6 +13,7 @@ type CategoryProductListProps = {
   maxPrice?: number;
   inStock?: boolean;
   onSale?: boolean;
+  onProductAdded?: (product: Product) => void;
 };
 
 export default function CategoryProductList({
@@ -22,6 +23,7 @@ export default function CategoryProductList({
   maxPrice = 500,
   inStock = false,
   onSale = false,
+  onProductAdded,
 }: CategoryProductListProps) {
   const categoryName = category
     .split("-")
@@ -90,7 +92,11 @@ export default function CategoryProductList({
         {/* Products */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {paginatedProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              onProductAdded={onProductAdded}
+            />
           ))}
         </div>
 

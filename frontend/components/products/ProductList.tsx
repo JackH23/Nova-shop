@@ -3,7 +3,7 @@
 import { useProductList } from "@/composables/useProductList";
 import ProductCard from "./ProductCard";
 import Pagination from "@/components/common/Pagination";
-import { products } from "@/lib/products";
+import { products, type Product } from "@/lib/products";
 import ProductSort from "./ProductSort";
 
 type ProductListProps = {
@@ -14,6 +14,7 @@ type ProductListProps = {
   category?: string;
   minDiscount?: number;
   minRating?: number;
+  onProductAdded?: (product: Product) => void;
 };
 
 export default function ProductList({
@@ -24,8 +25,8 @@ export default function ProductList({
   category = "all",
   minDiscount = 0,
   minRating = 0,
+  onProductAdded,
 }: ProductListProps) {
-
   const {
     currentPage,
     setCurrentPage,
@@ -57,10 +58,7 @@ export default function ProductList({
         </div>
 
         {/* Sort */}
-        <ProductSort
-          value={sortBy}
-          onChange={setSortBy}
-        />
+        <ProductSort value={sortBy} onChange={setSortBy} />
       </div>
 
       {/* Product cards */}
@@ -69,6 +67,7 @@ export default function ProductList({
           <ProductCard
             key={product.id}
             product={product}
+            onProductAdded={onProductAdded}
           />
         ))}
       </div>
