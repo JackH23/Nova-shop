@@ -1,21 +1,23 @@
 "use client";
 
-import { usePagination } from "@/composables/usePagination";
+import { useProductList } from "@/composables/useProductList";
 import ProductCard from "./ProductCard";
 import type { Product } from "@/lib/products";
-import CategoryFilters from "./CategoryFilters";
 import Pagination from "@/components/common/Pagination";
 import ProductSort from "./ProductSort";
-import PageContainer from "@/components/common/PageContainer";
 
 type CategoryProductListProps = {
   category: string;
   products: Product[];
+  minPrice?: number;
+  maxPrice?: number;
 };
 
 export default function CategoryProductList({
   category,
   products,
+  minPrice = 0,
+  maxPrice = 500,
 }: CategoryProductListProps) {
   const categoryName = category
     .split("-")
@@ -23,16 +25,21 @@ export default function CategoryProductList({
     .join(" ");
 
   const {
+    filteredProducts,
     currentPage,
     setCurrentPage,
     totalPages,
     startIndex,
     itemsPerPage: productsPerPage,
     paginatedItems: paginatedProducts,
-  } = usePagination(products);
+  } = useProductList({
+    products,
+    minPrice,
+    maxPrice,
+  });
 
   return (
-    <PageContainer>
+    <div className="min-w-0 flex-1">
       {/* Breadcrumb */}
       <p className="text-xs text-slate-400">
         Home / Categories / {categoryName}
@@ -49,51 +56,41 @@ export default function CategoryProductList({
 
       {/* Product count */}
       <p className="mt-8 text-sm text-slate-600">
-        Showing {products.length} products
+        Showing {filteredProducts.length} products
       </p>
 
-      {/* Filter + Product content */}
-      <div className="mt-8 flex flex-col gap-6 md:flex-row">
-        {/* Left filter */}
-        <CategoryFilters activeCategory={category} />
+      {/* Product content */}
+      <div className="mt-8">
+        {/* Product count + Sort */}
+        <div className="mb-5 flex items-center justify-between">
+          <p className="text-sm text-slate-600">
+            {filteredProducts.length === 0
+              ? "Showing 0 products"
+              : `Showing ${startIndex + 1}-${Math.min(
+                  startIndex + productsPerPage,
+                  filteredProducts.length,
+                )} of ${filteredProducts.length} products`}
+          </p>
 
-        {/* Right product content */}
-        <div className="min-w-0 flex-1">
-          {/* Product count + Sort */}
-          <div className="mb-5 flex items-center justify-between">
-            <p className="text-sm text-slate-600">
-              {products.length === 0
-                ? "Showing 0 products"
-                : `Showing ${startIndex + 1}-${Math.min(
-                    startIndex + productsPerPage,
-                    products.length,
-                  )} of ${products.length} products`}
-            </p>
-
-            {/* Sort */}
-            <ProductSort />
-          </div>
-
-          {/* Products */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {paginatedProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-              />
-            ))}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          )}
+          <ProductSort />
         </div>
+
+        {/* Products */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {paginatedProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
-    </PageContainer>
+    </div>
   );
 }

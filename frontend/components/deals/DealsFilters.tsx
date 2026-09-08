@@ -14,7 +14,19 @@ const discounts = [
   "50% or more",
 ];
 
-export default function DealsFilters() {
+type DealsFiltersProps = {
+  minPrice?: number;
+  maxPrice?: number;
+  onMinPriceChange?: (price: number) => void;
+  onMaxPriceChange?: (price: number) => void;
+};
+
+export default function DealsFilters({
+  minPrice = 0,
+  maxPrice = 500,
+  onMinPriceChange,
+  onMaxPriceChange,
+}: DealsFiltersProps) {
   return (
     <aside className="w-full shrink-0 md:w-[220px]">
       <div className="rounded-md border border-slate-200 bg-white p-5">
@@ -64,20 +76,48 @@ export default function DealsFilters() {
             Price Range
           </h3>
 
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-4 space-y-2">
+            {/* Minimum price */}
             <input
-              type="number"
-              placeholder="Min"
-              className="h-9 min-w-0 flex-1 rounded border border-slate-300 px-2 text-xs outline-none focus:border-indigo-600"
+              type="range"
+              min="0"
+              max="500"
+              value={minPrice}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+
+                if (value <= maxPrice) {
+                  onMinPriceChange?.(value);
+                }
+              }}
+              className="w-full accent-indigo-600"
             />
 
-            <span className="text-slate-400">-</span>
-
+            {/* Maximum price */}
             <input
-              type="number"
-              placeholder="Max"
-              className="h-9 min-w-0 flex-1 rounded border border-slate-300 px-2 text-xs outline-none focus:border-indigo-600"
+              type="range"
+              min="0"
+              max="500"
+              value={maxPrice}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+
+                if (value >= minPrice) {
+                  onMaxPriceChange?.(value);
+                }
+              }}
+              className="w-full accent-indigo-600"
             />
+          </div>
+
+          <div className="mt-2 flex justify-between">
+            <span className="rounded border border-slate-200 px-2 py-1 text-[10px]">
+              ${minPrice}
+            </span>
+
+            <span className="rounded border border-slate-200 px-2 py-1 text-[10px]">
+              ${maxPrice}
+            </span>
           </div>
         </div>
 

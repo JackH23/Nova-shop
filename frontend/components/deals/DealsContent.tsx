@@ -1,9 +1,20 @@
+"use client";
+
 import DealsHero from "./DealsHero";
 import PageContainer from "@/components/common/PageContainer";
 import CategoryFilters from "@/components/products/CategoryFilters";
 import ProductList from "@/components/products/ProductList";
+import { useProductFilters } from "@/composables/useProductFilters";
 
 export default function DealsContent() {
+
+  const {
+    minPrice,
+    maxPrice,
+    setMinPrice,
+    setMaxPrice,
+  } = useProductFilters();
+
   return (
     <PageContainer>
       {/* Breadcrumb */}
@@ -30,10 +41,19 @@ export default function DealsContent() {
       {/* Filters + Product list */}
       <div className="mt-10 flex flex-col gap-10 md:flex-row">
         {/* Left */}
-        <CategoryFilters variant="deals" />
+        <CategoryFilters
+          variant="deals"
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          onMinPriceChange={setMinPrice}
+          onMaxPriceChange={setMaxPrice}
+        />
 
         {/* Right */}
-        <ProductList />
+        <ProductList
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+        />
       </div>
     </PageContainer>
   );

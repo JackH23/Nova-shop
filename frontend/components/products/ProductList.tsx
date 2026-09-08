@@ -1,18 +1,31 @@
 "use client";
 
-import { usePagination } from "@/composables/usePagination";
+import { useProductList } from "@/composables/useProductList";
 import ProductCard from "./ProductCard";
 import Pagination from "@/components/common/Pagination";
 import { products } from "@/lib/products";
 import ProductSort from "./ProductSort";
 
-export default function ProductList() {
+type ProductListProps = {
+  minPrice?: number;
+  maxPrice?: number;
+};
+
+export default function ProductList({
+  minPrice = 0,
+  maxPrice = 500,
+}: ProductListProps) {
+
   const {
     currentPage,
     setCurrentPage,
     totalPages,
     paginatedItems: paginatedProducts,
-  } = usePagination(products);
+  } = useProductList({
+    products,
+    minPrice,
+    maxPrice,
+  });
 
   return (
     <div className="flex-1">

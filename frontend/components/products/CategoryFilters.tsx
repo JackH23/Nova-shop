@@ -7,6 +7,10 @@ import NewArrivalsFilters from "@/components/deals/NewArrivalsFilters";
 type CategoryFiltersProps = {
   activeCategory?: string;
   variant?: "default" | "deals" | "new-arrivals";
+  maxPrice?: number;
+  onMaxPriceChange?: (price: number) => void;
+  minPrice?: number;
+  onMinPriceChange?: (price: number) => void;
 };
 
 const categories = [
@@ -35,10 +39,20 @@ const categories = [
 export default function CategoryFilters({
   activeCategory = "all",
   variant = "default",
+  minPrice = 0,
+  maxPrice = 500,
+  onMinPriceChange,
+  onMaxPriceChange,
 }: CategoryFiltersProps) {
-  
   if (variant === "deals") {
-    return <DealsFilters />;
+    return (
+      <DealsFilters
+        minPrice={minPrice}
+        maxPrice={maxPrice}
+        onMinPriceChange={onMinPriceChange}
+        onMaxPriceChange={onMaxPriceChange}
+      />
+    );
   }
 
   if (variant === "new-arrivals") {
@@ -95,21 +109,47 @@ export default function CategoryFilters({
         <div>
           <h3 className="text-xs font-semibold text-slate-900">Price Range</h3>
 
-          <input
-            type="range"
-            min="0"
-            max="500"
-            defaultValue="250"
-            className="mt-4 w-full accent-indigo-600"
-          />
+          <div className="mt-4 space-y-2">
+            {/* Minimum price */}
+            <input
+              type="range"
+              min="0"
+              max="500"
+              value={minPrice}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+
+                if (value <= maxPrice) {
+                  onMinPriceChange?.(value);
+                }
+              }}
+              className="w-full accent-indigo-600"
+            />
+
+            {/* Maximum price */}
+            <input
+              type="range"
+              min="0"
+              max="500"
+              value={maxPrice}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+
+                if (value >= minPrice) {
+                  onMaxPriceChange?.(value);
+                }
+              }}
+              className="w-full accent-indigo-600"
+            />
+          </div>
 
           <div className="mt-2 flex justify-between">
             <span className="rounded border border-slate-200 px-2 py-1 text-[10px]">
-              $0
+              ${minPrice}
             </span>
 
             <span className="rounded border border-slate-200 px-2 py-1 text-[10px]">
-              $500+
+              ${maxPrice}
             </span>
           </div>
         </div>
