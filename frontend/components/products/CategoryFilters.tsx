@@ -11,6 +11,10 @@ type CategoryFiltersProps = {
   onMaxPriceChange?: (price: number) => void;
   minPrice?: number;
   onMinPriceChange?: (price: number) => void;
+  inStock?: boolean;
+  onSale?: boolean;
+  onInStockChange?: (checked: boolean) => void;
+  onOnSaleChange?: (checked: boolean) => void;
 };
 
 const categories = [
@@ -43,6 +47,10 @@ export default function CategoryFilters({
   maxPrice = 500,
   onMinPriceChange,
   onMaxPriceChange,
+  inStock,
+  onSale,
+  onInStockChange,
+  onOnSaleChange,
 }: CategoryFiltersProps) {
   if (variant === "deals") {
     return (
@@ -163,14 +171,20 @@ export default function CategoryFilters({
           <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
             <input
               type="checkbox"
-              defaultChecked
+              checked={inStock}
+              onChange={(e) => onInStockChange?.(e.target.checked)}
               className="accent-indigo-600"
             />
             In Stock
           </label>
 
           <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
-            <input type="checkbox" className="accent-indigo-600" />
+            <input
+              type="checkbox"
+              checked={onSale}
+              onChange={(e) => onOnSaleChange?.(e.target.checked)}
+              className="accent-indigo-600"
+            />
             On Sale
           </label>
         </div>

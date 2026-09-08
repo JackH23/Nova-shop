@@ -6,6 +6,7 @@ export type Product = {
   image: string;
   discount?: number;
   category: string;
+  stock: number;
 };
 
 export const products: Product[] = [
@@ -18,6 +19,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800",
     discount: 15,
     category: "clothing",
+    stock: 10,
   },
   {
     id: 11,
@@ -28,6 +30,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=800",
     discount: 25,
     category: "electronics",
+    stock: 5,
   },
   {
     id: 12,
@@ -38,6 +41,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800",
     discount: 20,
     category: "electronics",
+    stock: 15,
   },
   {
     id: 13,
@@ -48,6 +52,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800",
     discount: 30,
     category: "clothing",
+    stock: 20,
   },
   {
     id: 14,
@@ -57,6 +62,7 @@ export const products: Product[] = [
     image:
       "https://images.unsplash.com/photo-1543076447-215ad9ba6923?w=800",
     category: "clothing",
+    stock: 10,
   },
   {
     id: 15,
@@ -67,6 +73,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=800",
     discount: 10,
     category: "home-garden",
+    stock: 8,
   },
   {
     id: 16,
@@ -77,6 +84,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1603199506016-b9a594b593c0?w=800",
     discount: 40,
     category: "home-garden",
+    stock: 12,
   },
   {
     id: 17,
@@ -86,6 +94,7 @@ export const products: Product[] = [
     image:
       "https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=800",
     category: "home-garden",
+    stock: 15,
   },
   {
     id: 18,
@@ -96,6 +105,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=800",
     discount: 15,
     category: "home-garden",
+    stock: 25,
   },
   {
     id: 19,
@@ -106,6 +116,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1587033411391-5d9e51cce126?w=800",
     discount: 20,
     category: "electronics",
+    stock: 20,
   },
   {
     id: 20,
@@ -117,6 +128,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800",
     discount: 25,
     category: "electronics",
+    stock: 5,
   },
   {
     id: 21,
@@ -126,6 +138,7 @@ export const products: Product[] = [
     image:
       "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800",
     category: "electronics",
+    stock: 15,
   },
   {
     id: 22,
@@ -136,6 +149,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800",
     discount: 10,
     category: "clothing",
+    stock: 20,
   },
   {
     id: 23,
@@ -145,6 +159,7 @@ export const products: Product[] = [
     image:
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800",
     category: "clothing",
+    stock: 30,
   },
   {
     id: 24,
@@ -155,6 +170,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800",
     discount: 30,
     category: "home-garden",
+    stock: 10,
   },
 ];
 

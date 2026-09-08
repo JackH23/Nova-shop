@@ -9,11 +9,15 @@ import ProductSort from "./ProductSort";
 type ProductListProps = {
   minPrice?: number;
   maxPrice?: number;
+  inStock?: boolean;
+  onSale?: boolean;
 };
 
 export default function ProductList({
   minPrice = 0,
   maxPrice = 500,
+  inStock = false,
+  onSale = false,
 }: ProductListProps) {
 
   const {
@@ -25,6 +29,8 @@ export default function ProductList({
     products,
     minPrice,
     maxPrice,
+    inStock,
+    onSale,
   });
 
   return (

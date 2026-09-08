@@ -11,6 +11,8 @@ type CategoryProductListProps = {
   products: Product[];
   minPrice?: number;
   maxPrice?: number;
+  inStock?: boolean;
+  onSale?: boolean;
 };
 
 export default function CategoryProductList({
@@ -18,6 +20,8 @@ export default function CategoryProductList({
   products,
   minPrice = 0,
   maxPrice = 500,
+  inStock = false,
+  onSale = false,
 }: CategoryProductListProps) {
   const categoryName = category
     .split("-")
@@ -36,6 +40,8 @@ export default function CategoryProductList({
     products,
     minPrice,
     maxPrice,
+    inStock,
+    onSale,
   });
 
   return (

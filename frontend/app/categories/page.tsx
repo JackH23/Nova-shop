@@ -12,6 +12,10 @@ export default function CategoriesPage() {
     maxPrice,
     setMinPrice,
     setMaxPrice,
+    inStock,
+    onSale,
+    setInStock,
+    setOnSale,
   } = useProductFilters();
 
   return (
@@ -23,6 +27,10 @@ export default function CategoriesPage() {
           maxPrice={maxPrice}
           onMinPriceChange={setMinPrice}
           onMaxPriceChange={setMaxPrice}
+          inStock={inStock}
+          onSale={onSale}
+          onInStockChange={setInStock}
+          onOnSaleChange={setOnSale}
         />
 
         <CategoryProductList
@@ -30,6 +38,8 @@ export default function CategoriesPage() {
           products={products}
           minPrice={minPrice}
           maxPrice={maxPrice}
+          inStock={inStock}
+          onSale={onSale}
         />
       </div>
     </PageContainer>
