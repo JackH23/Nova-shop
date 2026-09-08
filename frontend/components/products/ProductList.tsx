@@ -12,6 +12,7 @@ type ProductListProps = {
   inStock?: boolean;
   onSale?: boolean;
   category?: string;
+  minDiscount?: number;
 };
 
 export default function ProductList({
@@ -20,6 +21,7 @@ export default function ProductList({
   inStock = false,
   onSale = false,
   category = "all",
+  minDiscount = 0,
 }: ProductListProps) {
 
   const {
@@ -34,6 +36,7 @@ export default function ProductList({
     inStock,
     onSale,
     category,
+    minDiscount,
   });
 
   return (

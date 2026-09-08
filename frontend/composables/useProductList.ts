@@ -8,6 +8,7 @@ type UseProductListProps = {
   inStock?: boolean;
   onSale?: boolean;
   category?: string;
+  minDiscount?: number;
 };
 
 export function useProductList({
@@ -17,6 +18,7 @@ export function useProductList({
   inStock = false,
   onSale = false,
   category = "all",
+  minDiscount = 0,
 }: UseProductListProps) {
   const filteredProducts = products.filter((product) => {
     const matchesPrice =
@@ -33,11 +35,16 @@ export function useProductList({
       category === "all" ||
       product.category === category;
 
+    const matchesDiscount =
+      minDiscount === 0 ||
+      (product.discount ?? 0) >= minDiscount;
+
     return (
       matchesPrice &&
       matchesInStock &&
       matchesOnSale &&
-      matchesCategory
+      matchesCategory &&
+      matchesDiscount
     );
   });
 

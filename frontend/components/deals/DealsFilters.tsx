@@ -1,27 +1,26 @@
 "use client";
 
 const dealCategories = [
-  "Electronics",
-  "Fashion",
-  "Home & Garden",
-  "Beauty",
+  { label: "Electronics", value: "electronics" },
+  { label: "Fashion", value: "clothing" },
+  { label: "Home & Garden", value: "home-garden" },
+  { label: "Beauty", value: "beauty" },
 ];
 
-const discounts = [
-  "10% or more",
-  "20% or more",
-  "30% or more",
-  "50% or more",
-];
+const discounts = ["10% or more", "20% or more", "30% or more", "50% or more"];
 
 type DealsFiltersProps = {
   minPrice?: number;
   maxPrice?: number;
   onMinPriceChange?: (price: number) => void;
   onMaxPriceChange?: (price: number) => void;
+  category?: string;
+  onCategoryChange?: (category: string) => void;
 };
 
 export default function DealsFilters({
+  category = "all",
+  onCategoryChange,
   minPrice = 0,
   maxPrice = 500,
   onMinPriceChange,
@@ -32,9 +31,7 @@ export default function DealsFilters({
       <div className="rounded-md border border-slate-200 bg-white p-5">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-950">
-            Filters
-          </h2>
+          <h2 className="text-sm font-semibold text-slate-950">Filters</h2>
 
           <button
             type="button"
@@ -46,23 +43,22 @@ export default function DealsFilters({
 
         {/* Category */}
         <div className="mt-5">
-          <h3 className="text-xs font-semibold text-slate-900">
-            Category
-          </h3>
+          <h3 className="text-xs font-semibold text-slate-900">Category</h3>
 
           <div className="mt-3 space-y-2">
-            {dealCategories.map((category) => (
+            {dealCategories.map((item) => (
               <label
-                key={category}
+                key={item.value}
                 className="flex cursor-pointer items-center gap-2 text-xs text-slate-600"
               >
                 <input
                   type="checkbox"
-                  defaultChecked={category === "Fashion"}
+                  checked={category === item.value}
+                  onChange={() => onCategoryChange?.(item.value)}
                   className="accent-indigo-600"
                 />
 
-                {category}
+                {item.label}
               </label>
             ))}
           </div>
@@ -72,9 +68,7 @@ export default function DealsFilters({
 
         {/* Price Range */}
         <div>
-          <h3 className="text-xs font-semibold text-slate-900">
-            Price Range
-          </h3>
+          <h3 className="text-xs font-semibold text-slate-900">Price Range</h3>
 
           <div className="mt-4 space-y-2">
             {/* Minimum price */}
@@ -125,9 +119,7 @@ export default function DealsFilters({
 
         {/* Discount */}
         <div>
-          <h3 className="text-xs font-semibold text-slate-900">
-            Discount
-          </h3>
+          <h3 className="text-xs font-semibold text-slate-900">Discount</h3>
 
           <div className="mt-3 space-y-2">
             {discounts.map((discount) => (

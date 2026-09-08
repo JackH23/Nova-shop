@@ -6,6 +6,8 @@ import NewArrivalsFilters from "@/components/deals/NewArrivalsFilters";
 
 type CategoryFiltersProps = {
   activeCategory?: string;
+  showAvailability?: boolean;
+  showPriceRange?: boolean;
   variant?: "default" | "deals" | "new-arrivals";
   maxPrice?: number;
   onMaxPriceChange?: (price: number) => void;
@@ -16,6 +18,9 @@ type CategoryFiltersProps = {
   onInStockChange?: (checked: boolean) => void;
   onOnSaleChange?: (checked: boolean) => void;
   onCategoryChange?: (category: string) => void;
+  showDiscount?: boolean;
+  minDiscount?: number;
+  onDiscountChange?: (discount: number) => void;
 };
 
 const categories = [
@@ -41,6 +46,13 @@ const categories = [
   },
 ];
 
+const discounts = [
+  { label: "10% or more", value: 10 },
+  { label: "20% or more", value: 20 },
+  { label: "30% or more", value: 30 },
+  { label: "50% or more", value: 50 },
+];
+
 export default function CategoryFilters({
   activeCategory = "all",
   onCategoryChange,
@@ -53,10 +65,16 @@ export default function CategoryFilters({
   onSale,
   onInStockChange,
   onOnSaleChange,
+  showAvailability = true,
+  showDiscount = false,
+  minDiscount = 0,
+  onDiscountChange,
 }: CategoryFiltersProps) {
   if (variant === "deals") {
     return (
       <DealsFilters
+        category={activeCategory}
+        onCategoryChange={onCategoryChange}
         minPrice={minPrice}
         maxPrice={maxPrice}
         onMinPriceChange={onMinPriceChange}
@@ -170,32 +188,67 @@ export default function CategoryFilters({
           </div>
         </div>
 
-        <div className="my-5 border-t border-slate-200" />
-
         {/* Availability */}
-        <div>
-          <h3 className="text-xs font-semibold text-slate-900">Availability</h3>
+        {showAvailability && (
+          <>
+            <div className="my-5 border-t border-slate-200" />
+            <div>
+              <h3 className="text-xs font-semibold text-slate-900">
+                Availability
+              </h3>
 
-          <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
-            <input
-              type="checkbox"
-              checked={inStock}
-              onChange={(e) => onInStockChange?.(e.target.checked)}
-              className="accent-indigo-600"
-            />
-            In Stock
-          </label>
+              <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={inStock}
+                  onChange={(e) => onInStockChange?.(e.target.checked)}
+                  className="accent-indigo-600"
+                />
+                In Stock
+              </label>
 
-          <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
-            <input
-              type="checkbox"
-              checked={onSale}
-              onChange={(e) => onOnSaleChange?.(e.target.checked)}
-              className="accent-indigo-600"
-            />
-            On Sale
-          </label>
-        </div>
+              <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
+                <input
+                  type="checkbox"
+                  checked={onSale}
+                  onChange={(e) => onOnSaleChange?.(e.target.checked)}
+                  className="accent-indigo-600"
+                />
+                On Sale
+              </label>
+            </div>
+          </>
+        )}
+
+        {/* Discount */}
+        {showDiscount && (
+          <>
+            <div className="my-5 border-t border-slate-200" />
+
+            <div>
+              <h3 className="text-xs font-semibold text-slate-900">Discount</h3>
+
+              <div className="mt-3 space-y-3">
+                {discounts.map((discount) => (
+                  <label
+                    key={discount.value}
+                    className="flex items-center gap-2 text-xs text-slate-600"
+                  >
+                    <input
+                      type="radio"
+                      name="discount"
+                      checked={minDiscount === discount.value}
+                      onChange={() => onDiscountChange?.(discount.value)}
+                      className="accent-indigo-600"
+                    />
+
+                    {discount.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </aside>
   );

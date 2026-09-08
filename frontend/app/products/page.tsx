@@ -12,11 +12,6 @@ export default function ProductsPage() {
     maxPrice,
     setMinPrice,
     setMaxPrice,
-
-    inStock,
-    onSale,
-    setInStock,
-    setOnSale,
   } = useProductFilters();
 
   return (
@@ -29,18 +24,13 @@ export default function ProductsPage() {
           maxPrice={maxPrice}
           onMinPriceChange={setMinPrice}
           onMaxPriceChange={setMaxPrice}
-          inStock={inStock}
-          onSale={onSale}
-          onInStockChange={setInStock}
-          onOnSaleChange={setOnSale}
+          showAvailability={false}
         />
 
         {/* Right product list */}
         <ProductList
           minPrice={minPrice}
           maxPrice={maxPrice}
-          inStock={inStock}
-          onSale={onSale}
         />
       </div>
     </PageContainer>
