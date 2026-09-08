@@ -31,6 +31,8 @@ export default function ProductList({
     setCurrentPage,
     totalPages,
     paginatedItems: paginatedProducts,
+    sortBy,
+    setSortBy,
   } = useProductList({
     products,
     minPrice,
@@ -55,7 +57,10 @@ export default function ProductList({
         </div>
 
         {/* Sort */}
-        <ProductSort />
+        <ProductSort
+          value={sortBy}
+          onChange={setSortBy}
+        />
       </div>
 
       {/* Product cards */}

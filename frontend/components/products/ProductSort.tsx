@@ -1,7 +1,18 @@
-export default function ProductSort() {
+"use client";
+
+type ProductSortProps = {
+  value: string;
+  onChange: (value: string) => void;
+};
+
+export default function ProductSort({
+  value,
+  onChange,
+}: ProductSortProps) {
   return (
     <select
-      defaultValue="featured"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
       className="rounded border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none"
     >
       <option value="featured">

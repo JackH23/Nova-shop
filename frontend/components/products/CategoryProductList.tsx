@@ -36,6 +36,8 @@ export default function CategoryProductList({
     startIndex,
     itemsPerPage: productsPerPage,
     paginatedItems: paginatedProducts,
+    sortBy,
+    setSortBy,
   } = useProductList({
     products,
     minPrice,
@@ -79,7 +81,10 @@ export default function CategoryProductList({
                 )} of ${filteredProducts.length} products`}
           </p>
 
-          <ProductSort />
+          <ProductSort
+            value={sortBy}
+            onChange={setSortBy}
+          />
         </div>
 
         {/* Products */}
