@@ -2,8 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useCart, type CartItem as CartItemType } from "@/composables/useCart";
+import {
+  useCart,
+  type CartItem as CartItemType,
+} from "@/composables/useCart";
 import PageContainer from "@/components/common/PageContainer";
+import EmptyState from "@/components/common/EmptyState";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 
@@ -14,7 +18,9 @@ export default function CartContent() {
 
   useEffect(() => {
     const loadCart = () => {
-      const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const storedCart = JSON.parse(
+        localStorage.getItem("cart") || "[]"
+      );
 
       setCart(storedCart);
     };
@@ -30,7 +36,9 @@ export default function CartContent() {
 
   return (
     <PageContainer>
-      <h1 className="text-3xl font-bold text-slate-950">Your Cart</h1>
+      <h1 className="text-3xl font-bold text-slate-950">
+        Your Cart
+      </h1>
 
       <p className="mt-2 text-sm text-slate-500">
         Review your items and proceed to checkout.
@@ -38,28 +46,52 @@ export default function CartContent() {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
         <div>
-          <div className="space-y-4">
-            {cart.map((item) => (
-              <CartItem
-                key={`${item.product.id}-${item.color}`}
-                item={item}
-                onIncrease={() =>
-                  updateQuantity(item.product.id, item.color, item.quantity + 1)
-                }
-                onDecrease={() =>
-                  updateQuantity(item.product.id, item.color, item.quantity - 1)
-                }
-                onRemove={() => removeFromCart(item.product.id, item.color)}
-              />
-            ))}
-          </div>
+          {cart.length === 0 ? (
+            <EmptyState
+              title="Your cart is empty"
+              description="Looks like you haven't added anything to your cart yet."
+              actionText="Continue Shopping"
+              actionHref="/products"
+            />
+          ) : (
+            <>
+              <div className="space-y-4">
+                {cart.map((item) => (
+                  <CartItem
+                    key={`${item.product.id}-${item.color}`}
+                    item={item}
+                    onIncrease={() =>
+                      updateQuantity(
+                        item.product.id,
+                        item.color,
+                        item.quantity + 1
+                      )
+                    }
+                    onDecrease={() =>
+                      updateQuantity(
+                        item.product.id,
+                        item.color,
+                        item.quantity - 1
+                      )
+                    }
+                    onRemove={() =>
+                      removeFromCart(
+                        item.product.id,
+                        item.color
+                      )
+                    }
+                  />
+                ))}
+              </div>
 
-          <Link
-            href="/products"
-            className="mt-8 inline-block text-sm font-medium text-indigo-600"
-          >
-            ← Continue Shopping
-          </Link>
+              <Link
+                href="/products"
+                className="mt-8 inline-block text-sm font-medium text-indigo-600"
+              >
+                ← Continue Shopping
+              </Link>
+            </>
+          )}
         </div>
 
         <CartSummary cart={cart} />

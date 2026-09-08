@@ -4,15 +4,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/composables/useCart";
-import {
-  Search,
-  Heart,
-  ShoppingCart,
-  UserRound,
-} from "lucide-react";
+import { Search, Heart, ShoppingCart, UserRound } from "lucide-react";
 
 export default function Navbar() {
-
   const pathname = usePathname();
   const { cartCount } = useCart();
 
@@ -56,9 +50,7 @@ export default function Navbar() {
   return (
     <header
       className={`sticky top-0 z-50 w-full bg-white transition-all duration-300 ease-in-out ${
-        isVisible
-          ? "translate-y-0 opacity-100"
-          : "-translate-y-full opacity-0"
+        isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
       }`}
     >
       {/* Free shipping bar */}
@@ -81,7 +73,9 @@ export default function Navbar() {
           </Link>
 
           {/* Navigation */}
+          {/* Navigation */}
           <nav className="ml-[135px] flex h-full items-center gap-7 text-[11px] text-slate-800">
+            {/* Shop */}
             <Link
               href="/products"
               className={`flex h-full items-center border-b-2 transition ${
@@ -93,13 +87,19 @@ export default function Navbar() {
               Shop
             </Link>
 
+            {/* Categories */}
             <Link
               href="/categories"
-              className="transition hover:text-[#3324d8]"
+              className={`flex h-full items-center border-b-2 transition ${
+                pathname.startsWith("/categories")
+                  ? "border-[#4b3cf0] text-[#3324d8]"
+                  : "border-transparent text-slate-800 hover:text-[#3324d8]"
+              }`}
             >
               Categories
             </Link>
 
+            {/* Deals */}
             <Link
               href="/deals"
               className={`flex h-full items-center border-b-2 transition ${
@@ -111,11 +111,16 @@ export default function Navbar() {
               Deals
             </Link>
 
+            {/* New Arrivals */}
             <Link
-              href="/new-arrival"
-              className="transition hover:text-[#3324d8]"
+              href="/new-arrivals"
+              className={`flex h-full items-center border-b-2 transition ${
+                pathname.startsWith("/new-arrivals")
+                  ? "border-[#4b3cf0] text-[#3324d8]"
+                  : "border-transparent text-slate-800 hover:text-[#3324d8]"
+              }`}
             >
-              New Arrival
+              New Arrivals
             </Link>
           </nav>
 
@@ -129,11 +134,7 @@ export default function Navbar() {
                 className="w-full bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-500"
               />
 
-              <Search
-                size={17}
-                strokeWidth={1.8}
-                className="text-slate-700"
-              />
+              <Search size={17} strokeWidth={1.8} className="text-slate-700" />
             </div>
 
             {/* Wishlist */}

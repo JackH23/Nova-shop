@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import DealsFilters from "@/components/deals/DealsFilters";
+import NewArrivalsFilters from "@/components/deals/NewArrivalsFilters";
 
 type CategoryFiltersProps = {
   activeCategory?: string;
-  variant?: "default" | "deals";
+  variant?: "default" | "deals" | "new-arrivals";
 };
 
 const categories = [
@@ -35,8 +36,13 @@ export default function CategoryFilters({
   activeCategory = "all",
   variant = "default",
 }: CategoryFiltersProps) {
+  
   if (variant === "deals") {
     return <DealsFilters />;
+  }
+
+  if (variant === "new-arrivals") {
+    return <NewArrivalsFilters />;
   }
 
   return (
