@@ -16,8 +16,8 @@ export default function DealsContent() {
     maxPrice,
     setMinPrice,
     setMaxPrice,
-    category,
-    setCategory,
+    categoryId,
+    setCategoryId,
     minDiscount,
     setMinDiscount,
   } = useProductFilters();
@@ -48,12 +48,12 @@ export default function DealsContent() {
         <div className="mt-10 flex flex-col gap-10 md:flex-row">
           {/* Left */}
           <CategoryFilters
-            activeCategory={category}
+            activeCategoryId={categoryId}
+            onCategoryChange={setCategoryId}
             minPrice={minPrice}
             maxPrice={maxPrice}
             onMinPriceChange={setMinPrice}
             onMaxPriceChange={setMaxPrice}
-            onCategoryChange={setCategory}
             showAvailability={false}
             showDiscount={true}
             minDiscount={minDiscount}
@@ -64,7 +64,8 @@ export default function DealsContent() {
           <ProductList
             minPrice={minPrice}
             maxPrice={maxPrice}
-            category={category}
+            categoryId={categoryId}
+            onSale={true}
             minDiscount={minDiscount}
             onProductAdded={handleProductAdded}
           />

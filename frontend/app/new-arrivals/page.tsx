@@ -14,8 +14,8 @@ export default function NewArrivalsPage() {
     maxPrice,
     setMinPrice,
     setMaxPrice,
-    category,
-    setCategory,
+    categoryId,
+    setCategoryId,
     minRating,
     setMinRating,
   } = useProductFilters();
@@ -33,12 +33,12 @@ export default function NewArrivalsPage() {
         <div className="mt-10 flex flex-col gap-10 md:flex-row">
           {/* Left */}
           <CategoryFilters
-            activeCategory={category}
+            activeCategoryId={categoryId}
+            onCategoryChange={setCategoryId}
             minPrice={minPrice}
             maxPrice={maxPrice}
             onMinPriceChange={setMinPrice}
             onMaxPriceChange={setMaxPrice}
-            onCategoryChange={setCategory}
             showAvailability={false}
             showRating={true}
             minRating={minRating}
@@ -49,7 +49,8 @@ export default function NewArrivalsPage() {
           <ProductList
             minPrice={minPrice}
             maxPrice={maxPrice}
-            category={category}
+            categoryId={categoryId}
+            newArrivals={true}
             minRating={minRating}
             onProductAdded={handleProductAdded}
           />

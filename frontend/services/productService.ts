@@ -6,7 +6,9 @@ export const productService = {
     limit = 9,
     categoryId?: number,
     minPrice?: number,
-    maxPrice?: number
+    maxPrice?: number,
+    onSale?: boolean,
+    newArrivals?: boolean
   ) => {
     let url = `/products?page=${page}&limit=${limit}`;
 
@@ -23,6 +25,16 @@ export const productService = {
     // Maximum price filter
     if (maxPrice !== undefined) {
       url += `&max_price=${maxPrice}`;
+    }
+
+    // Deals filter
+    if (onSale) {
+      url += `&on_sale=true`;
+    }
+
+    // New arrivals filter
+    if (newArrivals) {
+      url += `&new_arrivals=true`;
     }
 
     return apiRequest(url, {

@@ -12,6 +12,7 @@ type UseProductListProps = {
   maxPrice?: number;
   inStock?: boolean;
   onSale?: boolean;
+  newArrivals?: boolean;
   categoryId?: number | null;
   minDiscount?: number;
   minRating?: number;
@@ -22,6 +23,7 @@ export function useProductList({
   maxPrice = 500,
   inStock = false,
   onSale = false,
+  newArrivals = false,
   categoryId = null,
   minDiscount = 0,
   minRating = 0,
@@ -47,7 +49,9 @@ export function useProductList({
           9,
           categoryId ?? undefined,
           minPrice,
-          maxPrice
+          maxPrice,
+          onSale,
+          newArrivals
         );
 
         dispatch({
@@ -75,7 +79,14 @@ export function useProductList({
     };
 
     fetchProducts();
-  }, [currentPage, categoryId, minPrice, maxPrice]);
+  }, [
+    currentPage,
+    categoryId,
+    minPrice,
+    maxPrice,
+    onSale,
+    newArrivals,
+  ]);
 
   return {
     filteredProducts: state.products,

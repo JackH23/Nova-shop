@@ -11,6 +11,8 @@ export type Product = {
   stock: number;
   image: string;
   is_featured: boolean;
+  is_new_arrival: boolean;
+  is_on_sale: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;

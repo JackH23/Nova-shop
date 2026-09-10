@@ -52,16 +52,28 @@ const Product = sequelize.define(
             allowNull: true,
         },
 
+        is_active: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: true,
+        },
+
+        is_on_sale: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+        },
+
         is_featured: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false,
         },
 
-        is_active: {
+        is_new_arrival: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: true,
+            defaultValue: false,
         },
     },
     {

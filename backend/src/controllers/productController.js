@@ -7,7 +7,13 @@ const getProducts = async (req, res) => {
     const limit = Math.max(parseInt(req.query.limit) || 8, 1);
     const offset = (page - 1) * limit;
 
-    const { category_id, min_price, max_price } = req.query;
+    const {
+      category_id,
+      min_price,
+      max_price,
+      on_sale,
+      new_arrivals
+    } = req.query;
 
     const where = {
       is_active: true,
@@ -29,6 +35,16 @@ const getProducts = async (req, res) => {
       if (max_price) {
         where.price[Op.lte] = Number(max_price);
       }
+    }
+
+    // Deals filter
+    if (on_sale === "true") {
+      where.is_on_sale = true;
+    }
+
+    // New arrivals filter
+    if (new_arrivals === "true") {
+      where.is_new_arrival = true;
     }
 
     const { count, rows: products } = await Product.findAndCountAll({
