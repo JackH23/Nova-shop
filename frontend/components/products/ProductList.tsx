@@ -11,7 +11,7 @@ type ProductListProps = {
   maxPrice?: number;
   inStock?: boolean;
   onSale?: boolean;
-  category?: string;
+  categoryId?: number | null;
   minDiscount?: number;
   minRating?: number;
   onProductAdded?: (product: Product) => void;
@@ -22,7 +22,7 @@ export default function ProductList({
   maxPrice = 500,
   inStock = false,
   onSale = false,
-  category = "all",
+  categoryId = null,
   minDiscount = 0,
   minRating = 0,
   onProductAdded,
@@ -41,7 +41,7 @@ export default function ProductList({
     maxPrice,
     inStock,
     onSale,
-    category,
+    categoryId,
     minDiscount,
     minRating,
   });

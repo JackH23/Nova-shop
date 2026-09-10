@@ -14,7 +14,14 @@ export default function ProductsPage() {
     removeToast,
   } = useCartToast();
 
-  const { minPrice, maxPrice, setMinPrice, setMaxPrice } = useProductFilters();
+  const {
+    minPrice,
+    maxPrice,
+    categoryId,
+    setMinPrice,
+    setMaxPrice,
+    setCategoryId,
+  } = useProductFilters();
 
   return (
     <>
@@ -22,7 +29,8 @@ export default function ProductsPage() {
         <div className="flex flex-col gap-10 md:flex-row">
           {/* Left filters */}
           <CategoryFilters
-            activeCategory="all"
+            activeCategoryId={categoryId}
+            onCategoryChange={setCategoryId}
             minPrice={minPrice}
             maxPrice={maxPrice}
             onMinPriceChange={setMinPrice}
@@ -34,6 +42,7 @@ export default function ProductsPage() {
           <ProductList
             minPrice={minPrice}
             maxPrice={maxPrice}
+            categoryId={categoryId}
             onProductAdded={handleProductAdded}
           />
         </div>

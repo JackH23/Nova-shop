@@ -12,7 +12,7 @@ type UseProductListProps = {
   maxPrice?: number;
   inStock?: boolean;
   onSale?: boolean;
-  category?: string;
+  categoryId?: number | null;
   minDiscount?: number;
   minRating?: number;
 };
@@ -22,7 +22,7 @@ export function useProductList({
   maxPrice = 500,
   inStock = false,
   onSale = false,
-  category = "all",
+  categoryId = null,
   minDiscount = 0,
   minRating = 0,
 }: UseProductListProps) {
@@ -44,7 +44,8 @@ export function useProductList({
       try {
         const response = await productService.getProducts(
           currentPage,
-          9
+          9,
+          categoryId ?? undefined
         );
 
         dispatch({
@@ -72,7 +73,7 @@ export function useProductList({
     };
 
     fetchProducts();
-  }, [currentPage]);
+  }, [currentPage, categoryId]);
 
   return {
     filteredProducts: state.products,

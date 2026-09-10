@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function useProductFilters(initialCategory = "all") {
+export function useProductFilters() {
   // Price filter
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(500);
@@ -10,8 +10,13 @@ export function useProductFilters(initialCategory = "all") {
   // Availability filter
   const [inStock, setInStock] = useState(false);
   const [onSale, setOnSale] = useState(false);
-  const [category, setCategory] = useState(initialCategory);
+
+  // Category filter
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+
+  // Discount filter
   const [minDiscount, setMinDiscount] = useState(20);
+
   // Rating filter
   const [minRating, setMinRating] = useState(0);
 
@@ -31,7 +36,7 @@ export function useProductFilters(initialCategory = "all") {
   const resetFilters = () => {
     resetPrice();
     resetAvailability();
-    setCategory("all");
+    setCategoryId(null);
     setMinDiscount(20);
     setMinRating(0);
   };
@@ -49,17 +54,17 @@ export function useProductFilters(initialCategory = "all") {
     setInStock,
     setOnSale,
 
-    // Rating
-    minRating,
-    setMinRating,
-
     // Category
-    category,
-    setCategory,
+    categoryId,
+    setCategoryId,
 
     // Discount
     minDiscount,
     setMinDiscount,
+
+    // Rating
+    minRating,
+    setMinRating,
 
     // Reset
     resetPrice,

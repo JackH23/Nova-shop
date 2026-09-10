@@ -1,69 +1,76 @@
 const Product = require("../models/Product");
 
 const getProducts = async (req, res) => {
-    try {
+  try {
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit) || 8, 1);
+    const offset = (page - 1) * limit;
 
-        const page = Math.max(parseInt(req.query.page) || 1, 1);
-        const limit = Math.max(parseInt(req.query.limit) || 8, 1);
-        const offset = (page - 1) * limit;
+    const { category_id } = req.query;
 
-        const { count, rows: products } = await Product.findAndCountAll({
-            where: {
-                is_active: true,
-            },
-            order: [["created_at", "DESC"]],
-            limit,
-            offset,
-        });
+    const where = {
+      is_active: true,
+    };
 
-        return res.status(200).json({
-            message: "Products fetched successfully",
-            products,
-            total: count,
-            totalPages: Math.ceil(count / limit),
-            page,
-            limit,
-        });
-    } catch (error) {
-        console.error("Get products error:", error);
-
-        return res.status(500).json({
-            message: "Internal server error",
-        });
+    if (category_id) {
+      where.category_id = Number(category_id);
     }
+
+    const { count, rows: products } = await Product.findAndCountAll({
+      where,
+      order: [["created_at", "DESC"]],
+      limit,
+      offset,
+    });
+
+    return res.status(200).json({
+      message: "Products fetched successfully",
+      products,
+      total: count,
+      totalPages: Math.ceil(count / limit),
+      page,
+      limit,
+    });
+  } catch (error) {
+    console.error("Get products error:", error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
 };
 
 const getProductById = async (req, res) => {
-    try {
-        const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-        const product = await Product.findOne({
-            where: {
-                id: id,
-                is_active: true,
-            },
-        });
+    const product = await Product.findOne({
+      where: {
+        id: id,
+        is_active: true,
+      },
+    });
 
-        if (!product) {
-            return res.status(404).json({
-                message: "Product not found",
-            });
-        }
-
-        return res.status(200).json({
-            message: "Product fetched successfully",
-            product,
-        });
-    } catch (error) {
-        console.error("Get product detail error:", error);
-
-        return res.status(500).json({
-            message: "Internal server error",
-        });
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
     }
+
+    return res.status(200).json({
+      message: "Product fetched successfully",
+      product,
+    });
+  } catch (error) {
+    console.error("Get product detail error:", error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
 };
 
 module.exports = {
-    getProducts,
-    getProductById,
+  getProducts,
+  getProductById,
 };
