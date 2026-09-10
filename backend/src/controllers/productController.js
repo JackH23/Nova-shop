@@ -16,6 +16,7 @@ const getProducts = async (req, res) => {
       in_stock,
       discount,
       rating,
+      sort,
     } = req.query;
 
     const where = {
@@ -86,9 +87,33 @@ const getProducts = async (req, res) => {
       }
     }
 
+        // Product sorting
+    let order = [["created_at", "DESC"]];
+
+    switch (sort) {
+      case "low-high":
+        order = [["price", "ASC"]];
+        break;
+
+      case "high-low":
+        order = [["price", "DESC"]];
+        break;
+
+      case "featured":
+        order = [
+          ["is_featured", "DESC"],
+          ["created_at", "DESC"],
+        ];
+        break;
+
+      default:
+        order = [["created_at", "DESC"]];
+        break;
+    }
+
     const { count, rows: products } = await Product.findAndCountAll({
       where,
-      order: [["created_at", "DESC"]],
+      order,
       limit,
       offset,
     });

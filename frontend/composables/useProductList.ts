@@ -42,6 +42,7 @@ export function useProductList({
     inStock,
     minDiscount,
     minRating,
+    sortBy,
   ]);
 
   useEffect(() => {
@@ -63,6 +64,7 @@ export function useProductList({
           inStock,
           minDiscount,
           minRating,
+          sortBy
         );
 
         dispatch({
@@ -98,6 +100,7 @@ export function useProductList({
     inStock,
     minDiscount,
     minRating,
+    sortBy,
   ]);
 
   return {

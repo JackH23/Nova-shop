@@ -11,7 +11,8 @@ export const productService = {
     newArrivals?: boolean,
     inStock?: boolean,
     discount?: number,
-    rating?: number
+    rating?: number,
+    sortBy?: string
   ) => {
     let url = `/products?page=${page}&limit=${limit}`;
 
@@ -53,6 +54,11 @@ export const productService = {
     // Rating filter
     if (rating !== undefined && rating > 0) {
       url += `&rating=${rating}`;
+    }
+
+    // Product sorting
+    if (sortBy) {
+      url += `&sort=${sortBy}`;
     }
 
     return apiRequest(url, {
