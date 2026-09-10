@@ -48,6 +48,17 @@ export interface ResetPasswordData {
   confirmPassword: string;
 }
 
+export interface User {
+  id: number;
+  fullName: string;
+  email: string;
+  isVerified: boolean;
+}
+
+export interface GetMeResponse {
+  user: User;
+}
+
 export const authService = {
   register: (data: RegisterData) => {
     return apiRequest("/auth/register", {
@@ -104,6 +115,12 @@ export const authService = {
     return apiRequest("/auth/forgot-password", {
       method: "POST",
       body: JSON.stringify(data),
+    });
+  },
+
+  getMe: (): Promise<GetMeResponse> => {
+    return apiRequest("/auth/me", {
+      method: "GET",
     });
   },
 

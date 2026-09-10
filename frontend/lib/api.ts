@@ -1,14 +1,12 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+let refreshPromise: Promise<string> | null = null;
 
 function getStoredToken(key: string) {
   if (typeof window === "undefined") {
     return null;
   }
 
-  return (
-    localStorage.getItem(key) ||
-    sessionStorage.getItem(key)
-  );
+  return localStorage.getItem(key) || sessionStorage.getItem(key);
 }
 
 function saveAccessToken(accessToken: string) {
@@ -32,25 +30,20 @@ async function refreshAccessToken() {
     throw new Error("Refresh token not found");
   }
 
-  const response = await fetch(
-    `${API_URL}/auth/refresh-token`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        refreshToken,
-      }),
-    }
-  );
+  const response = await fetch(`${API_URL}/auth/refresh-token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      refreshToken,
+    }),
+  });
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      data.message || "Unable to refresh access token"
-    );
+    throw new Error(data.message || "Unable to refresh access token");
   }
 
   saveAccessToken(data.accessToken);
@@ -58,10 +51,7 @@ async function refreshAccessToken() {
   return data.accessToken;
 }
 
-export async function apiRequest(
-  endpoint: string,
-  options: RequestInit = {}
-) {
+export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   const accessToken = getStoredToken("accessToken");
 
   // First request
@@ -88,8 +78,13 @@ export async function apiRequest(
     endpoint !== "/auth/refresh-token"
   ) {
     try {
-      const newAccessToken =
-        await refreshAccessToken();
+      if (!refreshPromise) {
+        refreshPromise = refreshAccessToken().finally(() => {
+          refreshPromise = null;
+        });
+      }
+
+      const newAccessToken = await refreshPromise;
 
       // Retry original request with new token
       response = await fetch(`${API_URL}${endpoint}`, {
@@ -112,9 +107,7 @@ export async function apiRequest(
         window.location.href = "/login";
       }
 
-      throw new Error(
-        "Your session has expired. Please login again."
-      );
+      throw new Error("Your session has expired. Please login again.");
     }
   }
 
