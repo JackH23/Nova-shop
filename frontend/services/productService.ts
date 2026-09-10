@@ -8,7 +8,8 @@ export const productService = {
     minPrice?: number,
     maxPrice?: number,
     onSale?: boolean,
-    newArrivals?: boolean
+    newArrivals?: boolean,
+    inStock?: boolean
   ) => {
     let url = `/products?page=${page}&limit=${limit}`;
 
@@ -35,6 +36,11 @@ export const productService = {
     // New arrivals filter
     if (newArrivals) {
       url += `&new_arrivals=true`;
+    }
+
+    // In stock filter
+    if (inStock) {
+      url += `&in_stock=true`;
     }
 
     return apiRequest(url, {

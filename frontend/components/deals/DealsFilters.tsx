@@ -1,10 +1,10 @@
 "use client";
 
 const dealCategories = [
-  { label: "Electronics", value: "electronics" },
-  { label: "Fashion", value: "clothing" },
-  { label: "Home & Garden", value: "home-garden" },
-  { label: "Beauty", value: "beauty" },
+  { id: 1, label: "Electronics" },
+  { id: 2, label: "Clothing" },
+  { id: 3, label: "Home & Living" },
+  { id: 4, label: "Accessories" },
 ];
 
 const discounts = ["10% or more", "20% or more", "30% or more", "50% or more"];
@@ -15,11 +15,12 @@ type DealsFiltersProps = {
   onMinPriceChange?: (price: number) => void;
   onMaxPriceChange?: (price: number) => void;
   category?: string;
-  onCategoryChange?: (category: string) => void;
+  categoryId?: number | null;
+  onCategoryChange?: (categoryId: number | null) => void;
 };
 
 export default function DealsFilters({
-  category = "all",
+  categoryId = null,
   onCategoryChange,
   minPrice = 0,
   maxPrice = 500,
@@ -48,13 +49,17 @@ export default function DealsFilters({
           <div className="mt-3 space-y-2">
             {dealCategories.map((item) => (
               <label
-                key={item.value}
+                key={item.id}
                 className="flex cursor-pointer items-center gap-2 text-xs text-slate-600"
               >
                 <input
                   type="checkbox"
-                  checked={category === item.value}
-                  onChange={() => onCategoryChange?.(item.value)}
+                  checked={categoryId === item.id}
+                  onChange={() =>
+                    onCategoryChange?.(
+                      categoryId === item.id ? null : item.id
+                    )
+                  }
                   className="accent-indigo-600"
                 />
 

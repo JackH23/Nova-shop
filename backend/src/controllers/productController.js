@@ -12,7 +12,8 @@ const getProducts = async (req, res) => {
       min_price,
       max_price,
       on_sale,
-      new_arrivals
+      new_arrivals,
+      in_stock
     } = req.query;
 
     const where = {
@@ -45,6 +46,13 @@ const getProducts = async (req, res) => {
     // New arrivals filter
     if (new_arrivals === "true") {
       where.is_new_arrival = true;
+    }
+
+    // In stock filter
+    if (in_stock === "true") {
+      where.stock = {
+        [Op.gt]: 0,
+      };
     }
 
     const { count, rows: products } = await Product.findAndCountAll({

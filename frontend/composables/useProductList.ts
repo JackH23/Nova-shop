@@ -51,7 +51,8 @@ export function useProductList({
           minPrice,
           maxPrice,
           onSale,
-          newArrivals
+          newArrivals,
+          inStock
         );
 
         dispatch({
@@ -86,6 +87,7 @@ export function useProductList({
     maxPrice,
     onSale,
     newArrivals,
+    inStock,
   ]);
 
   return {

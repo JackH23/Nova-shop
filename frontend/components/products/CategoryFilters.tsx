@@ -57,22 +57,22 @@ export default function CategoryFilters({
 }: CategoryFiltersProps) {
   const { categories, loading, error } = useCategories();
 
-  if (variant === "deals") {
-    return (
-      <DealsFilters
-        category={activeCategory}
-        onCategoryChange={onCategoryChange}
-        minPrice={minPrice}
-        maxPrice={maxPrice}
-        onMinPriceChange={onMinPriceChange}
-        onMaxPriceChange={onMaxPriceChange}
-      />
-    );
-  }
+  // if (variant === "deals") {
+  //   return (
+  //     <DealsFilters
+  //       categoryId={activeCategoryId}
+  //       onCategoryChange={onCategoryChange}
+  //       minPrice={minPrice}
+  //       maxPrice={maxPrice}
+  //       onMinPriceChange={onMinPriceChange}
+  //       onMaxPriceChange={onMaxPriceChange}
+  //     />
+  //   );
+  // }
 
-  if (variant === "new-arrivals") {
-    return <NewArrivalsFilters />;
-  }
+  // if (variant === "new-arrivals") {
+  //   return <NewArrivalsFilters />;
+  // }
 
   return (
     <aside className="w-full shrink-0 md:w-[220px]">
@@ -103,9 +103,7 @@ export default function CategoryFilters({
 
         {/* Category */}
         <div className="mt-5">
-          <h3 className="text-xs font-semibold text-slate-900">
-            Category
-          </h3>
+          <h3 className="text-xs font-semibold text-slate-900">Category</h3>
 
           <div className="mt-3 space-y-3">
             {/* All */}
@@ -125,23 +123,16 @@ export default function CategoryFilters({
                   <span className="text-[10px]">✓</span>
                 )}
               </span>
-
               All
             </button>
 
             {/* Loading */}
             {loading && (
-              <p className="text-xs text-slate-400">
-                Loading categories...
-              </p>
+              <p className="text-xs text-slate-400">Loading categories...</p>
             )}
 
             {/* Error */}
-            {error && (
-              <p className="text-xs text-red-500">
-                {error}
-              </p>
-            )}
+            {error && <p className="text-xs text-red-500">{error}</p>}
 
             {/* API Categories */}
             {!loading &&
@@ -225,26 +216,45 @@ export default function CategoryFilters({
         {showAvailability && (
           <>
             <div className="my-5 border-t border-slate-200" />
+
             <div>
               <h3 className="text-xs font-semibold text-slate-900">
                 Availability
               </h3>
 
+              {/* In Stock */}
               <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
                 <input
                   type="checkbox"
                   checked={inStock}
-                  onChange={(e) => onInStockChange?.(e.target.checked)}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+
+                    onInStockChange?.(checked);
+
+                    if (checked) {
+                      onOnSaleChange?.(false);
+                    }
+                  }}
                   className="accent-indigo-600"
                 />
                 In Stock
               </label>
 
+              {/* On Sale */}
               <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
                 <input
                   type="checkbox"
                   checked={onSale}
-                  onChange={(e) => onOnSaleChange?.(e.target.checked)}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+
+                    onOnSaleChange?.(checked);
+
+                    if (checked) {
+                      onInStockChange?.(false);
+                    }
+                  }}
                   className="accent-indigo-600"
                 />
                 On Sale
