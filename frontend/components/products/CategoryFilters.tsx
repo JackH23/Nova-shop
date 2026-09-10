@@ -81,12 +81,24 @@ export default function CategoryFilters({
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-slate-950">Filters</h2>
 
-          <Link
-            href="/categories"
-            className="text-[10px] text-slate-500 hover:text-indigo-600"
+          <button
+            type="button"
+            onClick={() => {
+              onCategoryChange?.(null);
+
+              onMinPriceChange?.(0);
+              onMaxPriceChange?.(500);
+
+              onInStockChange?.(false);
+              onOnSaleChange?.(false);
+
+              onDiscountChange?.(0);
+              onRatingChange?.(0);
+            }}
+            className="text-[10px] text-slate-500 hover:text-indigo-600 cursor-pointer"
           >
             Clear All
-          </Link>
+          </button>
         </div>
 
         {/* Category */}
@@ -97,15 +109,10 @@ export default function CategoryFilters({
 
           <div className="mt-3 space-y-3">
             {/* All */}
-            <Link
-              href="/categories"
-              className="flex items-center gap-2 text-xs text-slate-600"
-              onClick={(e) => {
-                if (onCategoryChange) {
-                  e.preventDefault();
-                  onCategoryChange(null);
-                }
-              }}
+            <button
+              type="button"
+              className="flex w-full items-center gap-2 text-xs text-slate-600 cursor-pointer"
+              onClick={() => onCategoryChange?.(null)}
             >
               <span
                 className={`flex h-4 w-4 items-center justify-center rounded-sm border ${
@@ -120,7 +127,7 @@ export default function CategoryFilters({
               </span>
 
               All
-            </Link>
+            </button>
 
             {/* Loading */}
             {loading && (
@@ -139,16 +146,11 @@ export default function CategoryFilters({
             {/* API Categories */}
             {!loading &&
               categories.map((category) => (
-                <Link
+                <button
                   key={category.id}
-                  href={`/categories?category_id=${category.id}`}
-                  className="flex items-center gap-2 text-xs text-slate-600"
-                  onClick={(e) => {
-                    if (onCategoryChange) {
-                      e.preventDefault();
-                      onCategoryChange(category.id);
-                    }
-                  }}
+                  type="button"
+                  className="flex w-full items-center gap-2 text-xs text-slate-600"
+                  onClick={() => onCategoryChange?.(category.id)}
                 >
                   <span
                     className={`flex h-4 w-4 items-center justify-center rounded-sm border ${
@@ -163,7 +165,7 @@ export default function CategoryFilters({
                   </span>
 
                   {category.name}
-                </Link>
+                </button>
               ))}
           </div>
         </div>

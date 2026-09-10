@@ -12,6 +12,7 @@ type ProductListProps = {
   inStock?: boolean;
   onSale?: boolean;
   categoryId?: number | null;
+  categoryName?: string;
   minDiscount?: number;
   minRating?: number;
   onProductAdded?: (product: Product) => void;
@@ -23,6 +24,7 @@ export default function ProductList({
   inStock = false,
   onSale = false,
   categoryId = null,
+  categoryName,
   minDiscount = 0,
   minRating = 0,
   onProductAdded,
@@ -66,7 +68,7 @@ export default function ProductList({
 
           {/* Title */}
           <h1 className="text-2xl font-bold text-slate-950">
-            Shop Products
+            {categoryName ?? "Shop Products"}
           </h1>
         </div>
 

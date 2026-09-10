@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const Product = require("../models/Product");
 
 const getProducts = async (req, res) => {
@@ -6,14 +7,28 @@ const getProducts = async (req, res) => {
     const limit = Math.max(parseInt(req.query.limit) || 8, 1);
     const offset = (page - 1) * limit;
 
-    const { category_id } = req.query;
+    const { category_id, min_price, max_price } = req.query;
 
     const where = {
       is_active: true,
     };
 
+    // Category filter
     if (category_id) {
       where.category_id = Number(category_id);
+    }
+
+    // Price range filter
+    if (min_price || max_price) {
+      where.price = {};
+
+      if (min_price) {
+        where.price[Op.gte] = Number(min_price);
+      }
+
+      if (max_price) {
+        where.price[Op.lte] = Number(max_price);
+      }
     }
 
     const { count, rows: products } = await Product.findAndCountAll({

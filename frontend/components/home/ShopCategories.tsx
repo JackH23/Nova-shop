@@ -1,7 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useCategories } from "@/composables/useCategories";
 
 export default function ShopCategories() {
+
+  const { categories, loading, error } = useCategories();
+
   return (
     <section>
       {/* Header */}
@@ -19,34 +25,42 @@ export default function ShopCategories() {
       {/* Categories */}
       <div className="grid gap-4 md:h-[570px] md:grid-cols-2">
         {/* Electronics - Left */}
-        <CategoryCard
-          name="Electronics"
-          image="/images/categories/electronics.jpg"
-          href="/categories/electronics"
-        />
+        {categories[0] && (
+          <CategoryCard
+            name={categories[0].name}
+            image="/images/categories/electronics.jpg"
+            href={`/categories?category_id=${categories[0].id}`}
+          />
+        )}
 
         {/* Right */}
         <div className="grid gap-4 md:grid-rows-[1fr_1fr]">
           {/* Fashion */}
-          <CategoryCard
-            name="Fashion"
-            image="/images/categories/fashion.jpg"
-            href="/categories/clothing"
-          />
+          {categories[1] && (
+            <CategoryCard
+              name={categories[1].name}
+              image="/images/categories/fashion.jpg"
+              href={`/categories?category_id=${categories[1].id}`}
+            />
+          )}
 
           {/* Home + Beauty */}
           <div className="grid grid-cols-2 gap-4">
-            <CategoryCard
-              name="Home"
-              image="/images/categories/home.jpg"
-              href="/categories/home-garden"
-            />
+            {categories[2] && (
+              <CategoryCard
+                name={categories[2].name}
+                image="/images/categories/home.jpg"
+                href={`/categories?category_id=${categories[2].id}`}
+              />
+            )}
 
-            <CategoryCard
-              name="Beauty"
-              image="/images/categories/beauty.jpg"
-              href="/categories/beauty"
-            />
+            {categories[3] && (
+              <CategoryCard
+                name={categories[3].name}
+                image="/images/categories/beauty.jpg"
+                href={`/categories?category_id=${categories[3].id}`}
+              />
+            )}
           </div>
         </div>
       </div>

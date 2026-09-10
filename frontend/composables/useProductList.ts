@@ -45,7 +45,9 @@ export function useProductList({
         const response = await productService.getProducts(
           currentPage,
           9,
-          categoryId ?? undefined
+          categoryId ?? undefined,
+          minPrice,
+          maxPrice
         );
 
         dispatch({
@@ -73,7 +75,7 @@ export function useProductList({
     };
 
     fetchProducts();
-  }, [currentPage, categoryId]);
+  }, [currentPage, categoryId, minPrice, maxPrice]);
 
   return {
     filteredProducts: state.products,

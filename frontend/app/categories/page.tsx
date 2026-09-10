@@ -2,13 +2,22 @@
 
 import { useProductFilters } from "@/composables/useProductFilters";
 import CategoryFilters from "@/components/products/CategoryFilters";
-import CategoryProductList from "@/components/products/CategoryProductList";
+import ProductList from "@/components/products/ProductList";
 import PageContainer from "@/components/common/PageContainer";
 import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartToast } from "@/composables/useCartToast";
-import { products } from "@/lib/products";
+import { useSearchParams } from "next/navigation";
+import { useCategories } from "@/composables/useCategories";
 
 export default function CategoriesPage() {
+  const searchParams = useSearchParams();
+
+  const categoryIdFromUrl = searchParams.get("category_id");
+
+  const initialCategoryId = categoryIdFromUrl
+    ? Number(categoryIdFromUrl)
+    : null;
+
   const { addedProducts, handleProductAdded, removeToast } = useCartToast();
 
   const {
@@ -20,16 +29,23 @@ export default function CategoriesPage() {
     onSale,
     setInStock,
     setOnSale,
-    category,
-    setCategory,
-  } = useProductFilters();
+    categoryId,
+    setCategoryId,
+  } = useProductFilters(initialCategoryId);
+
+  const { categories } = useCategories();
+
+  const selectedCategory = categories.find(
+    (category) => category.id === categoryId
+  );
 
   return (
     <>
       <PageContainer>
-        <div className="flex flex-col gap-6 md:flex-row">
+        <div className="flex flex-col gap-10 md:flex-row">
           <CategoryFilters
-            activeCategory={category}
+            activeCategoryId={categoryId}
+            onCategoryChange={setCategoryId}
             minPrice={minPrice}
             maxPrice={maxPrice}
             onMinPriceChange={setMinPrice}
@@ -38,12 +54,11 @@ export default function CategoriesPage() {
             onSale={onSale}
             onInStockChange={setInStock}
             onOnSaleChange={setOnSale}
-            onCategoryChange={setCategory}
           />
 
-          <CategoryProductList
-            category={category}
-            products={products}
+          <ProductList
+            categoryId={categoryId}
+            categoryName={selectedCategory?.name}
             minPrice={minPrice}
             maxPrice={maxPrice}
             inStock={inStock}

@@ -28,7 +28,7 @@ export default function ProductsPage() {
       <PageContainer>
         <div className="flex flex-col gap-10 md:flex-row">
           {/* Left filters */}
-          <CategoryFilters
+          {/* <CategoryFilters
             activeCategoryId={categoryId}
             onCategoryChange={setCategoryId}
             minPrice={minPrice}
@@ -36,7 +36,7 @@ export default function ProductsPage() {
             onMinPriceChange={setMinPrice}
             onMaxPriceChange={setMaxPrice}
             showAvailability={false}
-          />
+          /> */}
 
           {/* Right product list */}
           <ProductList

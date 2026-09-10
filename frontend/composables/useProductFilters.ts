@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 
-export function useProductFilters() {
+export function useProductFilters(
+  initialCategoryId: number | null = null
+) {
   // Price filter
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(500);
@@ -12,7 +14,9 @@ export function useProductFilters() {
   const [onSale, setOnSale] = useState(false);
 
   // Category filter
-  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [categoryId, setCategoryId] = useState<number | null>(
+    initialCategoryId
+  );
 
   // Discount filter
   const [minDiscount, setMinDiscount] = useState(20);
