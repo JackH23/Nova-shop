@@ -16,7 +16,24 @@ export default function ProductCard({
 }: ProductCardProps) {
   const { handleAdd } = useProductCart(product, onProductAdded);
 
-  const { id, name, description, price, image, discount } = product;
+  const {
+    id,
+    name,
+    description,
+    price,
+    original_price,
+    image,
+  } = product;
+
+  const priceNumber = Number(price);
+  const originalPriceNumber = Number(original_price);
+
+  const discount =
+    originalPriceNumber > priceNumber
+      ? Math.round(
+          ((originalPriceNumber - priceNumber) / originalPriceNumber) * 100
+        )
+      : 0;
   return (
     <div className="group overflow-hidden bg-white">
       {/* Product image */}
@@ -52,7 +69,7 @@ export default function ProductCard({
         {/* Price + Add */}
         <div className="mt-3 flex items-center justify-between">
           <span className="text-sm font-bold text-slate-950">
-            ${price.toFixed(2)}
+            ${priceNumber.toFixed(2)}
           </span>
 
           <button

@@ -3,7 +3,7 @@
 import { useProductList } from "@/composables/useProductList";
 import ProductCard from "./ProductCard";
 import Pagination from "@/components/common/Pagination";
-import { products, type Product } from "@/lib/products";
+import type { Product } from "@/lib/products";
 import ProductSort from "./ProductSort";
 
 type ProductListProps = {
@@ -34,8 +34,9 @@ export default function ProductList({
     paginatedItems: paginatedProducts,
     sortBy,
     setSortBy,
+    loading,
+    error,
   } = useProductList({
-    products,
     minPrice,
     maxPrice,
     inStock,
@@ -45,20 +46,35 @@ export default function ProductList({
     minRating,
   });
 
+  if (loading) {
+    return <div className="flex-1">Loading products...</div>;
+  }
+
+  if (error) {
+    return <div className="flex-1">{error}</div>;
+  }
+
   return (
     <div className="flex-1">
       {/* Top section */}
       <div className="mb-5 flex items-end justify-between">
         <div>
           {/* Breadcrumb */}
-          <p className="mb-1 text-[10px] text-slate-400">Home / Shop</p>
+          <p className="mb-1 text-[10px] text-slate-400">
+            Home / Shop
+          </p>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-slate-950">Shop Products</h1>
+          <h1 className="text-2xl font-bold text-slate-950">
+            Shop Products
+          </h1>
         </div>
 
         {/* Sort */}
-        <ProductSort value={sortBy} onChange={setSortBy} />
+        <ProductSort
+          value={sortBy}
+          onChange={setSortBy}
+        />
       </div>
 
       {/* Product cards */}

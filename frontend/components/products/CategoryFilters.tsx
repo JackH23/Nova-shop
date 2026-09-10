@@ -3,6 +3,7 @@
 import Link from "next/link";
 import DealsFilters from "@/components/deals/DealsFilters";
 import NewArrivalsFilters from "@/components/deals/NewArrivalsFilters";
+import { useCategories } from "@/composables/useCategories";
 
 type CategoryFiltersProps = {
   activeCategory?: string;
@@ -25,29 +26,6 @@ type CategoryFiltersProps = {
   minRating?: number;
   onRatingChange?: (rating: number) => void;
 };
-
-const categories = [
-  {
-    label: "All",
-    value: "all",
-    href: "/categories",
-  },
-  {
-    label: "Electronics",
-    value: "electronics",
-    href: "/categories?category=electronics",
-  },
-  {
-    label: "Clothing",
-    value: "clothing",
-    href: "/categories?category=clothing",
-  },
-  {
-    label: "Home & Garden",
-    value: "home-garden",
-    href: "/categories?category=home-garden",
-  },
-];
 
 const discounts = [
   { label: "10% or more", value: 10 },
@@ -77,6 +55,8 @@ export default function CategoryFilters({
   minRating = 0,
   onRatingChange,
 }: CategoryFiltersProps) {
+  const { categories, loading, error } = useCategories();
+
   if (variant === "deals") {
     return (
       <DealsFilters
@@ -114,33 +94,66 @@ export default function CategoryFilters({
           <h3 className="text-xs font-semibold text-slate-900">Category</h3>
 
           <div className="mt-3 space-y-3">
-            {categories.map((category) => (
-              <Link
-                key={category.value}
-                href={category.href}
-                className="flex items-center gap-2 text-xs text-slate-600"
-                onClick={(e) => {
-                  if (onCategoryChange) {
-                    e.preventDefault();
-                    onCategoryChange(category.value);
-                  }
-                }}
+            {/* All */}
+            <Link
+              href="/categories"
+              className="flex items-center gap-2 text-xs text-slate-600"
+              onClick={(e) => {
+                if (onCategoryChange) {
+                  e.preventDefault();
+                  onCategoryChange("all");
+                }
+              }}
+            >
+              <span
+                className={`flex h-4 w-4 items-center justify-center rounded-sm border ${
+                  activeCategory === "all"
+                    ? "border-indigo-600 bg-indigo-600 text-white"
+                    : "border-slate-300 bg-white"
+                }`}
               >
-                <span
-                  className={`flex h-4 w-4 items-center justify-center rounded-sm border ${
-                    activeCategory === category.value
-                      ? "border-indigo-600 bg-indigo-600 text-white"
-                      : "border-slate-300 bg-white"
-                  }`}
-                >
-                  {activeCategory === category.value && (
-                    <span className="text-[10px]">✓</span>
-                  )}
-                </span>
+                {activeCategory === "all" && (
+                  <span className="text-[10px]">✓</span>
+                )}
+              </span>
+              All
+            </Link>
 
-                {category.label}
-              </Link>
-            ))}
+            {/* API Categories */}
+            {loading && (
+              <p className="text-xs text-slate-400">Loading categories...</p>
+            )}
+
+            {error && <p className="text-xs text-red-500">{error}</p>}
+
+            {!loading &&
+              categories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/categories?category=${category.slug}`}
+                  className="flex items-center gap-2 text-xs text-slate-600"
+                  onClick={(e) => {
+                    if (onCategoryChange) {
+                      e.preventDefault();
+                      onCategoryChange(category.slug);
+                    }
+                  }}
+                >
+                  <span
+                    className={`flex h-4 w-4 items-center justify-center rounded-sm border ${
+                      activeCategory === category.slug
+                        ? "border-indigo-600 bg-indigo-600 text-white"
+                        : "border-slate-300 bg-white"
+                    }`}
+                  >
+                    {activeCategory === category.slug && (
+                      <span className="text-[10px]">✓</span>
+                    )}
+                  </span>
+
+                  {category.name}
+                </Link>
+              ))}
           </div>
         </div>
 

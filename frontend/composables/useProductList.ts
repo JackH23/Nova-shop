@@ -1,9 +1,13 @@
-import { useState } from "react";
-import { usePagination } from "@/composables/usePagination";
-import type { Product } from "@/lib/products";
+"use client";
+
+import { useEffect, useReducer, useState } from "react";
+import { productService } from "@/services/productService";
+import {
+  productReducer,
+  initialProductState,
+} from "@/reducers/productReducer";
 
 type UseProductListProps = {
-  products: Product[];
   minPrice?: number;
   maxPrice?: number;
   inStock?: boolean;
@@ -14,7 +18,6 @@ type UseProductListProps = {
 };
 
 export function useProductList({
-  products,
   minPrice = 0,
   maxPrice = 500,
   inStock = false,
@@ -23,49 +26,66 @@ export function useProductList({
   minDiscount = 0,
   minRating = 0,
 }: UseProductListProps) {
+  const [state, dispatch] = useReducer(
+    productReducer,
+    initialProductState
+  );
+
+  const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("featured");
-  const filteredProducts = products.filter((product) => {
-    const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
 
-    const matchesInStock = !inStock || product.stock > 0;
+  useEffect(() => {
+    const fetchProducts = async () => {
+      dispatch({
+        type: "SET_LOADING",
+        value: true,
+      });
 
-    const matchesOnSale = !onSale || (product.discount ?? 0) > 0;
+      try {
+        const response = await productService.getProducts(
+          currentPage,
+          9
+        );
 
-    const matchesCategory = category === "all" || product.category === category;
+        dispatch({
+          type: "SET_PRODUCTS",
+          products: response.products,
+          total: response.total,
+          totalPages: response.totalPages,
+          page: response.page,
+          limit: response.limit,
+        });
+      } catch (error) {
+        dispatch({
+          type: "SET_ERROR",
+          value:
+            error instanceof Error
+              ? error.message
+              : "Failed to get products",
+        });
+      } finally {
+        dispatch({
+          type: "SET_LOADING",
+          value: false,
+        });
+      }
+    };
 
-    const matchesDiscount =
-      minDiscount === 0 || (product.discount ?? 0) >= minDiscount;
-
-    const matchesRating = minRating === 0 || (product.rating ?? 0) >= minRating;
-
-    return (
-      matchesPrice &&
-      matchesInStock &&
-      matchesOnSale &&
-      matchesCategory &&
-      matchesDiscount &&
-      matchesRating
-    );
-  });
-
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    if (sortBy === "low-high") {
-      return a.price - b.price;
-    }
-
-    if (sortBy === "high-low") {
-      return b.price - a.price;
-    }
-
-    return 0;
-  });
-
-  const pagination = usePagination(sortedProducts);
+    fetchProducts();
+  }, [currentPage]);
 
   return {
-    filteredProducts,
+    filteredProducts: state.products,
+    paginatedItems: state.products,
+
+    currentPage,
+    setCurrentPage,
+    totalPages: state.totalPages,
+
     sortBy,
     setSortBy,
-    ...pagination,
+
+    loading: state.loading,
+    error: state.error,
   };
 }
