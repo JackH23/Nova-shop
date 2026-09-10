@@ -1,5 +1,11 @@
 import { productService } from "@/services/productService";
 
+export type ProductImage = {
+  id: number;
+  image_url: string;
+  sort_order: number;
+};
+
 export type Product = {
   id: number;
   category_id: number;
@@ -7,10 +13,16 @@ export type Product = {
   slug: string;
   description: string;
   price: string;
-  original_price: string;
+  original_price: string | null;
   rating: string;
   stock: number;
+
+  // Main image
   image: string;
+
+  // Additional product gallery images
+  images?: ProductImage[];
+
   is_featured: boolean;
   is_new_arrival: boolean;
   is_on_sale: boolean;
@@ -30,9 +42,20 @@ export type ProductsResponse = {
   limit: number;
 };
 
+export type ProductResponse = {
+  message: string;
+  product: Product;
+};
+
 export async function getProducts(
   page = 1,
   limit = 9
 ): Promise<ProductsResponse> {
   return productService.getProducts(page, limit);
+}
+
+export async function getProductById(
+  id: number
+): Promise<ProductResponse> {
+  return productService.getProductById(id);
 }

@@ -1,5 +1,6 @@
 const { Op, literal } = require("sequelize");
 const Product = require("../models/Product");
+const ProductImage = require("../models/ProductImage");
 
 const getProducts = async (req, res) => {
   try {
@@ -144,6 +145,27 @@ const getProductById = async (req, res) => {
         id: id,
         is_active: true,
       },
+
+      include: [
+        {
+          model: ProductImage,
+          as: "images",
+          attributes: [
+            "id",
+            "image_url",
+            "sort_order",
+          ],
+          required: false,
+        },
+      ],
+
+      order: [
+        [
+          { model: ProductImage, as: "images" },
+          "sort_order",
+          "ASC",
+        ],
+      ],
     });
 
     if (!product) {

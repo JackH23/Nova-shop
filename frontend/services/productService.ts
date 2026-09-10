@@ -65,4 +65,11 @@ export const productService = {
       method: "GET",
     });
   },
+
+  // Get product by ID
+  getProductById: (id: number) => {
+    return apiRequest(`/products/${id}`, {
+      method: "GET",
+    });
+  },
 };

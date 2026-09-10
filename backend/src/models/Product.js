@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
+const ProductImage = require("./ProductImage");
 
 const Product = sequelize.define(
     "Product",
@@ -91,5 +92,10 @@ const Product = sequelize.define(
         updatedAt: "updated_at",
     }
 );
+
+Product.hasMany(ProductImage, {
+    foreignKey: "product_id",
+    as: "images",
+});
 
 module.exports = Product;

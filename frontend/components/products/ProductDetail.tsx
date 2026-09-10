@@ -22,7 +22,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       </Link>
 
       <div className="grid gap-10 lg:grid-cols-2">
-        <ProductGallery image={product.image} name={product.name} />
+        <ProductGallery
+          image={product.image}
+          images={product.images ?? []}
+          name={product.name}
+        />
 
         <ProductInfo product={product} />
       </div>

@@ -46,7 +46,9 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           New Release
         </span>
 
-        <span className="font-medium text-slate-800">⭐ 4.8</span>
+        <span className="font-medium text-slate-800">
+          ⭐ {Number(product.rating).toFixed(1)}
+        </span>
 
         <span className="text-slate-500">(124 Reviews)</span>
       </div>
@@ -58,7 +60,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
       {/* Price */}
       <p className="mt-3 text-xl font-semibold text-slate-950">
-        ${product.price.toFixed(2)}
+        ${Number(product.price).toFixed(2)}
       </p>
 
       {/* Description */}

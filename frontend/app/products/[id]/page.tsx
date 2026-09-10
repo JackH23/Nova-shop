@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 
-import ProductDetail from "@/components/products/ProductDetail";
-import { getProductById } from "@/lib/products";
+import ProductDetailClient from "@/components/products/ProductDetailClient";
 
 type ProductDetailPageProps = {
   params: Promise<{
@@ -14,13 +13,11 @@ export default async function ProductDetailPage({
 }: ProductDetailPageProps) {
   const { id } = await params;
 
-  // Find product using the id from the URL
-  const product = getProductById(Number(id));
+  const productId = Number(id);
 
-  // Product does not exist
-  if (!product) {
+  if (Number.isNaN(productId)) {
     notFound();
   }
 
-  return <ProductDetail product={product} />;
+  return <ProductDetailClient productId={productId} />;
 }
