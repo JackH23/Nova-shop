@@ -2,16 +2,27 @@ const Product = require("../models/Product");
 
 const getProducts = async (req, res) => {
     try {
-        const products = await Product.findAll({
+
+        const page = Math.max(parseInt(req.query.page) || 1, 1);
+        const limit = Math.max(parseInt(req.query.limit) || 8, 1);
+        const offset = (page - 1) * limit;
+
+        const { count, rows: products } = await Product.findAndCountAll({
             where: {
                 is_active: true,
             },
             order: [["created_at", "DESC"]],
+            limit,
+            offset,
         });
 
         return res.status(200).json({
             message: "Products fetched successfully",
             products,
+            total: count,
+            totalPages: Math.ceil(count / limit),
+            page,
+            limit,
         });
     } catch (error) {
         console.error("Get products error:", error);
