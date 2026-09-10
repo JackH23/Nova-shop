@@ -57,6 +57,13 @@ export default function CategoryFilters({
 }: CategoryFiltersProps) {
   const { categories, loading, error } = useCategories();
 
+  const ratings = [
+    { label: "4.5 & Up", value: 4.5, stars: "★★★★★" },
+    { label: "4 & Up", value: 4, stars: "★★★★☆" },
+    { label: "3 & Up", value: 3, stars: "★★★☆☆" },
+    { label: "2 & Up", value: 2, stars: "★★☆☆☆" },
+  ];
+
   // if (variant === "deals") {
   //   return (
   //     <DealsFilters
@@ -302,29 +309,26 @@ export default function CategoryFilters({
               <h3 className="text-xs font-semibold text-slate-900">Rating</h3>
 
               <div className="mt-3 space-y-3">
-                <label className="flex items-center gap-2 text-xs text-slate-600">
-                  <input
-                    type="checkbox"
-                    checked={minRating === 4}
-                    onChange={() => onRatingChange?.(minRating === 4 ? 0 : 4)}
-                    className="accent-indigo-600"
-                  />
+                {ratings.map((rating) => (
+                  <label
+                    key={rating.value}
+                    className="flex items-center gap-2 text-xs text-slate-600"
+                  >
+                    <input
+                      type="radio"
+                      name="rating"
+                      checked={minRating === rating.value}
+                      onChange={() => onRatingChange?.(rating.value)}
+                      className="accent-indigo-600"
+                    />
 
-                  <span className="text-amber-500">★★★★★</span>
-                  <span>4 & Up</span>
-                </label>
+                    <span className="text-amber-500">
+                      {rating.stars}
+                    </span>
 
-                <label className="flex items-center gap-2 text-xs text-slate-600">
-                  <input
-                    type="checkbox"
-                    checked={minRating === 3}
-                    onChange={() => onRatingChange?.(minRating === 3 ? 0 : 3)}
-                    className="accent-indigo-600"
-                  />
-
-                  <span className="text-amber-500">★★★★☆</span>
-                  <span>3 & Up</span>
-                </label>
+                    <span>{rating.label}</span>
+                  </label>
+                ))}
               </div>
             </div>
           </>

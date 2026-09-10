@@ -7,6 +7,7 @@ import ProductList from "@/components/products/ProductList";
 import { useProductFilters } from "@/composables/useProductFilters";
 import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartToast } from "@/composables/useCartToast";
+import { useCategories } from "@/composables/useCategories";
 
 export default function DealsContent() {
   const { addedProducts, handleProductAdded, removeToast } = useCartToast();
@@ -16,11 +17,15 @@ export default function DealsContent() {
     maxPrice,
     setMinPrice,
     setMaxPrice,
-    categoryId,
-    setCategoryId,
     minDiscount,
     setMinDiscount,
   } = useProductFilters();
+
+  const {
+    categoryId,
+    setCategoryId,
+    selectedCategory,
+  } = useCategories();
 
   return (
     <>
@@ -65,6 +70,7 @@ export default function DealsContent() {
             minPrice={minPrice}
             maxPrice={maxPrice}
             categoryId={categoryId}
+            categoryName={selectedCategory?.name}
             onSale={true}
             minDiscount={minDiscount}
             onProductAdded={handleProductAdded}

@@ -9,7 +9,9 @@ export const productService = {
     maxPrice?: number,
     onSale?: boolean,
     newArrivals?: boolean,
-    inStock?: boolean
+    inStock?: boolean,
+    discount?: number,
+    rating?: number
   ) => {
     let url = `/products?page=${page}&limit=${limit}`;
 
@@ -41,6 +43,16 @@ export const productService = {
     // In stock filter
     if (inStock) {
       url += `&in_stock=true`;
+    }
+
+    // Discount filter
+    if (discount !== undefined && discount > 0) {
+      url += `&discount=${discount}`;
+    }
+
+    // Rating filter
+    if (rating !== undefined && rating > 0) {
+      url += `&rating=${rating}`;
     }
 
     return apiRequest(url, {

@@ -8,6 +8,7 @@ export type Product = {
   description: string;
   price: string;
   original_price: string;
+  rating: string;
   stock: number;
   image: string;
   is_featured: boolean;

@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+const { Op, literal } = require("sequelize");
 const Product = require("../models/Product");
 
 const getProducts = async (req, res) => {
@@ -13,7 +13,9 @@ const getProducts = async (req, res) => {
       max_price,
       on_sale,
       new_arrivals,
-      in_stock
+      in_stock,
+      discount,
+      rating,
     } = req.query;
 
     const where = {
@@ -53,6 +55,35 @@ const getProducts = async (req, res) => {
       where.stock = {
         [Op.gt]: 0,
       };
+    }
+
+    // Discount filter
+    if (discount) {
+      const discountValue = Number(discount);
+      const allowedDiscounts = [10, 20, 30, 50];
+
+      if (allowedDiscounts.includes(discountValue)) {
+        where[Op.and] = [
+          literal(`
+            original_price IS NOT NULL
+            AND original_price > 0
+            AND original_price > price
+            AND ((original_price - price) / original_price * 100) >= ${discountValue}
+          `),
+        ];
+      }
+    }
+
+    // Rating filter
+    if (rating) {
+      const ratingValue = Number(rating);
+      const allowedRatings = [3, 4];
+
+      if (allowedRatings.includes(ratingValue)) {
+        where.rating = {
+          [Op.gte]: ratingValue,
+        };
+      }
     }
 
     const { count, rows: products } = await Product.findAndCountAll({

@@ -41,6 +41,12 @@ const Product = sequelize.define(
             allowNull: true,
         },
 
+        rating: {
+            type: DataTypes.DECIMAL(2, 1),
+            allowNull: false,
+            defaultValue: 0,
+        },
+
         stock: {
             type: DataTypes.INTEGER,
             allowNull: false,

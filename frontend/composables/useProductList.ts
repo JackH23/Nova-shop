@@ -2,10 +2,7 @@
 
 import { useEffect, useReducer, useState } from "react";
 import { productService } from "@/services/productService";
-import {
-  productReducer,
-  initialProductState,
-} from "@/reducers/productReducer";
+import { productReducer, initialProductState } from "@/reducers/productReducer";
 
 type UseProductListProps = {
   minPrice?: number;
@@ -28,13 +25,24 @@ export function useProductList({
   minDiscount = 0,
   minRating = 0,
 }: UseProductListProps) {
-  const [state, dispatch] = useReducer(
-    productReducer,
-    initialProductState
-  );
+  const [state, dispatch] = useReducer(productReducer, initialProductState);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState("featured");
+
+  // Reset to page 1 when any filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    categoryId,
+    minPrice,
+    maxPrice,
+    onSale,
+    newArrivals,
+    inStock,
+    minDiscount,
+    minRating,
+  ]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -52,7 +60,9 @@ export function useProductList({
           maxPrice,
           onSale,
           newArrivals,
-          inStock
+          inStock,
+          minDiscount,
+          minRating,
         );
 
         dispatch({
@@ -67,9 +77,7 @@ export function useProductList({
         dispatch({
           type: "SET_ERROR",
           value:
-            error instanceof Error
-              ? error.message
-              : "Failed to get products",
+            error instanceof Error ? error.message : "Failed to get products",
         });
       } finally {
         dispatch({
@@ -88,6 +96,8 @@ export function useProductList({
     onSale,
     newArrivals,
     inStock,
+    minDiscount,
+    minRating,
   ]);
 
   return {

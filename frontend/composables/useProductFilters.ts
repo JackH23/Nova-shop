@@ -19,7 +19,7 @@ export function useProductFilters(
   );
 
   // Discount filter
-  const [minDiscount, setMinDiscount] = useState(20);
+  const [minDiscount, setMinDiscount] = useState(0);
 
   // Rating filter
   const [minRating, setMinRating] = useState(0);
@@ -41,7 +41,7 @@ export function useProductFilters(
     resetPrice();
     resetAvailability();
     setCategoryId(null);
-    setMinDiscount(20);
+    setMinDiscount(0);
     setMinRating(0);
   };
 

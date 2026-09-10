@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { categoryService } from "@/services/categoryService";
 import {
   categoryReducer,
@@ -8,10 +9,19 @@ import {
 } from "@/reducers/categoryReducer";
 
 export function useCategories() {
-  const [state, dispatch] = useReducer(
-    categoryReducer,
-    initialCategoryState
+  const searchParams = useSearchParams();
+
+  const categoryIdFromUrl = searchParams.get("category_id");
+
+  const initialCategoryId = categoryIdFromUrl
+    ? Number(categoryIdFromUrl)
+    : null;
+
+  const [categoryId, setCategoryId] = useState<number | null>(
+    initialCategoryId,
   );
+
+  const [state, dispatch] = useReducer(categoryReducer, initialCategoryState);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -31,9 +41,7 @@ export function useCategories() {
         dispatch({
           type: "SET_ERROR",
           value:
-            error instanceof Error
-              ? error.message
-              : "Failed to get categories",
+            error instanceof Error ? error.message : "Failed to get categories",
         });
       } finally {
         dispatch({
@@ -46,5 +54,14 @@ export function useCategories() {
     fetchCategories();
   }, []);
 
-  return state;
+  const selectedCategory = state.categories.find(
+    (category) => category.id === categoryId,
+  );
+
+  return {
+    ...state,
+    categoryId,
+    setCategoryId,
+    selectedCategory,
+  };
 }

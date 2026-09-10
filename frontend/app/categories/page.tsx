@@ -6,19 +6,14 @@ import ProductList from "@/components/products/ProductList";
 import PageContainer from "@/components/common/PageContainer";
 import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartToast } from "@/composables/useCartToast";
-import { useSearchParams } from "next/navigation";
 import { useCategories } from "@/composables/useCategories";
 
 export default function CategoriesPage() {
-  const searchParams = useSearchParams();
-
-  const categoryIdFromUrl = searchParams.get("category_id");
-
-  const initialCategoryId = categoryIdFromUrl
-    ? Number(categoryIdFromUrl)
-    : null;
-
-  const { addedProducts, handleProductAdded, removeToast } = useCartToast();
+  const {
+    categoryId,
+    setCategoryId,
+    selectedCategory,
+  } = useCategories();
 
   const {
     minPrice,
@@ -29,15 +24,13 @@ export default function CategoriesPage() {
     onSale,
     setInStock,
     setOnSale,
-    categoryId,
-    setCategoryId,
-  } = useProductFilters(initialCategoryId);
+  } = useProductFilters();
 
-  const { categories } = useCategories();
-
-  const selectedCategory = categories.find(
-    (category) => category.id === categoryId
-  );
+  const {
+    addedProducts,
+    handleProductAdded,
+    removeToast,
+  } = useCartToast();
 
   return (
     <>
