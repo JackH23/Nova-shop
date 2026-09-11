@@ -1,16 +1,33 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import ProductGallery from "./ProductGallery";
 import ProductInfo from "./ProductInfo";
 import ProductTabs from "./ProductTabs";
 import PageContainer from "@/components/common/PageContainer";
 
-import type { Product } from "@/lib/products";
+import type { Product, ProductVariant } from "@/lib/products";
 
 type ProductDetailProps = {
   product: Product;
 };
 
 export default function ProductDetail({ product }: ProductDetailProps) {
+  const variants = product.variants ?? [];
+
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
+    null,
+  );
+
+  const allVariantImages = variants.flatMap((variant) => variant.images);
+
+  const handleVariantChange = (variant: ProductVariant) => {
+    setSelectedVariant((current) =>
+      current?.id === variant.id ? null : variant
+    );
+  };
+
   return (
     <PageContainer>
       {/* Back to products */}
@@ -24,11 +41,15 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       <div className="grid gap-10 lg:grid-cols-2">
         <ProductGallery
           image={product.image}
-          images={product.images ?? []}
+          images={selectedVariant ? selectedVariant.images : allVariantImages}
           name={product.name}
         />
 
-        <ProductInfo product={product} />
+        <ProductInfo
+          product={product}
+          selectedVariant={selectedVariant}
+          onVariantChange={handleVariantChange}
+        />
       </div>
 
       <ProductTabs />

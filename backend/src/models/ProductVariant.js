@@ -1,8 +1,9 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
+const ProductImage = require("./ProductImage");
 
-const ProductImage = sequelize.define(
-  "ProductImage",
+const ProductVariant = sequelize.define(
+  "ProductVariant",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -15,17 +16,17 @@ const ProductImage = sequelize.define(
       allowNull: false,
     },
 
-    variant_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-
-    image_url: {
-      type: DataTypes.STRING(500),
+    color_name: {
+      type: DataTypes.STRING(100),
       allowNull: false,
     },
 
-    sort_order: {
+    color_hex: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+    },
+
+    stock: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
@@ -37,9 +38,14 @@ const ProductImage = sequelize.define(
     },
   },
   {
-    tableName: "product_images",
+    tableName: "product_variants",
     timestamps: false,
-  },
+  }
 );
 
-module.exports = ProductImage;
+ProductVariant.hasMany(ProductImage, {
+  foreignKey: "variant_id",
+  as: "images",
+});
+
+module.exports = ProductVariant;

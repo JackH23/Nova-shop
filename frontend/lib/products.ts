@@ -6,6 +6,14 @@ export type ProductImage = {
   sort_order: number;
 };
 
+export type ProductVariant = {
+  id: number;
+  color_name: string;
+  color_hex: string | null;
+  stock: number;
+  images: ProductImage[];
+};
+
 export type Product = {
   id: number;
   category_id: number;
@@ -20,8 +28,8 @@ export type Product = {
   // Main image
   image: string;
 
-  // Additional product gallery images
-  images?: ProductImage[];
+  // Product color variants
+  variants?: ProductVariant[];
 
   is_featured: boolean;
   is_new_arrival: boolean;

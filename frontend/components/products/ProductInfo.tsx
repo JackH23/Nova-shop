@@ -1,42 +1,25 @@
 "use client";
 
 import { useProductCart } from "@/composables/useProductCart";
-import type { Product } from "@/lib/products";
+import type { Product, ProductVariant } from "@/lib/products";
 
 type ProductInfoProps = {
   product: Product;
+  selectedVariant: ProductVariant | null;
+  onVariantChange: (variant: ProductVariant) => void;
 };
 
-const colors = [
-  {
-    id: "white",
-    name: "Matte White",
-    className: "bg-white",
-  },
-  {
-    id: "black",
-    name: "Black",
-    className: "bg-slate-900",
-  },
-  {
-    id: "sand",
-    name: "Sand",
-    className: "bg-stone-300",
-  },
-];
-
-export default function ProductInfo({ product }: ProductInfoProps) {
+export default function ProductInfo({
+  product,
+  selectedVariant,
+  onVariantChange,
+}: ProductInfoProps) {
   const {
     quantity,
-    selectedColor,
-    setSelectedColor,
     decreaseQuantity,
     increaseQuantity,
     handleAddToCart,
   } = useProductCart(product);
-
-  const selectedColorName =
-    colors.find((color) => color.id === selectedColor)?.name ?? "Matte White";
 
   return (
     <div className="flex flex-col">
@@ -73,19 +56,25 @@ export default function ProductInfo({ product }: ProductInfoProps) {
       {/* Color selection */}
       <div>
         <p className="text-sm text-slate-700">
-          Color: <span className="font-medium">{selectedColorName}</span>
+          Color:{" "}
+          <span className="font-medium">
+            {selectedVariant?.color_name ?? "No color"}
+          </span>
         </p>
 
         <div className="mt-3 flex gap-3">
-          {colors.map((color) => (
+          {product.variants?.map((variant) => (
             <button
-              key={color.id}
+              key={variant.id}
               type="button"
-              title={color.name}
-              aria-label={`Select ${color.name}`}
-              onClick={() => setSelectedColor(color.id)}
-              className={`h-7 w-7 rounded-full border border-slate-300 ${color.className} ${
-                selectedColor === color.id
+              title={variant.color_name}
+              aria-label={`Select ${variant.color_name}`}
+              onClick={() => onVariantChange(variant)}
+              style={{
+                backgroundColor: variant.color_hex ?? "#ffffff",
+              }}
+              className={`h-7 w-7 rounded-full border border-slate-300 ${
+                selectedVariant?.id === variant.id
                   ? "ring-2 ring-indigo-600 ring-offset-2"
                   : ""
               }`}

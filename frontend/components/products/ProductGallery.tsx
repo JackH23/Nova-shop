@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import type { ProductImage } from "@/lib/products";
 
@@ -15,12 +15,14 @@ export default function ProductGallery({
   images,
   name,
 }: ProductGalleryProps) {
-  const galleryImages = [
-    image,
-    ...images.map((item) => item.image_url),
-  ];
+  const galleryImages =
+    images.length > 0 ? images.map((item) => item.image_url) : [image];
 
-  const [selectedImage, setSelectedImage] = useState(image);
+  const [selectedImage, setSelectedImage] = useState(galleryImages[0]);
+
+  useEffect(() => {
+    setSelectedImage(galleryImages[0]);
+  }, [images, image]);
 
   return (
     <div>
