@@ -7,19 +7,27 @@ type ProductInfoProps = {
   product: Product;
   selectedVariant: ProductVariant | null;
   onVariantChange: (variant: ProductVariant) => void;
+  onProductAdded?: (product: Product) => void;
 };
 
 export default function ProductInfo({
   product,
   selectedVariant,
   onVariantChange,
+  onProductAdded,
 }: ProductInfoProps) {
   const {
     quantity,
     decreaseQuantity,
     increaseQuantity,
     handleAddToCart,
-  } = useProductCart(product);
+    loading,
+    error,
+  } = useProductCart(
+    product,
+    selectedVariant,
+    onProductAdded,
+  );
 
   return (
     <div className="flex flex-col">
@@ -112,11 +120,18 @@ export default function ProductInfo({
         <button
           type="button"
           onClick={handleAddToCart}
-          className="h-11 flex-1 rounded-md bg-indigo-600 px-6 text-sm font-semibold text-white transition hover:bg-indigo-700 cursor-pointer"
+          disabled={loading}
+          className="h-11 flex-1 cursor-pointer rounded-md bg-indigo-600 px-6 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Add to Cart
+          {loading ? "Adding..." : "Add to Cart"}
         </button>
       </div>
+
+      {error && (
+        <p className="mt-2 text-sm text-red-600">
+          {error}
+        </p>
+      )}
 
       {/* Shipping */}
       <p className="mt-4 text-xs text-slate-600">

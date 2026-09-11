@@ -1,85 +1,114 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  useCart,
-  type CartItem,
-} from "@/composables/useCart";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import { useCartToast } from "@/composables/useCartToast";
+import { cartService } from "@/services/cartService";
+import { cartReducer, initialCartState } from "@/reducers/cartReducer";
+import type { CartItem } from "@/lib/cart";
 
 export function useCartContent() {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [state, dispatch] = useReducer(cartReducer, initialCartState);
 
-  const {
-    updateQuantity,
-    removeFromCart,
-  } = useCart();
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const {
-    addedProducts,
-    handleProductRemoved,
-    removeToast,
-  } = useCartToast();
+  const itemsPerPage = 5;
+
+  const { addedProducts, handleProductRemoved, removeToast } = useCartToast();
+
+  // Get cart
+  const getCart = useCallback(async () => {
+    try {
+      dispatch({
+        type: "SET_LOADING",
+        value: true,
+      });
+
+      dispatch({
+        type: "SET_ERROR",
+        value: "",
+      });
+
+      const response = await cartService.getCart(currentPage, itemsPerPage);
+
+      dispatch({
+        type: "SET_CART",
+        value: response.cart,
+      });
+
+      dispatch({
+        type: "SET_PAGINATION",
+        value: response.pagination,
+      });
+    } catch (error) {
+      dispatch({
+        type: "SET_ERROR",
+        value: error instanceof Error ? error.message : "Failed to fetch cart",
+      });
+    } finally {
+      dispatch({
+        type: "SET_LOADING",
+        value: false,
+      });
+    }
+  }, [currentPage]);
 
   // Increase quantity
   const handleIncrease = (item: CartItem) => {
-    updateQuantity(
-      item.product.id,
-      item.color,
-      item.quantity + 1,
-    );
+    console.log("increase", item);
   };
 
   // Decrease quantity
   const handleDecrease = (item: CartItem) => {
-    updateQuantity(
-      item.product.id,
-      item.color,
-      item.quantity - 1,
-    );
+    console.log("decrease", item);
   };
 
   // Remove product
-  const handleRemove = (item: CartItem) => {
-    handleProductRemoved(item.product);
+  const handleRemove = async (item: CartItem) => {
+    try {
+      dispatch({
+        type: "SET_ERROR",
+        value: "",
+      });
 
-    removeFromCart(
-      item.product.id,
-      item.color,
-    );
+      await cartService.removeCartItem(item.id);
+
+      // Show removed success toast
+      handleProductRemoved(item.product);
+
+      // Refresh cart page
+      await getCart();
+
+      // Refresh Navbar cart count
+      window.dispatchEvent(new Event("cart-updated"));
+    } catch (error) {
+      dispatch({
+        type: "SET_ERROR",
+        value:
+          error instanceof Error ? error.message : "Failed to remove cart item",
+      });
+    }
   };
 
-  // Load and listen for cart changes
+  // Fetch cart when page loads
   useEffect(() => {
-    const loadCart = () => {
-      const storedCart = JSON.parse(
-        localStorage.getItem("cart") || "[]",
-      );
-
-      setCart(storedCart);
-    };
-
-    loadCart();
-
-    window.addEventListener(
-      "cart-updated",
-      loadCart,
-    );
-
-    return () => {
-      window.removeEventListener(
-        "cart-updated",
-        loadCart,
-      );
-    };
-  }, []);
+    getCart();
+  }, [getCart]);
 
   return {
-    cart,
+    cart: state.cart?.items ?? [],
+    loading: state.loading,
+    error: state.error,
+
+    currentPage,
+    setCurrentPage,
+    totalPages: state.pagination.totalPages,
+
     addedProducts,
     handleIncrease,
     handleDecrease,
     handleRemove,
     removeToast,
+
+    getCart,
   };
 }

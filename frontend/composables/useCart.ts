@@ -1,112 +1,47 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Product } from "@/lib/products";
-
-export type CartItem = {
-  product: Product;
-  quantity: number;
-  color: string;
-};
+import { cartService } from "@/services/cartService";
+import type { CartItem } from "@/lib/cart";
 
 export function useCart() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
-    const updateCartCount = () => {
-      const storedCart: CartItem[] = JSON.parse(
-        localStorage.getItem("cart") || "[]",
-      );
+    const getCart = async () => {
+      try {
+        const response = await cartService.getCart();
 
-      setCart(storedCart);
+        const items = response.cart.items;
 
-      const totalQuantity = storedCart.reduce(
-        (total, item) => total + item.quantity,
-        0,
-      );
+        setCart(items);
 
-      setCartCount(totalQuantity);
+        const totalQuantity = items.reduce(
+          (total: number, item: CartItem) => total + item.quantity,
+          0,
+        );
+
+        setCartCount(totalQuantity);
+      } catch (error) {
+        console.error("Failed to fetch cart:", error);
+
+        setCart([]);
+        setCartCount(0);
+      }
     };
 
-    // Load count when component first mounts
-    updateCartCount();
+    getCart();
 
-    // Listen when cart changes
-    window.addEventListener("cart-updated", updateCartCount);
+    window.addEventListener("cart-updated", getCart);
 
     return () => {
-      window.removeEventListener("cart-updated", updateCartCount);
+      window.removeEventListener("cart-updated", getCart);
     };
   }, []);
-
-  const addToCart = (product: Product, quantity: number, color: string) => {
-    const cart: CartItem[] = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const existingItem = cart.find(
-      (item) => item.product.id === product.id && item.color === color,
-    );
-
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      cart.push({
-        product,
-        quantity,
-        color,
-      });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-
-    const totalQuantity = cart.reduce(
-      (total, item) => total + item.quantity,
-      0,
-    );
-
-    setCartCount(totalQuantity);
-
-    window.dispatchEvent(new Event("cart-updated"));
-  };
-
-  const updateQuantity = (
-    productId: number,
-    color: string,
-    quantity: number,
-  ) => {
-    const cart: CartItem[] = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const updatedCart = cart.map((item) =>
-      item.product.id === productId && item.color === color
-        ? {
-            ...item,
-            quantity: Math.max(1, quantity),
-          }
-        : item,
-    );
-
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-
-    window.dispatchEvent(new Event("cart-updated"));
-  };
-
-  const removeFromCart = (productId: number, color: string) => {
-    const cart: CartItem[] = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const updatedCart = cart.filter(
-      (item) => !(item.product.id === productId && item.color === color),
-    );
-
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-
-    window.dispatchEvent(new Event("cart-updated"));
-  };
 
   return {
     cart,
     cartCount,
-    addToCart,
-    updateQuantity,
-    removeFromCart,
   };
 }

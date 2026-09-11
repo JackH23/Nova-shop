@@ -7,10 +7,18 @@ import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartContent } from "@/composables/useCartContent";
+import Pagination from "@/components/common/Pagination";
 
 export default function CartContent() {
   const {
     cart,
+    loading,
+    error,
+
+    currentPage,
+    setCurrentPage,
+    totalPages,
+
     addedProducts,
     handleIncrease,
     handleDecrease,
@@ -29,7 +37,11 @@ export default function CartContent() {
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
           <div>
-            {cart.length === 0 ? (
+            {loading ? (
+              <p>Loading cart...</p>
+            ) : error ? (
+              <p className="text-red-600">{error}</p>
+            ) : cart.length === 0 ? (
               <EmptyState
                 title="Your cart is empty"
                 description="Looks like you haven't added anything to your cart yet."
@@ -41,7 +53,7 @@ export default function CartContent() {
                 <div className="space-y-4">
                   {cart.map((item) => (
                     <CartItem
-                      key={`${item.product.id}-${item.color}`}
+                      key={item.id}
                       item={item}
                       onIncrease={() => handleIncrease(item)}
                       onDecrease={() => handleDecrease(item)}
@@ -49,6 +61,14 @@ export default function CartContent() {
                     />
                   ))}
                 </div>
+
+                {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                  />
+                )}
 
                 <Link
                   href="/products"
@@ -60,7 +80,7 @@ export default function CartContent() {
             )}
           </div>
 
-          <CartSummary cart={cart} />
+          {!loading && !error && cart.length > 0 && <CartSummary cart={cart} />}
         </div>
       </PageContainer>
 

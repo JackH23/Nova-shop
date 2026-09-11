@@ -1,9 +1,14 @@
 import { useState } from "react";
-import type { Product } from "@/lib/products";
+
+type ToastProduct = {
+  id: number;
+  name: string;
+  image: string;
+};
 
 type CartToast = {
   id: number;
-  product: Product;
+  product: ToastProduct;
   type: "added" | "removed";
 };
 
@@ -11,7 +16,7 @@ export function useCartToast() {
   const [addedProducts, setAddedProducts] = useState<CartToast[]>([]);
 
   // Add new toast
-  const handleProductAdded = (product: Product) => {
+  const handleProductAdded = (product: ToastProduct) => {
     setAddedProducts((prev) => [
       ...prev,
       {
@@ -22,7 +27,7 @@ export function useCartToast() {
     ]);
   };
 
-  const handleProductRemoved = (product: Product) => {
+  const handleProductRemoved = (product: ToastProduct) => {
     setAddedProducts((prev) => [
       ...prev,
       {

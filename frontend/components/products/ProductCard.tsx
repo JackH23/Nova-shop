@@ -14,7 +14,11 @@ export default function ProductCard({
   product,
   onProductAdded,
 }: ProductCardProps) {
-  const { handleAdd } = useProductCart(product, onProductAdded);
+  const { handleAddToCart, loading } = useProductCart(
+    product,
+    null,
+    onProductAdded,
+  );
 
   const {
     id,
@@ -72,13 +76,23 @@ export default function ProductCard({
             ${priceNumber.toFixed(2)}
           </span>
 
-          <button
-            type="button"
-            onClick={handleAdd}
-            className="rounded bg-[#3324d8] px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-[#271bb7] cursor-pointer"
-          >
-            🛒 Add
-          </button>
+          {product.variants?.length ? (
+            <Link
+              href={`/products/${product.id}`}
+              className="rounded bg-[#3324d8] px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-[#271bb7]"
+            >
+              Select Options
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={loading}
+              className="cursor-pointer rounded bg-[#3324d8] px-3 py-2 text-[11px] font-semibold text-white transition hover:bg-[#271bb7] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "Adding..." : "🛒 Add"}
+            </button>
+          )}
         </div>
       </div>
     </div>

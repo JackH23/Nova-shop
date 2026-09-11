@@ -1,12 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { Product } from "@/lib/products";
 import { X, Check } from "lucide-react";
 import { useEffect, useState } from "react";
 
+type ToastProduct = {
+  id: number;
+  name: string;
+  image: string;
+};
+
 type AddToCartModalProps = {
-  product: Product | null;
+  product: ToastProduct | null;
   index: number;
   onClose: () => void;
   type?: "added" | "removed";

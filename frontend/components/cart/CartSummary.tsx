@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { CartItem } from "@/composables/useCart";
+import type { CartItem } from "@/lib/cart";
 
 type CartSummaryProps = {
   cart: CartItem[];
@@ -7,7 +7,8 @@ type CartSummaryProps = {
 
 export default function CartSummary({ cart }: CartSummaryProps) {
   const subtotal = cart.reduce(
-    (total, item) => total + item.product.price * item.quantity,
+    (total, item) =>
+      total + Number(item.product.price) * item.quantity,
     0,
   );
 

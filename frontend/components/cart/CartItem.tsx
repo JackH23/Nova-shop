@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { CartItem as CartItemType } from "@/composables/useCart";
+import type { CartItem as CartItemType } from "@/lib/cart";
 
 type CartItemProps = {
   item: CartItemType;
@@ -28,7 +28,11 @@ export default function CartItem({
       <div className="min-w-0 flex-1">
         <h2 className="font-semibold text-slate-950">{item.product.name}</h2>
 
-        <p className="mt-1 text-xs text-slate-500">Color: {item.color}</p>
+        {item.variant && (
+          <p className="mt-1 text-xs text-slate-500">
+            Color: {item.variant.color_name}
+          </p>
+        )}
 
         <div className="mt-3 flex h-8 w-fit items-center rounded-full border border-slate-300">
           <button
@@ -56,13 +60,13 @@ export default function CartItem({
 
       <div className="flex self-stretch flex-col items-end justify-between">
         <p className="font-semibold text-slate-950">
-          ${(item.product.price * item.quantity).toFixed(2)}
+          ${(Number(item.product.price) * item.quantity).toFixed(2)}
         </p>
 
         <button
           type="button"
           onClick={onRemove}
-          className="text-xs font-medium text-red-500 transition hover:text-red-600"
+          className="text-xs font-medium text-red-500 transition hover:text-red-600 cursor-pointer"
         >
           ♲ Remove
         </button>
