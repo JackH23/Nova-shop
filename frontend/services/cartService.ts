@@ -30,4 +30,14 @@ export const cartService = {
       method: "DELETE",
     });
   },
+
+  // Update cart item quantity
+  updateCartItem: (cartItemId: number, quantity: number) => {
+    return apiRequest(`/cart/items/${cartItemId}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        quantity,
+      }),
+    });
+  },
 };

@@ -10,6 +10,7 @@ export function useCartContent() {
   const [state, dispatch] = useReducer(cartReducer, initialCartState);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [updateError, setUpdateError] = useState("");
 
   const itemsPerPage = 5;
 
@@ -53,13 +54,55 @@ export function useCartContent() {
   }, [currentPage]);
 
   // Increase quantity
-  const handleIncrease = (item: CartItem) => {
-    console.log("increase", item);
+  const handleIncrease = async (item: CartItem) => {
+    try {
+      dispatch({
+        type: "SET_ERROR",
+        value: "",
+      });
+
+      await cartService.updateCartItem(item.id, item.quantity + 1);
+
+      // Refresh current cart page
+      await getCart();
+
+      // Refresh Navbar cart count
+      window.dispatchEvent(new Event("cart-updated"));
+    } catch (error) {
+      setUpdateError(
+        error instanceof Error
+          ? error.message
+          : "Failed to update cart item",
+      );
+    }
   };
 
   // Decrease quantity
-  const handleDecrease = (item: CartItem) => {
-    console.log("decrease", item);
+  const handleDecrease = async (item: CartItem) => {
+    if (item.quantity <= 1) {
+      return;
+    }
+
+    try {
+      dispatch({
+        type: "SET_ERROR",
+        value: "",
+      });
+
+      await cartService.updateCartItem(item.id, item.quantity - 1);
+
+      // Refresh current cart page
+      await getCart();
+
+      // Refresh Navbar cart count
+      window.dispatchEvent(new Event("cart-updated"));
+    } catch (error) {
+      setUpdateError(
+        error instanceof Error
+          ? error.message
+          : "Failed to update cart item",
+      );
+    }
   };
 
   // Remove product
@@ -89,6 +132,10 @@ export function useCartContent() {
     }
   };
 
+  const closeUpdateError = () => {
+    setUpdateError("");
+  };
+
   // Fetch cart when page loads
   useEffect(() => {
     getCart();
@@ -108,6 +155,9 @@ export function useCartContent() {
     handleDecrease,
     handleRemove,
     removeToast,
+
+    updateError,
+    closeUpdateError,
 
     getCart,
   };

@@ -8,6 +8,7 @@ import CartSummary from "./CartSummary";
 import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartContent } from "@/composables/useCartContent";
 import Pagination from "@/components/common/Pagination";
+import ConfirmModal from "@/components/common/ConfirmModal";
 
 export default function CartContent() {
   const {
@@ -18,6 +19,9 @@ export default function CartContent() {
     currentPage,
     setCurrentPage,
     totalPages,
+
+    updateError,
+    closeUpdateError,
 
     addedProducts,
     handleIncrease,
@@ -93,6 +97,16 @@ export default function CartContent() {
           onClose={() => removeToast(toast.id)}
         />
       ))}
+
+      <ConfirmModal
+        open={!!updateError}
+        title="Unable to Update Quantity"
+        message={updateError}
+        confirmText="OK"
+        cancelText="Close"
+        onConfirm={closeUpdateError}
+        onCancel={closeUpdateError}
+      />
     </>
   );
 }
