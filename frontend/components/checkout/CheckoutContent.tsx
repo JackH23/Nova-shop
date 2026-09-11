@@ -3,15 +3,27 @@
 import ShippingForm from "./ShippingForm";
 import PaymentMethod from "./PaymentMethod";
 import CheckoutSummary from "./CheckoutSummary";
-import { useCart } from "@/composables/useCart";
+import { useCheckout } from "@/composables/useCheckout";
 import { useState } from "react";
 import CheckoutSteps, { type CheckoutStep } from "./CheckoutSteps";
 import PageContainer from "@/components/common/PageContainer";
 import DeliveryMethod from "./DeliveryMethod";
 
 export default function CheckoutContent() {
-  const { cart } = useCart();
+  const { checkout, loading, error } = useCheckout();
   const [step, setStep] = useState<CheckoutStep>("shipping");
+
+  if (loading) {
+    return <div>Loading checkout...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!checkout) {
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -41,7 +53,7 @@ export default function CheckoutContent() {
           {/* Right */}
           <div>
             <CheckoutSummary
-              cart={cart}
+              checkout={checkout}
               step={step}
             />
           </div>

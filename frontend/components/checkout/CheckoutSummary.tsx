@@ -1,23 +1,16 @@
 import { LockKeyhole } from "lucide-react";
-import type { CartItem } from "@/composables/useCart";
+import type { CheckoutData } from "@/services/checkoutService";
 import type { CheckoutStep } from "./CheckoutSteps";
 
 type CheckoutSummaryProps = {
-  cart?: CartItem[];
+  checkout: CheckoutData;
   step: CheckoutStep;
 };
 
 export default function CheckoutSummary({
-  cart = [],
+  checkout,
   step,
 }: CheckoutSummaryProps) {
-  const subtotal = cart.reduce(
-    (total, item) => total + item.product.price * item.quantity,
-    0,
-  );
-
-  const tax = subtotal * 0.08;
-  const total = subtotal + tax;
 
   return (
     <aside className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:sticky lg:top-24">
@@ -26,14 +19,14 @@ export default function CheckoutSummary({
       </h2>
 
       <div className="space-y-4">
-        {cart.map((item) => (
+        {checkout.items.map((item) => (
           <div
-            key={`${item.product.id}-${item.color}`}
+            key={item.cartItemId}
             className="flex items-start justify-between gap-4"
           >
             <div>
               <p className="text-sm font-medium text-slate-900">
-                {item.product.name}
+                {item.productName}
               </p>
 
               <p className="text-xs text-slate-500">
@@ -42,7 +35,7 @@ export default function CheckoutSummary({
             </div>
 
             <span className="text-sm font-semibold">
-              ${(item.product.price * item.quantity).toFixed(2)}
+              ${item.lineTotal.toFixed(2)}
             </span>
           </div>
         ))}
@@ -71,7 +64,7 @@ export default function CheckoutSummary({
       <div className="space-y-3 text-sm">
         <div className="flex justify-between">
           <span className="text-slate-600">Subtotal</span>
-          <span>${subtotal.toFixed(2)}</span>
+          <span>${checkout.subtotal.toFixed(2)}</span>
         </div>
 
         <div className="flex justify-between">
@@ -81,7 +74,7 @@ export default function CheckoutSummary({
 
         <div className="flex justify-between">
           <span className="text-slate-600">Taxes</span>
-          <span>${tax.toFixed(2)}</span>
+          <span>${checkout.tax.toFixed(2)}</span>
         </div>
       </div>
 
@@ -89,7 +82,7 @@ export default function CheckoutSummary({
 
       <div className="flex justify-between text-lg font-bold">
         <span>Total</span>
-        <span>${total.toFixed(2)}</span>
+        <span>${checkout.total.toFixed(2)}</span>
       </div>
 
       <button
