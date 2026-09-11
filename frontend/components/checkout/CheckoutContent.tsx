@@ -8,10 +8,45 @@ import { useState } from "react";
 import CheckoutSteps, { type CheckoutStep } from "./CheckoutSteps";
 import PageContainer from "@/components/common/PageContainer";
 import DeliveryMethod from "./DeliveryMethod";
+import type {
+  ShippingData,
+  DeliveryMethod as DeliveryMethodType,
+  PaymentMethod as PaymentMethodType,
+} from "@/services/checkoutService";
 
 export default function CheckoutContent() {
-  const { checkout, loading, error } = useCheckout();
+  const { checkout, loading, placingOrder, error, placeOrder } = useCheckout();
   const [step, setStep] = useState<CheckoutStep>("shipping");
+
+  const [shippingData, setShippingData] = useState<ShippingData>({
+    email: "",
+    firstName: "",
+    lastName: "",
+    address: "",
+    city: "",
+    stateProvince: "",
+    postalCode: "",
+  });
+
+  const [deliveryMethod, setDeliveryMethod] =
+    useState<DeliveryMethodType>("STANDARD");
+
+  const [paymentMethod, setPaymentMethod] =
+    useState<PaymentMethodType>("CREDIT_CARD");
+
+  const handlePlaceOrder = async () => {
+    try {
+      const response = await placeOrder({
+        shipping: shippingData,
+        deliveryMethod,
+        paymentMethod,
+      });
+
+      console.log("Order placed:", response.order);
+    } catch (error) {
+      console.error("Place order failed:", error);
+    }
+  };
 
   if (loading) {
     return <div>Loading checkout...</div>;
@@ -35,18 +70,28 @@ export default function CheckoutContent() {
           {/* Left */}
           <div className="space-y-6">
             {step === "shipping" && (
-              <ShippingForm onContinue={() => setStep("delivery")} />
+              <ShippingForm
+                shippingData={shippingData}
+                onShippingChange={setShippingData}
+                onContinue={() => setStep("delivery")}
+              />
             )}
 
             {step === "delivery" && (
               <DeliveryMethod
+                deliveryMethod={deliveryMethod}
+                onDeliveryMethodChange={setDeliveryMethod}
                 onBack={() => setStep("shipping")}
                 onContinue={() => setStep("payment")}
               />
             )}
 
             {step === "payment" && (
-              <PaymentMethod onBack={() => setStep("delivery")} />
+              <PaymentMethod
+                paymentMethod={paymentMethod}
+                onPaymentMethodChange={setPaymentMethod}
+                onBack={() => setStep("delivery")}
+              />
             )}
           </div>
 
@@ -55,6 +100,9 @@ export default function CheckoutContent() {
             <CheckoutSummary
               checkout={checkout}
               step={step}
+              deliveryMethod={deliveryMethod}
+              placingOrder={placingOrder}
+              onPlaceOrder={handlePlaceOrder}
             />
           </div>
         </div>

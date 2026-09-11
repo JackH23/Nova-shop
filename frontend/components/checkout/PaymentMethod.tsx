@@ -5,12 +5,21 @@ import { CreditCard } from "lucide-react";
 import AuthInput from "@/components/auth/AuthInput";
 import IconInput from "@/components/auth/IconInput";
 
+import type {
+  PaymentMethod as PaymentMethodType,
+} from "@/services/checkoutService";
+
 type PaymentMethodProps = {
+  paymentMethod: PaymentMethodType;
+  onPaymentMethodChange: (method: PaymentMethodType) => void;
   onBack: () => void;
 };
 
-export default function PaymentMethod({ onBack }: PaymentMethodProps) {
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("card");
+export default function PaymentMethod({
+  paymentMethod,
+  onPaymentMethodChange,
+  onBack,
+}: PaymentMethodProps) {
 
   return (
     <div>
@@ -22,7 +31,7 @@ export default function PaymentMethod({ onBack }: PaymentMethodProps) {
         <div className="space-y-3">
           <label
             className={`flex cursor-pointer items-center justify-between rounded-md border p-4 ${
-              paymentMethod === "card"
+              paymentMethod === "CREDIT_CARD"
                 ? "border-indigo-600 ring-1 ring-indigo-600"
                 : "border-slate-300"
             }`}
@@ -31,8 +40,8 @@ export default function PaymentMethod({ onBack }: PaymentMethodProps) {
               <input
                 type="radio"
                 name="payment"
-                checked={paymentMethod === "card"}
-                onChange={() => setPaymentMethod("card")}
+                checked={paymentMethod === "CREDIT_CARD"}
+                onChange={() => onPaymentMethodChange("CREDIT_CARD")}
               />
 
               <span className="text-sm font-medium">Credit Card</span>
@@ -43,7 +52,7 @@ export default function PaymentMethod({ onBack }: PaymentMethodProps) {
 
           <label
             className={`flex cursor-pointer items-center rounded-md border p-4 ${
-              paymentMethod === "paypal"
+              paymentMethod === "PAYPAL"
                 ? "border-indigo-600 ring-1 ring-indigo-600"
                 : "border-slate-300"
             }`}
@@ -51,15 +60,15 @@ export default function PaymentMethod({ onBack }: PaymentMethodProps) {
             <input
               type="radio"
               name="payment"
-              checked={paymentMethod === "paypal"}
-              onChange={() => setPaymentMethod("paypal")}
+              checked={paymentMethod === "PAYPAL"}
+              onChange={() => onPaymentMethodChange("PAYPAL")}
             />
 
             <span className="ml-3 text-sm font-medium">PayPal</span>
           </label>
         </div>
 
-        {paymentMethod === "card" && (
+        {paymentMethod === "CREDIT_CARD" && (
           <div className="mt-6 space-y-4">
             <IconInput
               id="cardNumber"

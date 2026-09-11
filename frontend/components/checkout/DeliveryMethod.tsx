@@ -1,18 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import type {
+  DeliveryMethod as DeliveryMethodType,
+} from "@/services/checkoutService";
 
 type DeliveryMethodProps = {
+  deliveryMethod: DeliveryMethodType;
+  onDeliveryMethodChange: (method: DeliveryMethodType) => void;
   onBack: () => void;
   onContinue: () => void;
 };
 
 export default function DeliveryMethod({
+  deliveryMethod,
+  onDeliveryMethodChange,
   onBack,
   onContinue,
 }: DeliveryMethodProps) {
-  const [deliveryMethod, setDeliveryMethod] =
-    useState<"standard" | "express">("standard");
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -24,7 +28,7 @@ export default function DeliveryMethod({
         {/* Standard Shipping */}
         <label
           className={`flex cursor-pointer items-center justify-between rounded-md border p-4 transition ${
-            deliveryMethod === "standard"
+            deliveryMethod === "STANDARD"
               ? "border-indigo-600 ring-1 ring-indigo-600"
               : "border-slate-300"
           }`}
@@ -33,10 +37,10 @@ export default function DeliveryMethod({
             <input
               type="radio"
               name="delivery"
-              value="standard"
-              checked={deliveryMethod === "standard"}
+              value="STANDARD"
+              checked={deliveryMethod === "STANDARD"}
               onChange={() =>
-                setDeliveryMethod("standard")
+                onDeliveryMethodChange("STANDARD")
               }
             />
 
@@ -59,7 +63,7 @@ export default function DeliveryMethod({
         {/* Express Shipping */}
         <label
           className={`flex cursor-pointer items-center justify-between rounded-md border p-4 transition ${
-            deliveryMethod === "express"
+            deliveryMethod === "EXPRESS"
               ? "border-indigo-600 ring-1 ring-indigo-600"
               : "border-slate-300"
           }`}
@@ -68,10 +72,10 @@ export default function DeliveryMethod({
             <input
               type="radio"
               name="delivery"
-              value="express"
-              checked={deliveryMethod === "express"}
+              value="EXPRESS"
+              checked={deliveryMethod === "EXPRESS"}
               onChange={() =>
-                setDeliveryMethod("express")
+                onDeliveryMethodChange("EXPRESS")
               }
             />
 

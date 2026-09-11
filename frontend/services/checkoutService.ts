@@ -34,11 +34,57 @@ export type CheckoutResponse = {
   checkout: CheckoutData;
 };
 
+// Place Order types
+
+export type ShippingData = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string;
+  stateProvince: string;
+  postalCode: string;
+};
+
+export type DeliveryMethod = "STANDARD" | "EXPRESS";
+
+export type PaymentMethod = "CREDIT_CARD" | "PAYPAL";
+
+export type PlaceOrderRequest = {
+  shipping: ShippingData;
+  deliveryMethod: DeliveryMethod;
+  paymentMethod: PaymentMethod;
+};
+
+export type PlacedOrder = {
+  id: number;
+  orderNo: string;
+  subtotal: number;
+  shippingFee: number;
+  tax: number;
+  discountAmount: number;
+  total: number;
+  status: string;
+};
+
+export type PlaceOrderResponse = {
+  message: string;
+  order: PlacedOrder;
+};
+
 export const checkoutService = {
   // Get checkout information
   getCheckout: () => {
     return apiRequest("/checkout", {
       method: "GET",
     }) as Promise<CheckoutResponse>;
+  },
+
+  // Place order
+  placeOrder: (data: PlaceOrderRequest) => {
+    return apiRequest("/checkout/order", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }) as Promise<PlaceOrderResponse>;
   },
 };

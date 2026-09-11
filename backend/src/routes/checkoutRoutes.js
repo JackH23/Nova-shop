@@ -13,6 +13,6 @@ const router = express.Router();
 router.get("/", authMiddleware, getCheckout);
 
 // Place order
-router.post("/", authMiddleware, placeOrder);
+router.post("/order", authMiddleware, placeOrder);
 
 module.exports = router;

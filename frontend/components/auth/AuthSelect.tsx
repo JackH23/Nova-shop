@@ -1,3 +1,5 @@
+import type { ChangeEvent } from "react";
+
 type AuthSelectProps = {
   id: string;
   name: string;
@@ -6,6 +8,8 @@ type AuthSelectProps = {
     label: string;
     value: string;
   }[];
+  value?: string;
+  onChange?: (event: ChangeEvent<HTMLSelectElement>) => void;
 };
 
 export default function AuthSelect({
@@ -13,6 +17,8 @@ export default function AuthSelect({
   name,
   label,
   options,
+  value,
+  onChange,
 }: AuthSelectProps) {
   return (
     <div>
@@ -26,6 +32,8 @@ export default function AuthSelect({
       <select
         id={id}
         name={name}
+        value={value}
+        onChange={onChange}
         className="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none focus:border-indigo-500"
       >
         {options.map((option) => (

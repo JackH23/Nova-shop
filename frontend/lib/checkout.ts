@@ -37,3 +37,43 @@ export type CheckoutResponse = {
 export async function getCheckout(): Promise<CheckoutResponse> {
   return checkoutService.getCheckout();
 }
+
+// ================================
+// Place Order
+// ================================
+
+export type ShippingData = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string;
+  stateProvince: string;
+  postalCode: string;
+};
+
+export type DeliveryMethod = "STANDARD" | "EXPRESS";
+
+export type PaymentMethod = "CREDIT_CARD" | "PAYPAL";
+
+export type PlaceOrderRequest = {
+  shipping: ShippingData;
+  deliveryMethod: DeliveryMethod;
+  paymentMethod: PaymentMethod;
+};
+
+export type PlacedOrder = {
+  id: number;
+  orderNo: string;
+  subtotal: number;
+  shippingFee: number;
+  tax: number;
+  discountAmount: number;
+  total: number;
+  status: string;
+};
+
+export type PlaceOrderResponse = {
+  message: string;
+  order: PlacedOrder;
+};

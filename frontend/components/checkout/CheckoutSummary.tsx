@@ -1,16 +1,25 @@
 import { LockKeyhole } from "lucide-react";
-import type { CheckoutData } from "@/services/checkoutService";
+import type { CheckoutData, DeliveryMethod } from "@/services/checkoutService";
 import type { CheckoutStep } from "./CheckoutSteps";
 
 type CheckoutSummaryProps = {
   checkout: CheckoutData;
   step: CheckoutStep;
+  deliveryMethod: DeliveryMethod;
+  placingOrder: boolean;
+  onPlaceOrder: () => void;
 };
 
 export default function CheckoutSummary({
   checkout,
   step,
+  deliveryMethod,
+  placingOrder,
+  onPlaceOrder,
 }: CheckoutSummaryProps) {
+  const shippingFee = deliveryMethod === "EXPRESS" ? 15 : 5;
+
+  const total = checkout.subtotal + checkout.tax + shippingFee;
 
   return (
     <aside className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:sticky lg:top-24">
@@ -69,7 +78,7 @@ export default function CheckoutSummary({
 
         <div className="flex justify-between">
           <span className="text-slate-600">Shipping</span>
-          <span className="text-xs text-slate-500">Calculated next step</span>
+          <span>${shippingFee.toFixed(2)}</span>
         </div>
 
         <div className="flex justify-between">
@@ -82,20 +91,21 @@ export default function CheckoutSummary({
 
       <div className="flex justify-between text-lg font-bold">
         <span>Total</span>
-        <span>${checkout.total.toFixed(2)}</span>
+        <span>${total.toFixed(2)}</span>
       </div>
 
       <button
         type="button"
-        disabled={step !== "payment"}
+        onClick={onPlaceOrder}
+        disabled={step !== "payment" || placingOrder}
         className={`mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-md font-semibold text-white transition ${
-          step === "payment"
+          step === "payment" && !placingOrder
             ? "bg-indigo-600 hover:bg-indigo-700"
             : "cursor-not-allowed bg-slate-300"
         }`}
       >
         <LockKeyhole size={16} />
-        Place Order
+        {placingOrder ? "Placing Order..." : "Place Order"}
       </button>
 
       <p className="mt-3 text-center text-xs text-slate-500">
