@@ -7,6 +7,8 @@ import OrderHeader from "@/components/dashboard/OrderHeader";
 import OrderProgress from "@/components/dashboard/OrderProgress";
 import OrderItems from "@/components/dashboard/OrderItems";
 import OrderShipping from "@/components/dashboard/OrderShipping";
+import OrderPayment from "@/components/dashboard/OrderPayment";
+import OrderSummary from "@/components/dashboard/OrderSummary";
 
 type OrderDetailContentProps = {
   orderId: number;
@@ -35,19 +37,24 @@ export default function OrderDetailContent({
         <DashboardSidebar />
 
         <div className="min-w-0 space-y-6">
-          <OrderHeader
-            orderNo={order.order_no}
-            status={order.status}
-          />
+          <OrderHeader orderNo={order.order_no} status={order.status} />
 
           <OrderProgress status={order.status} />
 
           <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
-            <OrderItems items={order.items} />
+            {/* Left */}
+            <div className="min-w-0 space-y-6">
+              <OrderItems items={order.items} />
 
-            <OrderShipping
-              delivery={order.delivery}
-            />
+              <div className="grid gap-6 md:grid-cols-2">
+                <OrderShipping delivery={order.delivery} />
+
+                <OrderPayment payment={order.payment} />
+              </div>
+            </div>
+
+            {/* Right */}
+            <OrderSummary order={order} />
           </div>
         </div>
       </div>
