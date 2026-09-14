@@ -1,7 +1,9 @@
+const { Op } = require("sequelize");
 const Order = require("../models/Order");
 const OrderItem = require("../models/OrderItem");
 const Delivery = require("../models/Delivery");
 const Payment = require("../models/Payment");
+const ShippingAddress = require("../models/ShippingAddress");
 
 // Get all orders for logged-in user
 const getOrders = async (req, res) => {
@@ -61,6 +63,109 @@ const getOrders = async (req, res) => {
   }
 };
 
+const getDashboardSummary = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const now = new Date();
+
+    const startOfMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      1
+    );
+
+    const startOfNextMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      1
+    );
+
+    // Total orders
+    const totalOrders = await Order.count({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    // Orders this month
+    const ordersThisMonth = await Order.count({
+      where: {
+        user_id: userId,
+        created_at: {
+          [Op.gte]: startOfMonth,
+          [Op.lt]: startOfNextMonth,
+        },
+      },
+    });
+
+    // Total spending
+    const paidOrders = await Order.findAll({
+      where: {
+        user_id: userId,
+      },
+      include: [
+        {
+          model: Payment,
+          as: "payment",
+          required: true,
+          where: {
+            status: "PAID",
+          },
+          attributes: [],
+        },
+      ],
+      attributes: ["total_amount"],
+    });
+
+    const totalSpending = paidOrders.reduce(
+      (total, order) => total + Number(order.total_amount || 0),
+      0
+    );
+
+    // Recent order
+    const recentOrder = await Order.findOne({
+      where: {
+        user_id: userId,
+      },
+      include: [
+        {
+          model: OrderItem,
+          as: "items",
+          required: false,
+        },
+      ],
+      order: [["created_at", "DESC"]],
+    });
+
+    // Shipping address from most recent order
+    const defaultAddress = recentOrder
+      ? await ShippingAddress.findOne({
+          where: {
+            order_id: recentOrder.id,
+          },
+        })
+      : null;
+
+    return res.status(200).json({
+      message: "Dashboard summary fetched successfully",
+      dashboard: {
+        totalOrders,
+        ordersThisMonth,
+        totalSpending,
+        recentOrder,
+        defaultAddress,
+      },
+    });
+  } catch (error) {
+    console.error("Get dashboard summary error:", error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 // Get one order detail
 const getOrderById = async (req, res) => {
   try {
@@ -111,6 +216,7 @@ const getOrderById = async (req, res) => {
 };
 
 module.exports = {
+  getDashboardSummary,
   getOrders,
   getOrderById,
 };

@@ -1,24 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useOrders } from "@/composables/useOrders";
+import type { DashboardOrder } from "@/lib/dashboard";
 
-export default function DashboardRecentOrder() {
-  const { orders, loading, error } = useOrders();
+type DashboardRecentOrderProps = {
+  order: DashboardOrder | null;
+};
 
-  const recentOrder = orders[0];
-
-  if (loading) {
-    return (
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <p className="text-sm text-slate-500">
-          Loading recent order...
-        </p>
-      </div>
-    );
-  }
-
-  if (error || !recentOrder) {
+export default function DashboardRecentOrder({
+  order: recentOrder,
+}: DashboardRecentOrderProps) {
+  if (!recentOrder) {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
         <p className="text-sm text-slate-500">

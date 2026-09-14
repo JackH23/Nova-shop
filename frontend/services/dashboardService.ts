@@ -2,6 +2,7 @@ import { apiRequest } from "@/lib/api";
 import type {
   DashboardOrderResponse,
   DashboardOrdersResponse,
+  DashboardSummaryResponse,
 } from "@/lib/dashboard";
 
 export const dashboardService = {
@@ -23,6 +24,13 @@ export const dashboardService = {
     orderId: number,
   ): Promise<DashboardOrderResponse> => {
     return apiRequest(`/dashboard/orders/${orderId}`, {
+      method: "GET",
+    });
+  },
+
+  // GET dashboard summary
+  getSummary: (): Promise<DashboardSummaryResponse> => {
+    return apiRequest("/dashboard/summary", {
       method: "GET",
     });
   },

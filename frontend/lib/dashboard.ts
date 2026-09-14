@@ -67,6 +67,34 @@ export type DashboardOrderResponse = {
   order: DashboardOrder;
 };
 
+// Shipping Address
+export type DashboardShippingAddress = {
+  id: number;
+  order_id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  address: string;
+  city: string;
+  state_province: string;
+  postal_code: string;
+  created_at: string;
+  updated_at: string;
+};
+
+// GET /dashboard/summary
+export type DashboardSummaryResponse = {
+  message: string;
+
+  dashboard: {
+    totalOrders: number;
+    ordersThisMonth: number;
+    totalSpending: number;
+    recentOrder: DashboardOrder | null;
+    defaultAddress: DashboardShippingAddress | null;
+  };
+};
+
 // GET /dashboard/orders
 export type DashboardOrdersResponse = {
   message: string;

@@ -1,6 +1,8 @@
-import type { DashboardOrder } from "@/lib/dashboard";
+import type { DashboardOrder, DashboardSummaryResponse } from "@/lib/dashboard";
 
 export type DashboardState = {
+  summary: DashboardSummaryResponse["dashboard"] | null;
+
   order: DashboardOrder | null;
   orders: DashboardOrder[];
   total: number;
@@ -12,6 +14,7 @@ export type DashboardState = {
 };
 
 export const initialDashboardState: DashboardState = {
+  summary: null,
   order: null,
   orders: [],
   total: 0,
@@ -23,6 +26,10 @@ export const initialDashboardState: DashboardState = {
 };
 
 export type DashboardAction =
+  | {
+      type: "SET_SUMMARY";
+      value: DashboardSummaryResponse["dashboard"] | null;
+    }
   | {
       type: "SET_ORDER";
       value: DashboardOrder | null;
@@ -51,6 +58,11 @@ export function dashboardReducer(
   action: DashboardAction,
 ): DashboardState {
   switch (action.type) {
+    case "SET_SUMMARY":
+      return {
+        ...state,
+        summary: action.value,
+      };
     case "SET_ORDER":
       return {
         ...state,

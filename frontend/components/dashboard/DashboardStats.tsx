@@ -1,6 +1,16 @@
 import { ShoppingBag, Wallet } from "lucide-react";
 
-export default function DashboardStats() {
+type DashboardStatsProps = {
+  totalOrders: number;
+  ordersThisMonth: number;
+  totalSpending: number;
+};
+
+export default function DashboardStats({
+  totalOrders,
+  ordersThisMonth,
+  totalSpending,
+}: DashboardStatsProps) {
   return (
     <div className="mt-6 grid gap-4 md:grid-cols-3">
       {/* Total Orders */}
@@ -12,18 +22,15 @@ export default function DashboardStats() {
             </p>
 
             <p className="mt-2 text-3xl font-bold text-indigo-600">
-              24
+              {totalOrders}
             </p>
 
             <p className="mt-3 text-xs text-emerald-600">
-              ↗ +3 this month
+              ↗ +{ordersThisMonth} this month
             </p>
           </div>
 
-          <ShoppingBag
-            size={28}
-            className="text-indigo-100"
-          />
+          <ShoppingBag size={28} className="text-indigo-100" />
         </div>
       </div>
 
@@ -36,26 +43,19 @@ export default function DashboardStats() {
             </p>
 
             <p className="mt-2 text-3xl font-bold text-indigo-600">
-              $1,240
+              ${totalSpending.toLocaleString()}
             </p>
 
-            <p className="mt-3 text-xs text-slate-500">
-              Lifetime value
-            </p>
+            <p className="mt-3 text-xs text-slate-500">Lifetime value</p>
           </div>
 
-          <Wallet
-            size={28}
-            className="text-indigo-100"
-          />
+          <Wallet size={28} className="text-indigo-100" />
         </div>
       </div>
 
       {/* Premium */}
       <div className="rounded-lg bg-indigo-600 p-5 text-white shadow-sm">
-        <h2 className="font-semibold">
-          NovaShop Premium
-        </h2>
+        <h2 className="font-semibold">NovaShop Premium</h2>
 
         <p className="mt-3 text-sm text-indigo-100">
           You are earning 2x points on every purchase.

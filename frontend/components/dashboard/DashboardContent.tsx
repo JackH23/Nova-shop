@@ -5,8 +5,11 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import DashboardRecentOrder from "@/components/dashboard/DashboardRecentOrder";
 import DashboardDefaultAddress from "@/components/dashboard/DashboardDefaultAddress";
+import { useDashboard } from "@/composables/useDashboard";
 
 export default function DashboardContent() {
+  const { summary, loading, error } = useDashboard();
+
   return (
     <PageContainer>
       <div className="grid grid-cols-1 gap-6 py-8 lg:grid-cols-[220px_1fr]">
@@ -21,12 +24,19 @@ export default function DashboardContent() {
             Here is an overview of your recent activity and account status.
           </p>
 
-            <DashboardStats />
+          <DashboardStats
+            totalOrders={summary?.totalOrders ?? 0}
+            ordersThisMonth={summary?.ordersThisMonth ?? 0}
+            totalSpending={summary?.totalSpending ?? 0}
+          />
 
-            <div className="mt-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
-            <DashboardRecentOrder />
-            <DashboardDefaultAddress />
-            </div>
+          <div className="mt-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
+            <DashboardRecentOrder order={summary?.recentOrder ?? null} />
+
+            <DashboardDefaultAddress
+              address={summary?.defaultAddress ?? null}
+            />
+          </div>
         </div>
       </div>
     </PageContainer>

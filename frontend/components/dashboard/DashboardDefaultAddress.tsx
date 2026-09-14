@@ -1,37 +1,50 @@
-import { Pencil, Phone } from "lucide-react";
+import type { DashboardShippingAddress } from "@/lib/dashboard";
 
-export default function DashboardDefaultAddress() {
+type DashboardDefaultAddressProps = {
+  address: DashboardShippingAddress | null;
+};
+
+export default function DashboardDefaultAddress({
+  address,
+}: DashboardDefaultAddressProps) {
+  if (!address) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="text-sm font-semibold text-slate-900">
+          Shipping Address
+        </h2>
+
+        <p className="mt-4 text-sm text-slate-500">
+          No shipping address found.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold text-slate-900">
-          Default Address
+          Shipping Address
         </h2>
-
-        <button
-          type="button"
-          className="text-slate-500 hover:text-indigo-600"
-        >
-          <Pencil size={14} />
-        </button>
       </div>
 
       <div className="mt-4 rounded-md bg-slate-50 p-4">
         <p className="text-sm font-semibold text-slate-900">
-          Alex Doe
+          {address.first_name} {address.last_name}
         </p>
 
         <div className="mt-2 space-y-1 text-xs text-slate-600">
-          <p>1234 Design Boulevard</p>
-          <p>Apt 4B</p>
-          <p>San Francisco, CA 94107</p>
-          <p>United States</p>
+          <p>{address.address}</p>
+
+          <p>
+            {address.city}
+            {address.state_province && `, ${address.state_province}`}{" "}
+            {address.postal_code}
+          </p>
         </div>
 
-        <div className="mt-3 flex items-center gap-2 text-xs text-slate-600">
-          <Phone size={12} />
-          <span>+1 (555) 123-4567</span>
-        </div>
+        <div className="mt-3 text-xs text-slate-600">{address.email}</div>
       </div>
     </div>
   );
