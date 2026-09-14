@@ -32,6 +32,10 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
     }
   };
 
+  const handleReturnItem = () => {
+    router.push(`/dashboard/orders/${order.id}/return`);
+  };
+
   return (
     <div className="h-fit rounded-lg border border-slate-200 bg-white p-5">
       <h2 className="text-sm font-semibold text-slate-900">Order Summary</h2>
@@ -92,12 +96,15 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
         Buy Again
       </button>
 
-      <button
-        type="button"
-        className="mt-2 w-full cursor-pointer rounded-md border border-slate-200 py-2.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
-      >
-        Return Item
-      </button>
+      {order.status === "DELIVERED" && (
+        <button
+          type="button"
+          onClick={handleReturnItem}
+          className="mt-2 w-full cursor-pointer rounded-md border border-slate-200 py-2.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+        >
+          Return Item
+        </button>
+      )}
     </div>
   );
 }
