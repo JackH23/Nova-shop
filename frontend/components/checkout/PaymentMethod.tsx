@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import { CreditCard } from "lucide-react";
 import AuthInput from "@/components/auth/AuthInput";
 import IconInput from "@/components/auth/IconInput";
-
+import type { PaymentMethod as PaymentMethodType } from "@/services/checkoutService";
 import type {
-  PaymentMethod as PaymentMethodType,
-} from "@/services/checkoutService";
+  PaymentData,
+  PaymentErrors,
+} from "@/composables/usePaymentValidation";
 
 type PaymentMethodProps = {
+  onPaymentChange: (field: keyof PaymentData, value: string) => void;
+  paymentData: PaymentData;
+  errors: PaymentErrors;
   paymentMethod: PaymentMethodType;
   onPaymentMethodChange: (method: PaymentMethodType) => void;
   onBack: () => void;
@@ -17,10 +20,12 @@ type PaymentMethodProps = {
 
 export default function PaymentMethod({
   paymentMethod,
+  paymentData,
+  errors,
   onPaymentMethodChange,
+  onPaymentChange,
   onBack,
 }: PaymentMethodProps) {
-
   return (
     <div>
       <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -76,6 +81,9 @@ export default function PaymentMethod({
               label="Card Number"
               placeholder="0000 0000 0000 0000"
               icon={<CreditCard size={16} />}
+              value={paymentData.cardNumber}
+              error={errors.cardNumber}
+              onChange={(e) => onPaymentChange("cardNumber", e.target.value)}
             />
 
             <div className="grid grid-cols-2 gap-4">
@@ -85,6 +93,9 @@ export default function PaymentMethod({
                 label="Expiry Date"
                 type="text"
                 placeholder="MM/YY"
+                value={paymentData.expiryDate}
+                error={errors.expiryDate}
+                onChange={(e) => onPaymentChange("expiryDate", e.target.value)}
               />
 
               <AuthInput
@@ -93,6 +104,9 @@ export default function PaymentMethod({
                 label="CVC"
                 type="text"
                 placeholder="123"
+                value={paymentData.cvc}
+                error={errors.cvc}
+                onChange={(e) => onPaymentChange("cvc", e.target.value)}
               />
             </div>
           </div>

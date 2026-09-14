@@ -1,6 +1,6 @@
 import AuthInput from "@/components/auth/AuthInput";
 import AuthSelect from "@/components/auth/AuthSelect";
-
+import { useShippingValidation } from "@/composables/useShippingValidation";
 import type { ShippingData } from "@/services/checkoutService";
 
 type ShippingFormProps = {
@@ -14,15 +14,15 @@ export default function ShippingForm({
   onShippingChange,
   onContinue,
 }: ShippingFormProps) {
-  const handleChange = (
-    field: keyof ShippingData,
-    value: string,
-  ) => {
-    onShippingChange({
-      ...shippingData,
-      [field]: value,
-    });
-  };
+  const {
+    errors,
+    handleChange,
+    handleContinue,
+  } = useShippingValidation(
+    shippingData,
+    onShippingChange,
+    onContinue,
+  );
 
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
@@ -34,6 +34,7 @@ export default function ShippingForm({
         {/* Email */}
         <AuthInput
           id="email"
+          error={errors.email}
           name="email"
           label="Email address"
           type="email"
@@ -46,6 +47,7 @@ export default function ShippingForm({
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <AuthInput
             id="firstName"
+            error={errors.firstName}
             name="firstName"
             label="First Name"
             type="text"
@@ -56,6 +58,7 @@ export default function ShippingForm({
 
           <AuthInput
             id="lastName"
+            error={errors.lastName}
             name="lastName"
             label="Last Name"
             type="text"
@@ -68,6 +71,7 @@ export default function ShippingForm({
         {/* Address */}
         <AuthInput
           id="address"
+          error={errors.address}
           name="address"
           label="Address"
           type="text"
@@ -80,6 +84,7 @@ export default function ShippingForm({
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <AuthInput
             id="city"
+            error={errors.city}
             name="city"
             label="City"
             type="text"
@@ -93,9 +98,8 @@ export default function ShippingForm({
             name="state"
             label="State / Province"
             value={shippingData.stateProvince}
-            onChange={(e) =>
-              handleChange("stateProvince", e.target.value)
-            }
+            error={errors.stateProvince}
+            onChange={(e) => handleChange("stateProvince", e.target.value)}
             options={[
               { label: "Select State", value: "" },
               { label: "California", value: "california" },
@@ -106,20 +110,19 @@ export default function ShippingForm({
 
           <AuthInput
             id="postalCode"
+            error={errors.postalCode}
             name="postalCode"
             label="Postal Code"
             type="text"
             placeholder="Postal Code"
             value={shippingData.postalCode}
-            onChange={(e) =>
-              handleChange("postalCode", e.target.value)
-            }
+            onChange={(e) => handleChange("postalCode", e.target.value)}
           />
         </div>
 
         <button
           type="button"
-          onClick={onContinue}
+          onClick={handleContinue}
           className="h-11 w-full rounded-md bg-indigo-600 text-sm font-semibold text-white transition hover:bg-indigo-700"
         >
           Continue to Delivery →

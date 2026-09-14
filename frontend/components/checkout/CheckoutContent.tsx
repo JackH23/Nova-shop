@@ -3,53 +3,36 @@
 import ShippingForm from "./ShippingForm";
 import PaymentMethod from "./PaymentMethod";
 import CheckoutSummary from "./CheckoutSummary";
-import { useCheckout } from "@/composables/useCheckout";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import CheckoutSteps, { type CheckoutStep } from "./CheckoutSteps";
+import CheckoutSteps from "./CheckoutSteps";
 import PageContainer from "@/components/common/PageContainer";
 import DeliveryMethod from "./DeliveryMethod";
-import type {
-  ShippingData,
-  DeliveryMethod as DeliveryMethodType,
-  PaymentMethod as PaymentMethodType,
-} from "@/services/checkoutService";
+import { useCheckoutContent } from "@/composables/useCheckoutContent";
+import ConfirmModal from "@/components/common/ConfirmModal";
 
 export default function CheckoutContent() {
-  const { checkout, loading, placingOrder, error, placeOrder } = useCheckout();
-  const [step, setStep] = useState<CheckoutStep>("shipping");
-  const router = useRouter();
+  const {
+    checkout,
+    loading,
+    placingOrder,
+    error,
+    step,
+    setStep,
+    shippingData,
+    setShippingData,
+    deliveryMethod,
+    setDeliveryMethod,
+    paymentMethod,
+    setPaymentMethod,
+    paymentData,
+    paymentErrors,
+    handlePaymentChange,
 
-  const [shippingData, setShippingData] = useState<ShippingData>({
-    email: "",
-    firstName: "",
-    lastName: "",
-    address: "",
-    city: "",
-    stateProvince: "",
-    postalCode: "",
-  });
+    showConfirm,
+    openConfirm,
+    closeConfirm,
 
-  const [deliveryMethod, setDeliveryMethod] =
-    useState<DeliveryMethodType>("STANDARD");
-
-  const [paymentMethod, setPaymentMethod] =
-    useState<PaymentMethodType>("CREDIT_CARD");
-
-  const handlePlaceOrder = async () => {
-    try {
-      const response = await placeOrder({
-        shipping: shippingData,
-        deliveryMethod,
-        paymentMethod,
-      });
-
-      console.log("Order placed:", response.order);
-      router.push(`/checkout/success?orderId=${response.order.id}`);
-    } catch (error) {
-      console.error("Place order failed:", error);
-    }
-  };
+    handlePlaceOrder,
+  } = useCheckoutContent();
 
   if (loading) {
     return <div>Loading checkout...</div>;
@@ -64,52 +47,67 @@ export default function CheckoutContent() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <PageContainer>
-        {/* Checkout steps */}
-        <CheckoutSteps step={step} />
+    <>
+      <main className="min-h-screen bg-slate-50">
+        <PageContainer>
+          {/* Checkout steps */}
+          <CheckoutSteps step={step} />
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
-          {/* Left */}
-          <div className="space-y-6">
-            {step === "shipping" && (
-              <ShippingForm
-                shippingData={shippingData}
-                onShippingChange={setShippingData}
-                onContinue={() => setStep("delivery")}
-              />
-            )}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
+            {/* Left */}
+            <div className="space-y-6">
+              {step === "shipping" && (
+                <ShippingForm
+                  shippingData={shippingData}
+                  onShippingChange={setShippingData}
+                  onContinue={() => setStep("delivery")}
+                />
+              )}
 
-            {step === "delivery" && (
-              <DeliveryMethod
+              {step === "delivery" && (
+                <DeliveryMethod
+                  deliveryMethod={deliveryMethod}
+                  onDeliveryMethodChange={setDeliveryMethod}
+                  onBack={() => setStep("shipping")}
+                  onContinue={() => setStep("payment")}
+                />
+              )}
+
+              {step === "payment" && (
+                <PaymentMethod
+                  paymentMethod={paymentMethod}
+                  paymentData={paymentData}
+                  errors={paymentErrors}
+                  onPaymentMethodChange={setPaymentMethod}
+                  onPaymentChange={handlePaymentChange}
+                  onBack={() => setStep("delivery")}
+                />
+              )}
+            </div>
+
+            {/* Right */}
+            <div>
+              <CheckoutSummary
+                checkout={checkout}
+                step={step}
                 deliveryMethod={deliveryMethod}
-                onDeliveryMethodChange={setDeliveryMethod}
-                onBack={() => setStep("shipping")}
-                onContinue={() => setStep("payment")}
+                placingOrder={placingOrder}
+                onPlaceOrder={openConfirm}
               />
-            )}
-
-            {step === "payment" && (
-              <PaymentMethod
-                paymentMethod={paymentMethod}
-                onPaymentMethodChange={setPaymentMethod}
-                onBack={() => setStep("delivery")}
-              />
-            )}
+            </div>
           </div>
+        </PageContainer>
+      </main>
 
-          {/* Right */}
-          <div>
-            <CheckoutSummary
-              checkout={checkout}
-              step={step}
-              deliveryMethod={deliveryMethod}
-              placingOrder={placingOrder}
-              onPlaceOrder={handlePlaceOrder}
-            />
-          </div>
-        </div>
-      </PageContainer>
-    </main>
+      <ConfirmModal
+        open={showConfirm}
+        title="Confirm Order"
+        message="Are you sure you want to place this order?"
+        cancelText="Cancel"
+        confirmText="Place Order"
+        onCancel={closeConfirm}
+        onConfirm={handlePlaceOrder}
+      />
+    </>
   );
 }

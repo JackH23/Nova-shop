@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ChangeEventHandler, ReactNode } from "react";
 
 type IconInputProps = {
   id: string;
@@ -7,6 +7,9 @@ type IconInputProps = {
   type?: string;
   placeholder?: string;
   icon: ReactNode;
+  value?: string;
+  error?: string;
+  onChange?: ChangeEventHandler<HTMLInputElement>;
 };
 
 export default function IconInput({
@@ -16,6 +19,9 @@ export default function IconInput({
   type = "text",
   placeholder,
   icon,
+  value,
+  error,
+  onChange,
 }: IconInputProps) {
   return (
     <div>
@@ -31,12 +37,24 @@ export default function IconInput({
           {icon}
         </div>
 
+        {error && (
+          <p className="mt-1 text-xs text-red-500">
+            {error}
+          </p>
+        )}
+
         <input
           id={id}
           name={name}
+          value={value}
+          onChange={onChange}
           type={type}
           placeholder={placeholder}
-          className="h-11 w-full rounded-md border border-slate-300 pl-10 pr-3 text-sm outline-none focus:border-indigo-500"
+          className={`h-11 w-full rounded-md border pl-10 pr-3 text-sm outline-none transition ${
+            error
+              ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+              : "border-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          }`}
         />
       </div>
     </div>
