@@ -41,7 +41,7 @@ export default function Navbar() {
           <div className="mx-auto flex h-[70px] max-w-[1440px] items-center px-9">
             {/* Logo */}
             <Link
-              href="/dashboard"
+              href="/home"
               className="text-[18px] font-bold text-[#3324d8]"
             >
               NovaShop
