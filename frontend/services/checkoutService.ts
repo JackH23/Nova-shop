@@ -67,6 +67,11 @@ export type PlacedOrder = {
   status: string;
 };
 
+export type GetOrderResponse = {
+  message: string;
+  order: PlacedOrder;
+};
+
 export type PlaceOrderResponse = {
   message: string;
   order: PlacedOrder;
@@ -86,5 +91,12 @@ export const checkoutService = {
       method: "POST",
       body: JSON.stringify(data),
     }) as Promise<PlaceOrderResponse>;
+  },
+
+  // Get order by ID
+  getOrderById: (orderId: number) => {
+    return apiRequest(`/checkout/order/${orderId}`, {
+      method: "GET",
+    }) as Promise<GetOrderResponse>;
   },
 };

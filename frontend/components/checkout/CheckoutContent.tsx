@@ -4,6 +4,7 @@ import ShippingForm from "./ShippingForm";
 import PaymentMethod from "./PaymentMethod";
 import CheckoutSummary from "./CheckoutSummary";
 import { useCheckout } from "@/composables/useCheckout";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import CheckoutSteps, { type CheckoutStep } from "./CheckoutSteps";
 import PageContainer from "@/components/common/PageContainer";
@@ -17,6 +18,7 @@ import type {
 export default function CheckoutContent() {
   const { checkout, loading, placingOrder, error, placeOrder } = useCheckout();
   const [step, setStep] = useState<CheckoutStep>("shipping");
+  const router = useRouter();
 
   const [shippingData, setShippingData] = useState<ShippingData>({
     email: "",
@@ -43,6 +45,7 @@ export default function CheckoutContent() {
       });
 
       console.log("Order placed:", response.order);
+      router.push(`/checkout/success?orderId=${response.order.id}`);
     } catch (error) {
       console.error("Place order failed:", error);
     }

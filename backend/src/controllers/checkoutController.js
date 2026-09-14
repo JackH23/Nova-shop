@@ -491,7 +491,50 @@ const placeOrder = async (req, res) => {
   }
 };
 
+const getOrderById = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const orderId = req.params.id;
+
+    const order = await Order.findOne({
+      where: {
+        id: orderId,
+        user_id: userId,
+      },
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Order fetched successfully",
+
+      order: {
+        id: order.id,
+        orderNo: order.order_no,
+        subtotal: Number(order.subtotal),
+        shippingFee: Number(order.shipping_fee),
+        tax: Number(order.tax),
+        discountAmount: Number(order.discount_amount),
+        total: Number(order.total_amount),
+        status: order.status,
+      },
+    });
+  } catch (error) {
+    console.error("Get order error:", error);
+
+    return res.status(500).json({
+      message: "Failed to fetch order",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getCheckout,
   placeOrder,
+  getOrderById,
 };

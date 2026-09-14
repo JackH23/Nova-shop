@@ -39,12 +39,23 @@ export function useCheckout() {
         value: response.checkout,
       });
     } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to load checkout";
+
+      // Empty cart is a normal checkout state
+      if (message === "Your cart is empty") {
+        dispatch({
+          type: "RESET_CHECKOUT",
+        });
+
+        return;
+      }
+
       console.error("Failed to fetch checkout:", error);
 
       dispatch({
         type: "SET_ERROR",
-        value:
-          error instanceof Error ? error.message : "Failed to load checkout",
+        value: message,
       });
     } finally {
       dispatch({
