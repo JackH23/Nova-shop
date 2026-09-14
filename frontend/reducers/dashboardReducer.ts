@@ -2,12 +2,22 @@ import type { DashboardOrder } from "@/lib/dashboard";
 
 export type DashboardState = {
   order: DashboardOrder | null;
+  orders: DashboardOrder[];
+  total: number;
+  totalPages: number;
+  page: number;
+  limit: number;
   loading: boolean;
   error: string;
 };
 
 export const initialDashboardState: DashboardState = {
   order: null,
+  orders: [],
+  total: 0,
+  totalPages: 0,
+  page: 1,
+  limit: 5,
   loading: false,
   error: "",
 };
@@ -16,6 +26,16 @@ export type DashboardAction =
   | {
       type: "SET_ORDER";
       value: DashboardOrder | null;
+    }
+  | {
+      type: "SET_ORDERS";
+      value: {
+        orders: DashboardOrder[];
+        total: number;
+        totalPages: number;
+        page: number;
+        limit: number;
+      };
     }
   | {
       type: "SET_LOADING";
@@ -35,6 +55,16 @@ export function dashboardReducer(
       return {
         ...state,
         order: action.value,
+      };
+
+    case "SET_ORDERS":
+      return {
+        ...state,
+        orders: action.value.orders,
+        total: action.value.total,
+        totalPages: action.value.totalPages,
+        page: action.value.page,
+        limit: action.value.limit,
       };
 
     case "SET_LOADING":

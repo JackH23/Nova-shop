@@ -2,30 +2,17 @@
 
 import { useState } from "react";
 
-export function usePagination<T>(
-  items: T[],
-  itemsPerPage = 9,
-) {
-  const [currentPage, setCurrentPage] = useState(1);
+export function usePagination(initialPage = 1) {
+  const [currentPage, setCurrentPage] =
+    useState(initialPage);
 
-  const totalPages = Math.ceil(
-    items.length / itemsPerPage,
-  );
-
-  const startIndex =
-    (currentPage - 1) * itemsPerPage;
-
-  const paginatedItems = items.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
+  const resetPage = () => {
+    setCurrentPage(initialPage);
+  };
 
   return {
     currentPage,
     setCurrentPage,
-    totalPages,
-    startIndex,
-    itemsPerPage,
-    paginatedItems,
+    resetPage,
   };
 }

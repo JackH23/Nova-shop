@@ -66,3 +66,13 @@ export type DashboardOrderResponse = {
   message: string;
   order: DashboardOrder;
 };
+
+// GET /dashboard/orders
+export type DashboardOrdersResponse = {
+  message: string;
+  orders: DashboardOrder[];
+  total: number;
+  totalPages: number;
+  page: number;
+  limit: number;
+};

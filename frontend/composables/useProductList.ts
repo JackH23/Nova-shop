@@ -3,6 +3,7 @@
 import { useEffect, useReducer, useState } from "react";
 import { productService } from "@/services/productService";
 import { productReducer, initialProductState } from "@/reducers/productReducer";
+import { usePagination } from "@/composables/usePagination";
 
 type UseProductListProps = {
   minPrice?: number;
@@ -27,12 +28,17 @@ export function useProductList({
 }: UseProductListProps) {
   const [state, dispatch] = useReducer(productReducer, initialProductState);
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    currentPage,
+    setCurrentPage,
+    resetPage,
+  } = usePagination();
+
   const [sortBy, setSortBy] = useState("featured");
 
   // Reset to page 1 when any filter changes
   useEffect(() => {
-    setCurrentPage(1);
+    resetPage();
   }, [
     categoryId,
     minPrice,
