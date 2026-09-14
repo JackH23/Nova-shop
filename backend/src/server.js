@@ -3,12 +3,18 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const sequelize = require("./config/database");
+
+// Load Sequelize associations
+require("./models/associations");
+
 const User = require("./models/User");
+
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const checkoutRoutes = require("./routes/checkoutRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
@@ -20,29 +26,30 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/checkout", checkoutRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.get("/", (req, res) => {
-    res.json({
-        message: "Authentication API is running",
-    });
+  res.json({
+    message: "Authentication API is running",
+  });
 });
 
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
-    try {
-        await sequelize.authenticate();
-        console.log("MySQL connected successfully");
+  try {
+    await sequelize.authenticate();
+    console.log("MySQL connected successfully");
 
-        await sequelize.sync();
-        console.log("Database tables synchronized");
+    await sequelize.sync();
+    console.log("Database tables synchronized");
 
-        app.listen(PORT, () => {
-            console.log(`Server running on http://localhost:${PORT}`);
-        });
-    } catch (error) {
-        console.error("MySQL connection failed:", error);
-    }
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("MySQL connection failed:", error);
+  }
 };
 
 startServer();

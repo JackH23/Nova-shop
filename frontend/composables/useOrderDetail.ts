@@ -1,36 +1,54 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer } from "react";
+import { dashboardService } from "@/services/dashboardService";
 import {
-  checkoutService,
-  type PlacedOrder,
-} from "@/services/checkoutService";
+  dashboardReducer,
+  initialDashboardState,
+} from "@/reducers/dashboardReducer";
 
 export function useOrderDetail(orderId: number | null) {
-  const [order, setOrder] = useState<PlacedOrder | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [state, dispatch] = useReducer(
+    dashboardReducer,
+    initialDashboardState,
+  );
 
   const getOrder = useCallback(async () => {
     if (!orderId) return;
 
     try {
-      setLoading(true);
-      setError("");
+      dispatch({
+        type: "SET_LOADING",
+        value: true,
+      });
 
-      const response = await checkoutService.getOrderById(orderId);
+      dispatch({
+        type: "SET_ERROR",
+        value: "",
+      });
 
-      setOrder(response.order);
+      const response =
+        await dashboardService.getOrderById(orderId);
+
+      dispatch({
+        type: "SET_ORDER",
+        value: response.order,
+      });
     } catch (error) {
       console.error("Failed to fetch order:", error);
 
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to load order",
-      );
+      dispatch({
+        type: "SET_ERROR",
+        value:
+          error instanceof Error
+            ? error.message
+            : "Failed to load order",
+      });
     } finally {
-      setLoading(false);
+      dispatch({
+        type: "SET_LOADING",
+        value: false,
+      });
     }
   }, [orderId]);
 
@@ -39,9 +57,9 @@ export function useOrderDetail(orderId: number | null) {
   }, [getOrder]);
 
   return {
-    order,
-    loading,
-    error,
+    order: state.order,
+    loading: state.loading,
+    error: state.error,
     getOrder,
   };
 }

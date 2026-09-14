@@ -49,7 +49,7 @@ export default function OrderSuccessPage() {
             <span className="text-sm text-slate-500">Order Number</span>
 
             <span className="text-sm font-semibold text-indigo-600">
-              {order.orderNo}
+              {order.order_no}
             </span>
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function OrderSuccessPage() {
         {/* Actions */}
         <div className="mt-6 grid grid-cols-2 gap-3">
           <Link
-            href="/dashboard"
+            href={`/dashboard/orders/${order.id}`}
             className="flex h-11 items-center justify-center rounded-md border border-indigo-600 text-sm font-semibold text-indigo-600 transition hover:bg-indigo-50"
           >
             Track Order
