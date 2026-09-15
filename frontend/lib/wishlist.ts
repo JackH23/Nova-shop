@@ -13,6 +13,9 @@ export type WishlistResponse = {
   message: string;
   total: number;
   wishlist: WishlistItem[];
+  page: number;
+  limit: number;
+  totalPages: number;
 };
 
 export type AddToWishlistData = {
