@@ -8,6 +8,7 @@ type AddressFormProps = {
   form: CreateAddressData;
   loading: boolean;
   error: string;
+  isEditing: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onClose: () => void;
@@ -17,6 +18,7 @@ export default function AddressForm({
   form,
   loading,
   error,
+  isEditing,
   onChange,
   onSubmit,
   onClose,
@@ -26,7 +28,7 @@ export default function AddressForm({
       <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-950">
-            Add New Address
+            {isEditing ? "Edit Address" : "Add New Address"}
           </h2>
 
           <button
@@ -158,11 +160,7 @@ export default function AddressForm({
             Set as default address
           </label>
 
-          {error && (
-            <p className="text-xs text-red-500">
-              {error}
-            </p>
-          )}
+          {error && <p className="text-xs text-red-500">{error}</p>}
 
           <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
             <button
@@ -178,7 +176,13 @@ export default function AddressForm({
               disabled={loading}
               className="cursor-pointer rounded-md bg-[#3324d8] px-4 py-2 text-xs font-semibold text-white hover:bg-[#271bb7] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? "Adding..." : "Add Address"}
+              {loading
+                ? isEditing
+                    ? "Updating..."
+                    : "Adding..."
+                : isEditing
+                    ? "Update Address"
+                    : "Add Address"}
             </button>
           </div>
         </form>

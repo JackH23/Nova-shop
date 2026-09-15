@@ -5,11 +5,15 @@ import type { UserAddress } from "@/lib/address";
 
 type AddressCardProps = {
   address: UserAddress;
+  onEdit: (address: UserAddress) => void;
+  onRemove: (addressId: number) => Promise<void>;
   onSetDefault: (addressId: number) => Promise<unknown>;
 };
 
 export default function AddressCard({
   address,
+  onEdit,
+  onRemove,
   onSetDefault,
 }: AddressCardProps) {
   return (
@@ -64,6 +68,7 @@ export default function AddressCard({
         <div className="flex items-center gap-2">
           <button
             type="button"
+            onClick={() => onEdit(address)}
             className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-slate-600 transition hover:text-[#3324d8]"
           >
             <Pencil size={13} />
@@ -72,6 +77,7 @@ export default function AddressCard({
 
           <button
             type="button"
+            onClick={() => onRemove(address.id)}
             className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-slate-600 transition hover:text-red-500"
           >
             <Trash2 size={13} />

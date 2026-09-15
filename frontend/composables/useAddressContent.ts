@@ -139,6 +139,7 @@ export function useAddressContent() {
   };
 
   // Remove address
+  // Remove address
   const handleRemoveAddress = async (addressId: number) => {
     try {
       dispatch({
@@ -148,8 +149,14 @@ export function useAddressContent() {
 
       await addressService.removeAddress(addressId);
 
-      // Refresh because backend may automatically
-      // assign another address as default
+      // If the last item on the current page was removed,
+      // move back to the previous page
+      if (state.addresses.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+        return;
+      }
+
+      // Otherwise refresh the current page
       await getAddresses();
     } catch (error) {
       dispatch({
