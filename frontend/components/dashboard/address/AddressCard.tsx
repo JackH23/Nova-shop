@@ -1,40 +1,26 @@
 "use client";
 
 import { MapPin, Pencil, Trash2 } from "lucide-react";
-
-type Address = {
-  id: number;
-  full_name: string;
-  phone: string;
-  email: string;
-  address_line1: string;
-  address_line2: string;
-  city: string;
-  state: string;
-  postal_code: string;
-  country: string;
-  is_default: boolean;
-};
+import type { UserAddress } from "@/lib/address";
 
 type AddressCardProps = {
-  address: Address;
+  address: UserAddress;
+  onSetDefault: (addressId: number) => Promise<unknown>;
 };
 
 export default function AddressCard({
   address,
+  onSetDefault,
 }: AddressCardProps) {
   return (
     <div className="relative rounded-lg border border-slate-200 bg-white p-5">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-2">
-          <MapPin
-            size={16}
-            className="text-[#3324d8]"
-          />
+          <MapPin size={16} className="text-[#3324d8]" />
 
           <h2 className="text-sm font-semibold text-slate-950">
-            {address.full_name}
+            {address.first_name} {address.last_name}
           </h2>
         </div>
 
@@ -47,14 +33,12 @@ export default function AddressCard({
 
       {/* Address information */}
       <div className="mt-4 space-y-1 text-xs leading-5 text-slate-500">
-        <p>{address.address_line1}</p>
+        <p>{address.address}</p>
 
-        {address.address_line2 && (
-          <p>{address.address_line2}</p>
-        )}
+        {address.address_line2 && <p>{address.address_line2}</p>}
 
         <p>
-          {address.city}, {address.state} {address.postal_code}
+          {address.city}, {address.state_province} {address.postal_code}
         </p>
 
         <p>{address.country}</p>
@@ -63,21 +47,13 @@ export default function AddressCard({
       {/* Contact */}
       <div className="mt-4 space-y-1 text-xs">
         <p>
-          <span className="font-medium text-slate-700">
-            Phone:
-          </span>{" "}
-          <span className="text-slate-500">
-            {address.phone}
-          </span>
+          <span className="font-medium text-slate-700">Phone:</span>{" "}
+          <span className="text-slate-500">{address.phone}</span>
         </p>
 
         <p>
-          <span className="font-medium text-slate-700">
-            Email:
-          </span>{" "}
-          <span className="text-slate-500">
-            {address.email}
-          </span>
+          <span className="font-medium text-slate-700">Email:</span>{" "}
+          <span className="text-slate-500">{address.email}</span>
         </p>
       </div>
 
@@ -106,6 +82,7 @@ export default function AddressCard({
         {!address.is_default && (
           <button
             type="button"
+            onClick={() => onSetDefault(address.id)}
             className="cursor-pointer text-xs font-semibold text-[#3324d8] hover:underline"
           >
             Set as Default

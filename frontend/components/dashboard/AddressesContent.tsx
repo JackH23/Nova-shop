@@ -1,41 +1,38 @@
 "use client";
 
-import { useState } from "react";
 import PageContainer from "@/components/common/PageContainer";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import AddressCard from "@/components/dashboard/AddressCard";
-
-const addresses = [
-  {
-    id: 1,
-    full_name: "Jack Sihalard",
-    phone: "+856 20 5555 1234",
-    email: "jack@example.com",
-    address_line1: "123 Main Street",
-    address_line2: "",
-    city: "Vientiane",
-    state: "Vientiane Capital",
-    postal_code: "01000",
-    country: "Laos",
-    is_default: true,
-  },
-  {
-    id: 2,
-    full_name: "Jack Sihalard",
-    phone: "+856 20 5555 5678",
-    email: "jack@example.com",
-    address_line1: "25 Business Road",
-    address_line2: "Office 4",
-    city: "Vientiane",
-    state: "Vientiane Capital",
-    postal_code: "01000",
-    country: "Laos",
-    is_default: false,
-  },
-];
+import AddressCard from "@/components/dashboard/address/AddressCard";
+import { useAddressContent } from "@/composables/useAddressContent";
+import { useAddressForm } from "@/composables/useAddressForm";
+import AddressForm from "@/components/dashboard/address/AddressForm";
+import Pagination from "@/components/common/Pagination";
 
 export default function AddressesContent() {
-  const [showAddForm, setShowAddForm] = useState(false);
+  const {
+    addresses,
+    total,
+    loading,
+    error,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    handleCreateAddress,
+    handleUpdateAddress,
+    handleRemoveAddress,
+    handleSetDefaultAddress,
+  } = useAddressContent();
+
+  const {
+    form,
+    showAddForm,
+    handleChange,
+    handleSubmit,
+    handleOpenForm,
+    handleCloseForm,
+  } = useAddressForm({
+    onCreate: handleCreateAddress,
+  });
 
   return (
     <PageContainer>
@@ -57,7 +54,7 @@ export default function AddressesContent() {
 
             <button
               type="button"
-              onClick={() => setShowAddForm(true)}
+              onClick={handleOpenForm}
               className="cursor-pointer rounded-md bg-[#3324d8] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#271bb7]"
             >
               + Add New Address
@@ -73,6 +70,7 @@ export default function AddressesContent() {
                 <AddressCard
                   key={address.id}
                   address={address}
+                  onSetDefault={handleSetDefaultAddress}
                 />
               ))}
             </div>
@@ -88,29 +86,24 @@ export default function AddressesContent() {
             </div>
           )}
 
-          {/* Temporary modal placeholder */}
+          {/* Pagination */}
+          {!loading && !error && totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
+
           {showAddForm && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-              <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-slate-950">
-                    Add New Address
-                  </h2>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowAddForm(false)}
-                    className="cursor-pointer text-sm text-slate-500 hover:text-slate-900"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <p className="mt-2 text-sm text-slate-500">
-                  We will add the address form here next.
-                </p>
-              </div>
-            </div>
+            <AddressForm
+              form={form}
+              loading={loading}
+              error={error}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+              onClose={handleCloseForm}
+            />
           )}
         </div>
       </div>

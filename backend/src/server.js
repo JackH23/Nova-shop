@@ -17,6 +17,7 @@ const checkoutRoutes = require("./routes/checkoutRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const returnRoutes = require("./routes/returnRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
+const addressRoutes = require("./routes/addressRoutes");
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/api/checkout", checkoutRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/returns", returnRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/addresses", addressRoutes);
 
 app.get("/", (req, res) => {
   res.json({
