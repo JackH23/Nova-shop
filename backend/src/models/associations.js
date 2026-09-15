@@ -9,6 +9,7 @@ const ReturnItem = require("./ReturnItem");
 const User = require("./User");
 const Product = require("./Product");
 const WishlistItem = require("./WishlistItem");
+const PaymentMethod = require("./PaymentMethod");
 
 // ========================================
 // Order → Order Items
@@ -120,6 +121,20 @@ Product.hasMany(WishlistItem, {
 WishlistItem.belongsTo(Product, {
   foreignKey: "product_id",
   as: "product",
+});
+
+// ========================================
+// User → Payment Methods
+// ========================================
+
+User.hasMany(PaymentMethod, {
+  foreignKey: "user_id",
+  as: "paymentMethods",
+});
+
+PaymentMethod.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
 });
 
 module.exports = {

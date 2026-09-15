@@ -18,6 +18,7 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const returnRoutes = require("./routes/returnRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 const addressRoutes = require("./routes/addressRoutes");
+const paymentMethodRoutes = require("./routes/paymentMethodRoutes");
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/returns", returnRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/addresses", addressRoutes);
+app.use("/api/payment-methods", paymentMethodRoutes);
 
 app.get("/", (req, res) => {
   res.json({
