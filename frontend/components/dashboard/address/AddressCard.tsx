@@ -6,7 +6,7 @@ import type { UserAddress } from "@/lib/address";
 type AddressCardProps = {
   address: UserAddress;
   onEdit: (address: UserAddress) => void;
-  onRemove: (addressId: number) => Promise<void>;
+  onRemove: (addressId: number) => void;
   onSetDefault: (addressId: number) => Promise<unknown>;
 };
 
