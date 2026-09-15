@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
   getAddresses,
+  getDefaultAddress,
   createAddress,
   updateAddress,
   removeAddress,
@@ -17,6 +18,13 @@ router.get(
   "/",
   authMiddleware,
   getAddresses
+);
+
+// Get default address for logged-in user
+router.get(
+  "/default",
+  authMiddleware,
+  getDefaultAddress
 );
 
 // Create new address

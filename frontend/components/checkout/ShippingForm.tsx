@@ -93,19 +93,17 @@ export default function ShippingForm({
             onChange={(e) => handleChange("city", e.target.value)}
           />
 
-          <AuthSelect
-            id="state"
-            name="state"
-            label="State / Province"
-            value={shippingData.stateProvince}
+          <AuthInput
+            id="stateProvince"
             error={errors.stateProvince}
-            onChange={(e) => handleChange("stateProvince", e.target.value)}
-            options={[
-              { label: "Select State", value: "" },
-              { label: "California", value: "california" },
-              { label: "New York", value: "new-york" },
-              { label: "Texas", value: "texas" },
-            ]}
+            name="stateProvince"
+            label="State / Province"
+            type="text"
+            placeholder="State / Province"
+            value={shippingData.stateProvince}
+            onChange={(e) =>
+              handleChange("stateProvince", e.target.value)
+            }
           />
 
           <AuthInput

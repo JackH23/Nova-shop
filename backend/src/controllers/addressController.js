@@ -43,6 +43,31 @@ const getAddresses = async (req, res) => {
   }
 };
 
+// Get default address for logged-in user
+const getDefaultAddress = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const address = await UserAddress.findOne({
+      where: {
+        user_id: userId,
+        is_default: true,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Default address fetched successfully",
+      address,
+    });
+  } catch (error) {
+    console.error("Get default address error:", error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 // Create new address
 const createAddress = async (req, res) => {
   try {
@@ -83,8 +108,7 @@ const createAddress = async (req, res) => {
     });
 
     // First address automatically becomes default
-    const shouldBeDefault =
-      addressCount === 0 || is_default === true;
+    const shouldBeDefault = addressCount === 0 || is_default === true;
 
     // Remove old default if new address will be default
     if (shouldBeDefault && addressCount > 0) {
@@ -96,7 +120,7 @@ const createAddress = async (req, res) => {
           where: {
             user_id: userId,
           },
-        }
+        },
       );
     }
 
@@ -167,18 +191,14 @@ const updateAddress = async (req, res) => {
       phone: phone ?? userAddress.phone,
       address: address ?? userAddress.address,
       address_line2:
-        address_line2 !== undefined
-          ? address_line2
-          : userAddress.address_line2,
+        address_line2 !== undefined ? address_line2 : userAddress.address_line2,
       city: city ?? userAddress.city,
       state_province:
         state_province !== undefined
           ? state_province
           : userAddress.state_province,
       postal_code:
-        postal_code !== undefined
-          ? postal_code
-          : userAddress.postal_code,
+        postal_code !== undefined ? postal_code : userAddress.postal_code,
       country: country ?? userAddress.country,
     });
 
@@ -277,7 +297,7 @@ const setDefaultAddress = async (req, res) => {
         where: {
           user_id: userId,
         },
-      }
+      },
     );
 
     // Set selected address as default
@@ -290,7 +310,7 @@ const setDefaultAddress = async (req, res) => {
           id: addressId,
           user_id: userId,
         },
-      }
+      },
     );
 
     console.log("Default address updated rows:", updatedRows);
@@ -303,10 +323,7 @@ const setDefaultAddress = async (req, res) => {
       },
     });
 
-    console.log(
-      "Default address after update:",
-      updatedAddress?.toJSON()
-    );
+    console.log("Default address after update:", updatedAddress?.toJSON());
 
     return res.status(200).json({
       message: "Default address updated successfully",
@@ -323,6 +340,7 @@ const setDefaultAddress = async (req, res) => {
 
 module.exports = {
   getAddresses,
+  getDefaultAddress,
   createAddress,
   updateAddress,
   removeAddress,

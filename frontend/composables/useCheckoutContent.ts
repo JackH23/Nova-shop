@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useCheckout } from "@/composables/useCheckout";
@@ -8,7 +8,7 @@ import {
   usePaymentValidation,
   type PaymentData,
 } from "@/composables/usePaymentValidation";
-
+import { addressService } from "@/services/addressService";
 import type { CheckoutStep } from "@/components/checkout/CheckoutSteps";
 
 import type {
@@ -34,6 +34,32 @@ export function useCheckoutContent() {
     stateProvince: "",
     postalCode: "",
   });
+
+  useEffect(() => {
+    const getDefaultAddress = async () => {
+      try {
+        const response = await addressService.getDefaultAddress();
+
+        if (!response.address) return;
+
+        const defaultAddress = response.address;
+
+        setShippingData({
+          email: defaultAddress.email,
+          firstName: defaultAddress.first_name,
+          lastName: defaultAddress.last_name,
+          address: defaultAddress.address,
+          city: defaultAddress.city,
+          stateProvince: defaultAddress.state_province ?? "",
+          postalCode: defaultAddress.postal_code ?? "",
+        });
+      } catch (error) {
+        console.error("Failed to fetch default address:", error);
+      }
+    };
+
+    getDefaultAddress();
+  }, []);
 
   const closeConfirm = () => {
     setShowConfirm(false);

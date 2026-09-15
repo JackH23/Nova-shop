@@ -2,6 +2,7 @@ import { apiRequest } from "@/lib/api";
 
 import type {
   AddressResponse,
+  DefaultAddressResponse,
   CreateAddressData,
   CreateAddressResponse,
   UpdateAddressData,
@@ -11,6 +12,14 @@ import type {
 } from "@/lib/address";
 
 export const addressService = {
+
+  // GET logged-in user's default address
+  getDefaultAddress: (): Promise<DefaultAddressResponse> => {
+    return apiRequest("/addresses/default", {
+      method: "GET",
+    });
+  },
+
   // GET logged-in user's addresses
   getAddresses: (
     page: number = 1,

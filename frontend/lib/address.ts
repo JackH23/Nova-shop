@@ -25,6 +25,11 @@ export type AddressResponse = {
   totalPages: number;
 };
 
+export type DefaultAddressResponse = {
+  message: string;
+  address: UserAddress | null;
+};
+
 export type CreateAddressData = {
   first_name: string;
   last_name: string;
