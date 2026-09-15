@@ -2,17 +2,26 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Heart } from "lucide-react";
 import { useProductCart } from "@/composables/useProductCart";
 import type { Product } from "@/lib/products";
 
 type ProductCardProps = {
   product: Product;
   onProductAdded?: (product: Product) => void;
+  onAddWishlist?: (productId: number) => void;
+  onRemoveWishlist?: (productId: number) => void;
+  isWishlisted?: boolean;
+  removingWishlist?: boolean;
 };
 
 export default function ProductCard({
   product,
   onProductAdded,
+  onAddWishlist,
+  onRemoveWishlist,
+  isWishlisted = false,
+  removingWishlist = false,
 }: ProductCardProps) {
   const { handleAddToCart, loading } = useProductCart(
     product,
@@ -20,14 +29,7 @@ export default function ProductCard({
     onProductAdded,
   );
 
-  const {
-    id,
-    name,
-    description,
-    price,
-    original_price,
-    image,
-  } = product;
+  const { id, name, description, price, original_price, image } = product;
 
   const priceNumber = Number(price);
   const originalPriceNumber = Number(original_price);
@@ -35,7 +37,7 @@ export default function ProductCard({
   const discount =
     originalPriceNumber > priceNumber
       ? Math.round(
-          ((originalPriceNumber - priceNumber) / originalPriceNumber) * 100
+          ((originalPriceNumber - priceNumber) / originalPriceNumber) * 100,
         )
       : 0;
   return (
@@ -55,6 +57,32 @@ export default function ProductCard({
               -{discount}%
             </span>
           )}
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              if (isWishlisted && onRemoveWishlist) {
+                onRemoveWishlist(id);
+              } else if (onAddWishlist) {
+                onAddWishlist(id);
+              }
+            }}
+            disabled={removingWishlist}
+            className="absolute left-2 top-2 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-white shadow-sm hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+            aria-label={
+              onRemoveWishlist ? "Remove from wishlist" : "Add to wishlist"
+            }
+          >
+            <Heart
+              size={16}
+              className={
+                isWishlisted ? "fill-red-500 text-red-500" : "text-slate-600"
+              }
+            />
+          </button>
         </div>
       </Link>
 

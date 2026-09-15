@@ -5,7 +5,15 @@ const Payment = require("./Payment");
 const Return = require("./Return");
 const ReturnItem = require("./ReturnItem");
 
+// Wishlist
+const User = require("./User");
+const Product = require("./Product");
+const WishlistItem = require("./WishlistItem");
+
+// ========================================
 // Order → Order Items
+// ========================================
+
 Order.hasMany(OrderItem, {
   foreignKey: "order_id",
   as: "items",
@@ -16,7 +24,10 @@ OrderItem.belongsTo(Order, {
   as: "order",
 });
 
+// ========================================
 // Order → Delivery
+// ========================================
+
 Order.hasOne(Delivery, {
   foreignKey: "order_id",
   as: "delivery",
@@ -27,7 +38,10 @@ Delivery.belongsTo(Order, {
   as: "order",
 });
 
+// ========================================
 // Order → Payment
+// ========================================
+
 Order.hasOne(Payment, {
   foreignKey: "order_id",
   as: "payment",
@@ -38,7 +52,10 @@ Payment.belongsTo(Order, {
   as: "order",
 });
 
+// ========================================
 // Order → Returns
+// ========================================
+
 Order.hasMany(Return, {
   foreignKey: "order_id",
   as: "returns",
@@ -49,7 +66,10 @@ Return.belongsTo(Order, {
   as: "order",
 });
 
+// ========================================
 // Return → Return Items
+// ========================================
+
 Return.hasMany(ReturnItem, {
   foreignKey: "return_id",
   as: "items",
@@ -60,7 +80,10 @@ ReturnItem.belongsTo(Return, {
   as: "return",
 });
 
+// ========================================
 // Order Item → Return Items
+// ========================================
+
 OrderItem.hasMany(ReturnItem, {
   foreignKey: "order_item_id",
   as: "return_items",
@@ -71,6 +94,34 @@ ReturnItem.belongsTo(OrderItem, {
   as: "order_item",
 });
 
+// ========================================
+// User → Wishlist Items
+// ========================================
+
+User.hasMany(WishlistItem, {
+  foreignKey: "user_id",
+  as: "wishlistItems",
+});
+
+WishlistItem.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+// ========================================
+// Product → Wishlist Items
+// ========================================
+
+Product.hasMany(WishlistItem, {
+  foreignKey: "product_id",
+  as: "wishlistItems",
+});
+
+WishlistItem.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
 module.exports = {
   Order,
   OrderItem,
@@ -78,4 +129,8 @@ module.exports = {
   Payment,
   Return,
   ReturnItem,
+
+  User,
+  Product,
+  WishlistItem,
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useProductList } from "@/composables/useProductList";
+import { useWishlist } from "@/composables/useWishlist";
 import ProductCard from "./ProductCard";
 import Pagination from "@/components/common/Pagination";
 import type { Product } from "@/lib/products";
@@ -51,6 +52,8 @@ export default function ProductList({
     minRating,
   });
 
+  const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
+
   if (loading) {
     return <div className="flex-1">Loading products...</div>;
   }
@@ -65,9 +68,7 @@ export default function ProductList({
       <div className="mb-5 flex items-end justify-between">
         <div>
           {/* Breadcrumb */}
-          <p className="mb-1 text-[10px] text-slate-400">
-            Home / Shop
-          </p>
+          <p className="mb-1 text-[10px] text-slate-400">Home / Shop</p>
 
           {/* Title */}
           <h1 className="text-2xl font-bold text-slate-950">
@@ -76,10 +77,7 @@ export default function ProductList({
         </div>
 
         {/* Sort */}
-        <ProductSort
-          value={sortBy}
-          onChange={setSortBy}
-        />
+        <ProductSort value={sortBy} onChange={setSortBy} />
       </div>
 
       {/* Product cards */}
@@ -89,6 +87,11 @@ export default function ProductList({
             key={product.id}
             product={product}
             onProductAdded={onProductAdded}
+            isWishlisted={wishlist.some(
+              (item) => item.product_id === product.id,
+            )}
+            onAddWishlist={addToWishlist}
+            onRemoveWishlist={removeFromWishlist}
           />
         ))}
       </div>
