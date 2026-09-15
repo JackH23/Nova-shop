@@ -19,11 +19,18 @@ const returnRoutes = require("./routes/returnRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const paymentMethodRoutes = require("./routes/paymentMethodRoutes");
+const settingsRoutes = require("./routes/settingsRoutes");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Serve uploaded images
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "../uploads"))
+);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -35,6 +42,7 @@ app.use("/api/returns", returnRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/addresses", addressRoutes);
 app.use("/api/payment-methods", paymentMethodRoutes);
+app.use("/api/settings", settingsRoutes);
 
 app.get("/", (req, res) => {
   res.json({
@@ -52,8 +60,8 @@ const startServer = async () => {
     await sequelize.sync();
     console.log("Database tables synchronized");
 
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
     console.error("MySQL connection failed:", error);
