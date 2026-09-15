@@ -5,23 +5,20 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-
-type PaymentMethod = {
-  id: number;
-  type: string;
-  last_four: string;
-  cardholder_name: string;
-  expiry_month: string;
-  expiry_year: string;
-  is_default: boolean;
-};
+import type { PaymentMethod } from "@/lib/paymentMethod";
 
 type PaymentCardProps = {
   payment: PaymentMethod;
+  onEdit: (payment: PaymentMethod) => void;
+  onSetDefault: (paymentMethodId: number) => void;
+  onRemove: (paymentMethodId: number) => void;
 };
 
 export default function PaymentCard({
   payment,
+  onEdit,
+  onRemove,
+  onSetDefault,
 }: PaymentCardProps) {
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-5">
@@ -80,6 +77,7 @@ export default function PaymentCard({
         <div className="flex gap-3">
           <button
             type="button"
+            onClick={() => onEdit(payment)}
             className="flex cursor-pointer items-center gap-1.5 text-xs text-slate-600 hover:text-[#3324d8]"
           >
             <Pencil size={13} />
@@ -88,6 +86,7 @@ export default function PaymentCard({
 
           <button
             type="button"
+            onClick={() => onRemove(payment.id)}
             className="flex cursor-pointer items-center gap-1.5 text-xs text-slate-600 hover:text-red-500"
           >
             <Trash2 size={13} />
@@ -98,6 +97,7 @@ export default function PaymentCard({
         {!payment.is_default && (
           <button
             type="button"
+            onClick={() => onSetDefault(payment.id)}
             className="cursor-pointer text-xs font-semibold text-[#3324d8] hover:underline"
           >
             Set as Default

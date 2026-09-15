@@ -3,11 +3,19 @@
 import type { ChangeEvent, FormEvent } from "react";
 import AuthInput from "@/components/auth/AuthInput";
 import type { PaymentMethodFormData } from "@/lib/paymentMethod";
+import type { PaymentErrors } from "@/composables/usePaymentValidation";
+import type { PaymentMethodFormErrors } from "@/composables/usePaymentMethodForm";
 
 type PaymentMethodFormProps = {
   form: PaymentMethodFormData;
   loading: boolean;
   error: string;
+  isEditing: boolean;
+
+  paymentErrors: PaymentErrors;
+  formErrors: PaymentMethodFormErrors;
+  onCardNumberChange: (value: string) => void;
+
   onChange: (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onClose: () => void;
@@ -17,7 +25,11 @@ export default function PaymentMethodForm({
   form,
   loading,
   error,
+  isEditing,
+  paymentErrors,
+  formErrors,
   onChange,
+  onCardNumberChange,
   onSubmit,
   onClose,
 }: PaymentMethodFormProps) {
@@ -27,9 +39,8 @@ export default function PaymentMethodForm({
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-950">
-            Add Payment Method
+            {isEditing ? "Edit Payment Method" : "Add Payment Method"}
           </h2>
-
           <button
             type="button"
             onClick={onClose}
@@ -72,9 +83,14 @@ export default function PaymentMethodForm({
             name="card_number"
             label="Card Number"
             type="text"
-            placeholder="4242 4242 4242 4242"
+            placeholder={
+              isEditing
+                ? "Leave blank to keep current card"
+                : "4242 4242 4242 4242"
+            }
             value={form.card_number}
-            onChange={onChange}
+            error={paymentErrors.cardNumber}
+            onChange={(e) => onCardNumberChange(e.target.value)}
           />
 
           {/* Cardholder */}
@@ -85,6 +101,7 @@ export default function PaymentMethodForm({
             type="text"
             placeholder="Name on card"
             value={form.cardholder_name}
+            error={formErrors.cardholder_name}
             onChange={onChange}
           />
 
@@ -103,7 +120,11 @@ export default function PaymentMethodForm({
                 name="expiry_month"
                 value={form.expiry_month}
                 onChange={onChange}
-                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-indigo-500"
+                className={`w-full rounded-md border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none ${
+                  formErrors.expiry_month
+                    ? "border-red-500"
+                    : "border-slate-300 focus:border-indigo-500"
+                }`}
               >
                 <option value="">Month</option>
                 <option value="01">01</option>
@@ -119,6 +140,12 @@ export default function PaymentMethodForm({
                 <option value="11">11</option>
                 <option value="12">12</option>
               </select>
+
+              {formErrors.expiry_month && (
+                <p className="mt-1 text-xs text-red-500">
+                  {formErrors.expiry_month}
+                </p>
+              )}
             </div>
 
             <AuthInput
@@ -128,6 +155,7 @@ export default function PaymentMethodForm({
               type="text"
               placeholder="29"
               value={form.expiry_year}
+              error={formErrors.expiry_year}
               onChange={onChange}
             />
           </div>
@@ -162,7 +190,13 @@ export default function PaymentMethodForm({
               disabled={loading}
               className="cursor-pointer rounded-md bg-[#3324d8] px-4 py-2 text-xs font-semibold text-white hover:bg-[#271bb7] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? "Adding..." : "Add Payment Method"}
+              {loading
+                ? isEditing
+                  ? "Updating..."
+                  : "Adding..."
+                : isEditing
+                  ? "Update Payment Method"
+                  : "Add Payment Method"}
             </button>
           </div>
         </form>

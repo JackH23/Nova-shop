@@ -10,6 +10,8 @@ import {
 } from "@/composables/usePaymentValidation";
 import { addressService } from "@/services/addressService";
 import type { CheckoutStep } from "@/components/checkout/CheckoutSteps";
+import { paymentMethodService } from "@/services/paymentMethodService";
+import type { PaymentMethod as SavedPaymentMethod } from "@/lib/paymentMethod";
 
 import type {
   ShippingData,
@@ -24,6 +26,8 @@ export function useCheckoutContent() {
 
   const [step, setStep] = useState<CheckoutStep>("shipping");
   const [showConfirm, setShowConfirm] = useState(false);
+  const [defaultPaymentMethod, setDefaultPaymentMethod] =
+    useState<SavedPaymentMethod | null>(null);
 
   const [shippingData, setShippingData] = useState<ShippingData>({
     email: "",
@@ -57,7 +61,6 @@ export function useCheckoutContent() {
         console.error("Failed to fetch default address:", error);
       }
     };
-
     getDefaultAddress();
   }, []);
 
@@ -76,6 +79,34 @@ export function useCheckoutContent() {
     expiryDate: "",
     cvc: "",
   });
+
+  useEffect(() => {
+  const getDefaultPaymentMethod = async () => {
+    try {
+      const response =
+        await paymentMethodService.getDefaultPaymentMethod();
+
+      if (!response.paymentMethod) return;
+
+      const defaultPayment = response.paymentMethod;
+
+      setDefaultPaymentMethod(defaultPayment);
+
+      setPaymentData((prev) => ({
+        ...prev,
+        cardNumber: `•••• •••• •••• ${defaultPayment.last_four}`,
+        expiryDate: `${defaultPayment.expiry_month}/${defaultPayment.expiry_year}`,
+      }));
+    } catch (error) {
+      console.error(
+        "Failed to fetch default payment method:",
+        error,
+      );
+    }
+  };
+
+  getDefaultPaymentMethod();
+}, []);
 
   const {
     errors: paymentErrors,
@@ -128,6 +159,8 @@ export function useCheckoutContent() {
 
     paymentMethod,
     setPaymentMethod,
+
+    defaultPaymentMethod,
 
     paymentData,
     paymentErrors,

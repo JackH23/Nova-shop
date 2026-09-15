@@ -3,9 +3,11 @@
 import type { ChangeEvent, FormEvent } from "react";
 import AuthInput from "@/components/auth/AuthInput";
 import type { CreateAddressData } from "@/lib/address";
+import type { ShippingErrors } from "@/composables/useShippingValidation";
 
 type AddressFormProps = {
   form: CreateAddressData;
+  errors: ShippingErrors;
   loading: boolean;
   error: string;
   isEditing: boolean;
@@ -16,6 +18,7 @@ type AddressFormProps = {
 
 export default function AddressForm({
   form,
+  errors,
   loading,
   error,
   isEditing,
@@ -49,6 +52,7 @@ export default function AddressForm({
               type="text"
               placeholder="First Name"
               value={form.first_name}
+              error={errors.firstName}
               onChange={onChange}
             />
 
@@ -59,6 +63,7 @@ export default function AddressForm({
               type="text"
               placeholder="Last Name"
               value={form.last_name}
+              error={errors.lastName}
               onChange={onChange}
             />
           </div>
@@ -71,6 +76,7 @@ export default function AddressForm({
               type="email"
               placeholder="Enter your email"
               value={form.email}
+              error={errors.email}
               onChange={onChange}
             />
 
@@ -92,6 +98,7 @@ export default function AddressForm({
             type="text"
             placeholder="Street address"
             value={form.address}
+            error={errors.address}
             onChange={onChange}
           />
 
@@ -113,6 +120,7 @@ export default function AddressForm({
               type="text"
               placeholder="City"
               value={form.city}
+              error={errors.city}
               onChange={onChange}
             />
 
@@ -122,6 +130,7 @@ export default function AddressForm({
               label="State / Province"
               type="text"
               placeholder="State / Province"
+              error={errors.stateProvince}
               value={form.state_province}
               onChange={onChange}
             />
@@ -135,6 +144,7 @@ export default function AddressForm({
               type="text"
               placeholder="Postal Code"
               value={form.postal_code}
+              error={errors.postalCode}
               onChange={onChange}
             />
 

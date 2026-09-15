@@ -23,6 +23,7 @@ export default function CheckoutContent() {
     setDeliveryMethod,
     paymentMethod,
     setPaymentMethod,
+    defaultPaymentMethod,
     paymentData,
     paymentErrors,
     handlePaymentChange,
@@ -76,6 +77,7 @@ export default function CheckoutContent() {
               {step === "payment" && (
                 <PaymentMethod
                   paymentMethod={paymentMethod}
+                  defaultPaymentMethod={defaultPaymentMethod}
                   paymentData={paymentData}
                   errors={paymentErrors}
                   onPaymentMethodChange={setPaymentMethod}

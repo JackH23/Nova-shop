@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { ShippingData } from "@/services/checkoutService";
 
-type ShippingErrors = Partial<Record<keyof ShippingData, string>>;
+export type ShippingErrors = Partial<Record<keyof ShippingData, string>>;
 
 export function useShippingValidation(
   shippingData: ShippingData,
@@ -55,6 +55,10 @@ export function useShippingValidation(
     }));
   };
 
+  const clearErrors = () => {
+    setErrors({});
+  };
+
   const handleChange = (field: keyof ShippingData, value: string) => {
     onShippingChange({
       ...shippingData,
@@ -74,6 +78,7 @@ export function useShippingValidation(
     errors,
     validateShipping,
     clearError,
+    clearErrors,
     handleChange,
     handleContinue,
   };

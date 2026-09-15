@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import PageContainer from "@/components/common/PageContainer";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
@@ -9,12 +8,9 @@ import { useAddressContent } from "@/composables/useAddressContent";
 import { useAddressForm } from "@/composables/useAddressForm";
 import AddressForm from "@/components/dashboard/address/AddressForm";
 import Pagination from "@/components/common/Pagination";
+import { useRemoveConfirm } from "@/composables/useRemoveConfirm";
 
 export default function AddressesContent() {
-
-  const [removeAddressId, setRemoveAddressId] =
-  useState<number | null>(null);
-  
   const {
     addresses,
     total,
@@ -30,7 +26,17 @@ export default function AddressesContent() {
   } = useAddressContent();
 
   const {
+    removeId,
+    handleOpenRemoveConfirm,
+    handleCloseRemoveConfirm,
+    handleConfirmRemove,
+  } = useRemoveConfirm({
+    onRemove: handleRemoveAddress,
+  });
+
+  const {
     form,
+    errors,
     showAddForm,
     editingAddress,
     handleChange,
@@ -42,25 +48,6 @@ export default function AddressesContent() {
     onCreate: handleCreateAddress,
     onUpdate: handleUpdateAddress,
   });
-
-  const handleOpenRemoveConfirm = (addressId: number) => {
-    setRemoveAddressId(addressId);
-  };
-
-  const handleCloseRemoveConfirm = () => {
-    setRemoveAddressId(null);
-  };
-
-  const handleConfirmRemove = async () => {
-    if (removeAddressId === null) return;
-
-    try {
-      await handleRemoveAddress(removeAddressId);
-      setRemoveAddressId(null);
-    } catch (error) {
-      console.error("Remove address failed:", error);
-    }
-  };
 
   return (
     <>
@@ -129,6 +116,7 @@ export default function AddressesContent() {
             {showAddForm && (
               <AddressForm
                 form={form}
+                errors={errors}
                 loading={loading}
                 error={error}
                 isEditing={Boolean(editingAddress)}
@@ -142,7 +130,7 @@ export default function AddressesContent() {
       </PageContainer>
 
       <ConfirmModal
-        open={removeAddressId !== null}
+        open={removeId !== null}
         title="Remove Address"
         message="Are you sure you want to remove this address?"
         cancelText="Cancel"

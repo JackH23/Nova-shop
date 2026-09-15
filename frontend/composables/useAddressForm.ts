@@ -7,6 +7,10 @@ import type {
   UserAddress,
 } from "@/lib/address";
 
+import { useShippingValidation } from "@/composables/useShippingValidation";
+
+import type { ShippingData } from "@/services/checkoutService";
+
 type UseAddressFormProps = {
   onCreate: (data: CreateAddressData) => Promise<unknown>;
   onUpdate: (addressId: number, data: UpdateAddressData) => Promise<unknown>;
@@ -34,6 +38,27 @@ export function useAddressForm({ onCreate, onUpdate }: UseAddressFormProps) {
 
   const [form, setForm] = useState<CreateAddressData>(initialForm);
 
+  const shippingData: ShippingData = {
+    email: form.email,
+    firstName: form.first_name,
+    lastName: form.last_name,
+    address: form.address,
+    city: form.city,
+    stateProvince: form.state_province ?? "",
+    postalCode: form.postal_code ?? "",
+  };
+
+  const {
+    errors,
+    validateShipping,
+    clearError,
+    clearErrors,
+  } = useShippingValidation(
+    shippingData,
+    () => {},
+    () => {},
+  );
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
 
@@ -41,10 +66,32 @@ export function useAddressForm({ onCreate, onUpdate }: UseAddressFormProps) {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    const fieldMap: Partial<
+      Record<keyof CreateAddressData, keyof ShippingData>
+    > = {
+      first_name: "firstName",
+      last_name: "lastName",
+      email: "email",
+      address: "address",
+      city: "city",
+      state_province: "stateProvince",
+      postal_code: "postalCode",
+    };
+
+    const shippingField = fieldMap[name as keyof CreateAddressData];
+
+    if (shippingField) {
+      clearError(shippingField);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const isValid = validateShipping(shippingData);
+
+    if (!isValid) return;
 
     try {
       if (editingAddress) {
@@ -52,6 +99,8 @@ export function useAddressForm({ onCreate, onUpdate }: UseAddressFormProps) {
       } else {
         await onCreate(form);
       }
+
+      clearErrors();
 
       setForm(initialForm);
       setEditingAddress(null);
@@ -65,6 +114,8 @@ export function useAddressForm({ onCreate, onUpdate }: UseAddressFormProps) {
   };
 
   const handleOpenForm = () => {
+    clearErrors();
+
     setEditingAddress(null);
     setForm(initialForm);
     setShowAddForm(true);
@@ -72,6 +123,8 @@ export function useAddressForm({ onCreate, onUpdate }: UseAddressFormProps) {
 
   const handleEditAddress = (address: UserAddress) => {
     setEditingAddress(address);
+
+    clearErrors();
 
     setForm({
       first_name: address.first_name,
@@ -91,6 +144,8 @@ export function useAddressForm({ onCreate, onUpdate }: UseAddressFormProps) {
   };
 
   const handleCloseForm = () => {
+    clearErrors();
+
     setShowAddForm(false);
     setEditingAddress(null);
     setForm(initialForm);
@@ -98,6 +153,7 @@ export function useAddressForm({ onCreate, onUpdate }: UseAddressFormProps) {
 
   return {
     form,
+    errors,
     showAddForm,
     editingAddress,
 

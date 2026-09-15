@@ -4,6 +4,7 @@ import { CreditCard } from "lucide-react";
 import AuthInput from "@/components/auth/AuthInput";
 import IconInput from "@/components/auth/IconInput";
 import type { PaymentMethod as PaymentMethodType } from "@/services/checkoutService";
+import type { PaymentMethod as SavedPaymentMethod } from "@/lib/paymentMethod";
 import type {
   PaymentData,
   PaymentErrors,
@@ -14,15 +15,24 @@ type PaymentMethodProps = {
   paymentData: PaymentData;
   errors: PaymentErrors;
   paymentMethod: PaymentMethodType;
+
+  defaultPaymentMethod: SavedPaymentMethod | null;
+
+  useSavedPayment: boolean;
+  onUseSavedPaymentChange: (value: boolean) => void;
+
   onPaymentMethodChange: (method: PaymentMethodType) => void;
   onBack: () => void;
 };
 
 export default function PaymentMethod({
   paymentMethod,
+  defaultPaymentMethod,
+  useSavedPayment,
   paymentData,
   errors,
   onPaymentMethodChange,
+  onUseSavedPaymentChange,
   onPaymentChange,
   onBack,
 }: PaymentMethodProps) {
@@ -81,7 +91,12 @@ export default function PaymentMethod({
               label="Card Number"
               placeholder="0000 0000 0000 0000"
               icon={<CreditCard size={16} />}
-              value={paymentData.cardNumber}
+              value={
+                paymentData.cardNumber ||
+                (defaultPaymentMethod
+                  ? `•••• •••• •••• ${defaultPaymentMethod.last_four}`
+                  : "")
+              }
               error={errors.cardNumber}
               onChange={(e) => onPaymentChange("cardNumber", e.target.value)}
             />
@@ -93,7 +108,12 @@ export default function PaymentMethod({
                 label="Expiry Date"
                 type="text"
                 placeholder="MM/YY"
-                value={paymentData.expiryDate}
+                value={
+                  paymentData.expiryDate ||
+                  (defaultPaymentMethod
+                    ? `${defaultPaymentMethod.expiry_month}/${defaultPaymentMethod.expiry_year}`
+                    : "")
+                }
                 error={errors.expiryDate}
                 onChange={(e) => onPaymentChange("expiryDate", e.target.value)}
               />
@@ -102,8 +122,8 @@ export default function PaymentMethod({
                 id="cvc"
                 name="cvc"
                 label="CVC"
-                type="text"
-                placeholder="123"
+                type="password"
+                placeholder="Enter CVC"
                 value={paymentData.cvc}
                 error={errors.cvc}
                 onChange={(e) => onPaymentChange("cvc", e.target.value)}

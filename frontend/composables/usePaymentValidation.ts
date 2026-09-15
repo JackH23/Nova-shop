@@ -8,10 +8,17 @@ export type PaymentData = {
 
 export type PaymentErrors = Partial<Record<keyof PaymentData, string>>;
 
+type PaymentValidationOptions = {
+  requireExpiry?: boolean;
+  requireCvc?: boolean;
+};
+
 export function usePaymentValidation(
   paymentData?: PaymentData,
   onPaymentDataChange?: (data: PaymentData) => void,
+  options: PaymentValidationOptions = {},
 ) {
+  const { requireExpiry = true, requireCvc = true } = options;
   const [errors, setErrors] = useState<PaymentErrors>({});
 
   const validatePayment = (paymentData: PaymentData) => {
@@ -25,16 +32,20 @@ export function usePaymentValidation(
       newErrors.cardNumber = "Card number must be 16 digits";
     }
 
-    if (!paymentData.expiryDate.trim()) {
-      newErrors.expiryDate = "Expiry date is required";
-    } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(paymentData.expiryDate)) {
-      newErrors.expiryDate = "Expiry date must be MM/YY";
+    if (requireExpiry) {
+      if (!paymentData.expiryDate.trim()) {
+        newErrors.expiryDate = "Expiry date is required";
+      } else if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(paymentData.expiryDate)) {
+        newErrors.expiryDate = "Expiry date must be MM/YY";
+      }
     }
 
-    if (!paymentData.cvc.trim()) {
-      newErrors.cvc = "CVC is required";
-    } else if (!/^\d{3,4}$/.test(paymentData.cvc)) {
-      newErrors.cvc = "CVC must be 3 or 4 digits";
+    if (requireCvc) {
+      if (!paymentData.cvc.trim()) {
+        newErrors.cvc = "CVC is required";
+      } else if (!/^\d{3,4}$/.test(paymentData.cvc)) {
+        newErrors.cvc = "CVC must be 3 or 4 digits";
+      }
     }
 
     setErrors(newErrors);
@@ -47,6 +58,10 @@ export function usePaymentValidation(
       ...prev,
       [field]: undefined,
     }));
+  };
+
+  const clearErrors = () => {
+    setErrors({});
   };
 
   const handleChange = (field: keyof PaymentData, value: string) => {
@@ -86,6 +101,7 @@ export function usePaymentValidation(
     errors,
     validatePayment,
     clearError,
+    clearErrors,
     handleChange,
   };
 }
