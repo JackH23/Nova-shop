@@ -11,28 +11,24 @@ import type {
 } from "@/composables/usePaymentValidation";
 
 type PaymentMethodProps = {
-  onPaymentChange: (field: keyof PaymentData, value: string) => void;
-  paymentData: PaymentData;
-  errors: PaymentErrors;
   paymentMethod: PaymentMethodType;
-
   defaultPaymentMethod: SavedPaymentMethod | null;
 
-  useSavedPayment: boolean;
-  onUseSavedPaymentChange: (value: boolean) => void;
+  paymentData: PaymentData;
+  errors: PaymentErrors;
 
   onPaymentMethodChange: (method: PaymentMethodType) => void;
+  onPaymentChange: (field: keyof PaymentData, value: string) => void;
+
   onBack: () => void;
 };
 
 export default function PaymentMethod({
   paymentMethod,
   defaultPaymentMethod,
-  useSavedPayment,
   paymentData,
   errors,
   onPaymentMethodChange,
-  onUseSavedPaymentChange,
   onPaymentChange,
   onBack,
 }: PaymentMethodProps) {
