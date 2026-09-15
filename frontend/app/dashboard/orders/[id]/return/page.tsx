@@ -1,4 +1,5 @@
 import ReturnContent from "@/components/dashboard/ReturnContent";
+import PageContainer from "@/components/common/PageContainer";
 
 type ReturnPageProps = {
   params: Promise<{
@@ -6,10 +7,12 @@ type ReturnPageProps = {
   }>;
 };
 
-export default async function ReturnPage({
-  params,
-}: ReturnPageProps) {
+export default async function ReturnPage({ params }: ReturnPageProps) {
   const { id } = await params;
 
-  return <ReturnContent orderId={Number(id)} />;
+  return (
+    <PageContainer>
+      <ReturnContent orderId={Number(id)} />
+    </PageContainer>
+  );
 }

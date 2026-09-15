@@ -6,7 +6,7 @@ const ProductVariant = require("../models/ProductVariant");
 const getProducts = async (req, res) => {
   try {
     const page = Math.max(parseInt(req.query.page) || 1, 1);
-    const limit = Math.max(parseInt(req.query.limit) || 8, 1);
+    const limit = Math.max(parseInt(req.query.limit) || 15, 1);
     const offset = (page - 1) * limit;
 
     const {

@@ -1,19 +1,31 @@
 import { apiRequest } from "@/lib/api";
 
 export const productService = {
-  getProducts: (
+  getProducts: ({
     page = 1,
-    limit = 9,
-    categoryId?: number,
-    minPrice?: number,
-    maxPrice?: number,
-    onSale?: boolean,
-    newArrivals?: boolean,
-    inStock?: boolean,
-    discount?: number,
-    rating?: number,
-    sortBy?: string
-  ) => {
+    limit = 15,
+    categoryId,
+    minPrice,
+    maxPrice,
+    onSale,
+    newArrivals,
+    inStock,
+    discount,
+    rating,
+    sortBy,
+  }: {
+    page?: number;
+    limit?: number;
+    categoryId?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    onSale?: boolean;
+    newArrivals?: boolean;
+    inStock?: boolean;
+    discount?: number;
+    rating?: number;
+    sortBy?: string;
+  } = {}) => {
     let url = `/products?page=${page}&limit=${limit}`;
 
     // Category filter

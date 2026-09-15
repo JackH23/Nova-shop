@@ -59,19 +59,18 @@ export function useProductList({
       });
 
       try {
-        const response = await productService.getProducts(
-          currentPage,
-          9,
-          categoryId ?? undefined,
+        const response = await productService.getProducts({
+          page: currentPage,
+          categoryId: categoryId ?? undefined,
           minPrice,
           maxPrice,
           onSale,
           newArrivals,
           inStock,
-          minDiscount,
-          minRating,
-          sortBy
-        );
+          discount: minDiscount,
+          rating: minRating,
+          sortBy,
+        });
 
         dispatch({
           type: "SET_PRODUCTS",
