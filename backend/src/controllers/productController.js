@@ -19,11 +19,28 @@ const getProducts = async (req, res) => {
       discount,
       rating,
       sort,
+      search,
     } = req.query;
 
     const where = {
       is_active: true,
     };
+
+    // Search filter
+    if (search && search.trim()) {
+      where[Op.or] = [
+        {
+          name: {
+            [Op.like]: `%${search.trim()}%`,
+          },
+        },
+        {
+          description: {
+            [Op.like]: `%${search.trim()}%`,
+          },
+        },
+      ];
+    }
 
     // Category filter
     if (category_id) {
@@ -89,7 +106,7 @@ const getProducts = async (req, res) => {
       }
     }
 
-        // Product sorting
+    // Product sorting
     let order = [["created_at", "DESC"]];
 
     switch (sort) {
@@ -151,23 +168,14 @@ const getProductById = async (req, res) => {
         {
           model: ProductVariant,
           as: "variants",
-          attributes: [
-            "id",
-            "color_name",
-            "color_hex",
-            "stock",
-          ],
+          attributes: ["id", "color_name", "color_hex", "stock"],
           required: false,
 
           include: [
             {
               model: ProductImage,
               as: "images",
-              attributes: [
-                "id",
-                "image_url",
-                "sort_order",
-              ],
+              attributes: ["id", "image_url", "sort_order"],
               required: false,
             },
           ],

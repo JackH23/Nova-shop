@@ -14,6 +14,7 @@ type UseProductListProps = {
   categoryId?: number | null;
   minDiscount?: number;
   minRating?: number;
+  search?: string;
 };
 
 export function useProductList({
@@ -25,6 +26,7 @@ export function useProductList({
   categoryId = null,
   minDiscount = 0,
   minRating = 0,
+  search = "",
 }: UseProductListProps) {
   const [state, dispatch] = useReducer(productReducer, initialProductState);
 
@@ -49,6 +51,7 @@ export function useProductList({
     minDiscount,
     minRating,
     sortBy,
+    search,
   ]);
 
   useEffect(() => {
@@ -70,6 +73,7 @@ export function useProductList({
           discount: minDiscount,
           rating: minRating,
           sortBy,
+          search,
         });
 
         dispatch({
@@ -105,6 +109,7 @@ export function useProductList({
     inStock,
     minDiscount,
     minRating,
+    search,
     sortBy,
   ]);
 

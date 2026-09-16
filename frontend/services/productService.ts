@@ -13,6 +13,7 @@ export const productService = {
     discount,
     rating,
     sortBy,
+    search,
   }: {
     page?: number;
     limit?: number;
@@ -25,6 +26,7 @@ export const productService = {
     discount?: number;
     rating?: number;
     sortBy?: string;
+    search?: string;
   } = {}) => {
     let url = `/products?page=${page}&limit=${limit}`;
 
@@ -71,6 +73,11 @@ export const productService = {
     // Product sorting
     if (sortBy) {
       url += `&sort=${sortBy}`;
+    }
+
+    // Search product
+    if (search?.trim()) {
+      url += `&search=${encodeURIComponent(search.trim())}`;
     }
 
     return apiRequest(url, {

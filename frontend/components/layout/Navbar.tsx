@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useNavbar } from "@/composables/useNavbar";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { useProductList } from "@/composables/useProductList";
 import { useCart } from "@/composables/useCart";
 import { Search, Heart, ShoppingCart, UserRound } from "lucide-react";
 import { useMe } from "@/composables/useMe";
@@ -13,6 +15,14 @@ import { getFileUrl } from "@/lib/fileUrl";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [search, setSearch] = useState("");
+
+  const {
+    filteredProducts: searchResults,
+    loading: searching,
+  } = useProductList({
+    search,
+  });
 
   const { user } = useMe();
   const profileImageUrl = getFileUrl(user?.profileImage);
@@ -42,10 +52,7 @@ export default function Navbar() {
         <div className="border-b border-slate-200">
           <div className="mx-auto flex h-[70px] max-w-[1440px] items-center px-9">
             {/* Logo */}
-            <Link
-              href="/home"
-              className="text-[18px] font-bold text-[#3324d8]"
-            >
+            <Link href="/home" className="text-[18px] font-bold text-[#3324d8]">
               NovaShop
             </Link>
 
@@ -104,28 +111,71 @@ export default function Navbar() {
             {/* Right section */}
             <div className="ml-auto flex items-center gap-4">
               {/* Search */}
-              <div className="flex h-[42px] w-[180px] items-center rounded-full bg-[#f4f5f7] px-5">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="w-full bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-500"
-                />
+              <div className="relative">
+                <div className="flex h-[42px] w-[180px] items-center rounded-full bg-[#f4f5f7] px-5">
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search..."
+                    className="w-full bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-500"
+                  />
 
-                <Search
-                  size={17}
-                  strokeWidth={1.8}
-                  className="text-slate-700"
-                />
+                  <Search
+                    size={17}
+                    strokeWidth={1.8}
+                    className="shrink-0 text-slate-700"
+                  />
+                </div>
+
+                {search.trim() && (
+                  <div className="absolute right-0 top-[48px] z-50 w-[320px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
+                    {searching ? (
+                      <p className="p-4 text-xs text-slate-500">Searching...</p>
+                    ) : searchResults.length > 0 ? (
+                      searchResults.slice(0, 5).map((product) => (
+                        <Link
+                          key={product.id}
+                          href={`/products/${product.id}`}
+                          onClick={() => {
+                            setSearch("");
+                          }}
+                          className="flex items-center gap-3 border-b border-slate-100 p-3 last:border-b-0 hover:bg-slate-50"
+                        >
+                          <img
+                            src={product.image || "/placeholder.png"}
+                            alt={product.name}
+                            className="h-12 w-12 rounded-md object-cover"
+                          />
+
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-slate-900">
+                              {product.name}
+                            </p>
+
+                            <p className="text-xs font-semibold text-[#3324d8]">
+                              ${Number(product.price).toFixed(2)}
+                            </p>
+                          </div>
+                        </Link>
+                      ))
+                    ) : (
+                      <p className="p-4 text-xs text-slate-500">
+                        No products found.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Wishlist */}
-              <button
-                type="button"
+              <Link
+                href="/dashboard/wishlist"
                 className="text-[#3324d8] transition hover:opacity-70"
                 aria-label="Wishlist"
               >
                 <Heart size={19} strokeWidth={1.8} />
-              </button>
+              </Link>
 
               {/* Cart */}
               <Link

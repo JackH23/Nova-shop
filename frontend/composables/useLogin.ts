@@ -77,7 +77,7 @@ export function useLogin() {
         localStorage.removeItem("refreshToken");
       }
 
-      router.push("/dashboard");
+      router.push("/home");
     } catch (error) {
       dispatch({
         type: "SET_ERROR",

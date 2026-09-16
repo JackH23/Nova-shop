@@ -44,7 +44,11 @@ export default function ProfileModal({
       className="absolute right-0 top-11 z-50 w-64 rounded-lg border border-slate-200 bg-white p-4 shadow-lg"
     >
       {/* User */}
-      <div className="flex items-center gap-3">
+      <Link
+        href="/dashboard/settings"
+        onClick={onClose}
+        className="flex items-center gap-3 rounded-md p-2 transition hover:bg-slate-50"
+      >
         {profileImage ? (
           <img
             src={profileImage}
@@ -62,7 +66,7 @@ export default function ProfileModal({
 
           <p className="text-xs text-slate-500">{email}</p>
         </div>
-      </div>
+      </Link>
 
       {/* Menu */}
       <div className="mt-4 border-t border-slate-100 pt-3">
