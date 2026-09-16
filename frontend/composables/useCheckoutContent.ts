@@ -81,39 +81,38 @@ export function useCheckoutContent() {
   });
 
   useEffect(() => {
-  const getDefaultPaymentMethod = async () => {
-    try {
-      const response =
-        await paymentMethodService.getDefaultPaymentMethod();
+    const getDefaultPaymentMethod = async () => {
+      try {
+        const response = await paymentMethodService.getDefaultPaymentMethod();
 
-      if (!response.paymentMethod) return;
+        if (!response.paymentMethod) return;
 
-      const defaultPayment = response.paymentMethod;
+        const defaultPayment = response.paymentMethod;
 
-      setDefaultPaymentMethod(defaultPayment);
+        setDefaultPaymentMethod(defaultPayment);
 
-      setPaymentData((prev) => ({
-        ...prev,
-        cardNumber: `•••• •••• •••• ${defaultPayment.last_four}`,
-        expiryDate: `${defaultPayment.expiry_month}/${defaultPayment.expiry_year}`,
-      }));
-    } catch (error) {
-      console.error(
-        "Failed to fetch default payment method:",
-        error,
-      );
-    }
-  };
+        setPaymentData((prev) => ({
+          ...prev,
+          cardNumber: "",
+          expiryDate: "",
+        }));
+      } catch (error) {
+        console.error("Failed to fetch default payment method:", error);
+      }
+    };
 
-  getDefaultPaymentMethod();
-}, []);
+    getDefaultPaymentMethod();
+  }, []);
 
   const {
     errors: paymentErrors,
     validatePayment,
     handleChange: handlePaymentChange,
-  } = usePaymentValidation(paymentData, setPaymentData);
-
+  } = usePaymentValidation(paymentData, setPaymentData, {
+    requireCardNumber: !defaultPaymentMethod,
+    requireExpiry: !defaultPaymentMethod,
+    requireCvc: true,
+  });
   const openConfirm = () => {
     if (paymentMethod === "CREDIT_CARD") {
       const isValid = validatePayment(paymentData);

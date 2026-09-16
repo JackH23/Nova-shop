@@ -9,6 +9,7 @@ export type PaymentData = {
 export type PaymentErrors = Partial<Record<keyof PaymentData, string>>;
 
 type PaymentValidationOptions = {
+  requireCardNumber?: boolean;
   requireExpiry?: boolean;
   requireCvc?: boolean;
 };
@@ -18,18 +19,24 @@ export function usePaymentValidation(
   onPaymentDataChange?: (data: PaymentData) => void,
   options: PaymentValidationOptions = {},
 ) {
-  const { requireExpiry = true, requireCvc = true } = options;
+  const {
+    requireCardNumber = true,
+    requireExpiry = true,
+    requireCvc = true,
+  } = options;
   const [errors, setErrors] = useState<PaymentErrors>({});
 
   const validatePayment = (paymentData: PaymentData) => {
     const newErrors: PaymentErrors = {};
 
-    const cleanCardNumber = paymentData.cardNumber.replace(/\s/g, "");
+    if (requireCardNumber) {
+      const cleanCardNumber = paymentData.cardNumber.replace(/\s/g, "");
 
-    if (!cleanCardNumber) {
-      newErrors.cardNumber = "Card number is required";
-    } else if (!/^\d{16}$/.test(cleanCardNumber)) {
-      newErrors.cardNumber = "Card number must be 16 digits";
+      if (!cleanCardNumber) {
+        newErrors.cardNumber = "Card number is required";
+      } else if (!/^\d{16}$/.test(cleanCardNumber)) {
+        newErrors.cardNumber = "Card number must be 16 digits";
+      }
     }
 
     if (requireExpiry) {
