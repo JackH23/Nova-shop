@@ -26,6 +26,20 @@ OrderItem.belongsTo(Order, {
 });
 
 // ========================================
+// Order Item → Product
+// ========================================
+
+OrderItem.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+Product.hasMany(OrderItem, {
+  foreignKey: "product_id",
+  as: "orderItems",
+});
+
+// ========================================
 // Order → Delivery
 // ========================================
 

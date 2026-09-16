@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
 const Order = require("../models/Order");
 const OrderItem = require("../models/OrderItem");
+const Product = require("../models/Product");
 const Delivery = require("../models/Delivery");
 const Payment = require("../models/Payment");
 const ShippingAddress = require("../models/ShippingAddress");
@@ -69,17 +70,9 @@ const getDashboardSummary = async (req, res) => {
 
     const now = new Date();
 
-    const startOfMonth = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      1
-    );
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const startOfNextMonth = new Date(
-      now.getFullYear(),
-      now.getMonth() + 1,
-      1
-    );
+    const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
     // Total orders
     const totalOrders = await Order.count({
@@ -120,7 +113,7 @@ const getDashboardSummary = async (req, res) => {
 
     const totalSpending = paidOrders.reduce(
       (total, order) => total + Number(order.total_amount || 0),
-      0
+      0,
     );
 
     // Recent order
@@ -133,6 +126,14 @@ const getDashboardSummary = async (req, res) => {
           model: OrderItem,
           as: "items",
           required: false,
+          include: [
+            {
+              model: Product,
+              as: "product",
+              required: false,
+              attributes: ["id", "image"],
+            },
+          ],
         },
       ],
       order: [["created_at", "DESC"]],
@@ -182,6 +183,14 @@ const getOrderById = async (req, res) => {
           model: OrderItem,
           as: "items",
           required: false,
+          include: [
+            {
+              model: Product,
+              as: "product",
+              required: false,
+              attributes: ["id", "image"],
+            },
+          ],
         },
         {
           model: Delivery,

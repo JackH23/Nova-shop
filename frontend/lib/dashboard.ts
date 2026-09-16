@@ -8,6 +8,12 @@ export type DashboardOrderItem = {
   unit_price: string;
   quantity: number;
   line_total: string;
+
+  product: {
+    id: number;
+    image: string | null;
+  } | null;
+
   created_at: string;
   updated_at: string;
 };
