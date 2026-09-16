@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 const {
   getAccountSettings,
@@ -18,18 +19,35 @@ const router = express.Router();
    Profile Image Upload
 ================================ */
 
+// Absolute path:
+// backend/uploads/profiles
+const uploadDir = path.join(
+  __dirname,
+  "../../uploads/profiles"
+);
+
+// Create uploads/profiles if it does not exist
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, {
+    recursive: true,
+  });
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/profiles");
+    cb(null, uploadDir);
   },
 
   filename: (req, file, cb) => {
     const uniqueName =
-      Date.now() + "-" + Math.round(Math.random() * 1e9);
+      Date.now() +
+      "-" +
+      Math.round(Math.random() * 1e9);
 
     cb(
       null,
-      uniqueName + path.extname(file.originalname)
+      uniqueName +
+        path.extname(file.originalname)
     );
   },
 });
@@ -51,7 +69,9 @@ const upload = multer({
 
     if (!allowedTypes.includes(file.mimetype)) {
       return cb(
-        new Error("Only JPG, PNG and WEBP images are allowed")
+        new Error(
+          "Only JPG, PNG and WEBP images are allowed"
+        )
       );
     }
 
@@ -82,14 +102,18 @@ router.put(
   "/profile-image",
 
   (req, res, next) => {
-    console.log("1. Profile image request received");
+    console.log(
+      "1. Profile image request received"
+    );
     next();
   },
 
   authMiddleware,
 
   (req, res, next) => {
-    console.log("2. Auth middleware passed");
+    console.log(
+      "2. Auth middleware passed"
+    );
     next();
   },
 

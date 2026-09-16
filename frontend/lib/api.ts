@@ -1,4 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 let refreshPromise: Promise<string> | null = null;
 
 function getStoredToken(key: string) {
@@ -6,7 +7,10 @@ function getStoredToken(key: string) {
     return null;
   }
 
-  return localStorage.getItem(key) || sessionStorage.getItem(key);
+  return (
+    localStorage.getItem(key) ||
+    sessionStorage.getItem(key)
+  );
 }
 
 function saveAccessToken(accessToken: string) {
@@ -17,33 +21,54 @@ function saveAccessToken(accessToken: string) {
   // If refreshToken is stored in localStorage,
   // Remember Me was enabled.
   if (localStorage.getItem("refreshToken")) {
-    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem(
+      "accessToken",
+      accessToken,
+    );
   } else {
-    sessionStorage.setItem("accessToken", accessToken);
+    sessionStorage.setItem(
+      "accessToken",
+      accessToken,
+    );
   }
 }
 
+// ========================================
+// Refresh access token
+// ========================================
+
 async function refreshAccessToken() {
-  const refreshToken = getStoredToken("refreshToken");
+  const refreshToken =
+    getStoredToken("refreshToken");
 
   if (!refreshToken) {
-    throw new Error("Refresh token not found");
+    throw new Error(
+      "Refresh token not found",
+    );
   }
 
-  const response = await fetch(`${API_URL}/auth/refresh-token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${API_URL}/auth/refresh-token`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        refreshToken,
+      }),
     },
-    body: JSON.stringify({
-      refreshToken,
-    }),
-  });
+  );
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Unable to refresh access token");
+    throw new Error(
+      data.message ||
+        "Unable to refresh access token",
+    );
   }
 
   saveAccessToken(data.accessToken);
@@ -51,26 +76,82 @@ async function refreshAccessToken() {
   return data.accessToken;
 }
 
-export async function apiRequest(endpoint: string, options: RequestInit = {}) {
-  const accessToken = getStoredToken("accessToken");
+// ========================================
+// Create request headers
+// ========================================
+
+function createHeaders(
+  options: RequestInit,
+  accessToken: string | null,
+) {
+  const headers = new Headers(
+    options.headers,
+  );
+
+  const isFormData =
+    typeof FormData !== "undefined" &&
+    options.body instanceof FormData;
+
+  // JSON request
+  if (!isFormData) {
+    if (!headers.has("Content-Type")) {
+      headers.set(
+        "Content-Type",
+        "application/json",
+      );
+    }
+  }
+
+  // FormData request
+  //
+  // Do NOT manually set multipart/form-data.
+  // Browser automatically creates:
+  //
+  // multipart/form-data;
+  // boundary=----WebKitFormBoundary...
+  if (isFormData) {
+    headers.delete("Content-Type");
+  }
+
+  // Authorization
+  if (accessToken) {
+    headers.set(
+      "Authorization",
+      `Bearer ${accessToken}`,
+    );
+  }
+
+  return headers;
+}
+
+// ========================================
+// API request
+// ========================================
+
+export async function apiRequest<T = any>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const accessToken =
+    getStoredToken("accessToken");
 
   // First request
-  let response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
+  let response = await fetch(
+    `${API_URL}${endpoint}`,
+    {
+      ...options,
 
-      ...(accessToken
-        ? {
-            Authorization: `Bearer ${accessToken}`,
-          }
-        : {}),
-
-      ...options.headers,
+      headers: createHeaders(
+        options,
+        accessToken,
+      ),
     },
-  });
+  );
 
+  // ========================================
   // Access token expired
+  // ========================================
+
   if (
     response.status === 401 &&
     endpoint !== "/auth/login" &&
@@ -79,43 +160,93 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   ) {
     try {
       if (!refreshPromise) {
-        refreshPromise = refreshAccessToken().finally(() => {
-          refreshPromise = null;
-        });
+        refreshPromise =
+          refreshAccessToken().finally(
+            () => {
+              refreshPromise = null;
+            },
+          );
       }
 
-      const newAccessToken = await refreshPromise;
+      const newAccessToken =
+        await refreshPromise;
 
-      // Retry original request with new token
-      response = await fetch(`${API_URL}${endpoint}`, {
-        ...options,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${newAccessToken}`,
-          ...options.headers,
+      // Retry original request
+      response = await fetch(
+        `${API_URL}${endpoint}`,
+        {
+          ...options,
+
+          headers: createHeaders(
+            options,
+            newAccessToken,
+          ),
         },
-      });
+      );
     } catch {
-      // Refresh token is also invalid/expired
+      // Refresh token invalid/expired
       if (typeof window !== "undefined") {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
+        localStorage.removeItem(
+          "accessToken",
+        );
 
-        sessionStorage.removeItem("accessToken");
-        sessionStorage.removeItem("refreshToken");
+        localStorage.removeItem(
+          "refreshToken",
+        );
+
+        sessionStorage.removeItem(
+          "accessToken",
+        );
+
+        sessionStorage.removeItem(
+          "refreshToken",
+        );
 
         window.location.href = "/login";
       }
 
-      throw new Error("Your session has expired. Please login again.");
+      throw new Error(
+        "Your session has expired. Please login again.",
+      );
     }
   }
 
-  const data = await response.json();
+  // ========================================
+  // Parse response
+  // ========================================
 
-  if (!response.ok) {
-    throw new Error(data.message || "Request failed");
+  const contentType =
+    response.headers.get("content-type");
+
+  let data: any;
+
+  if (
+    contentType?.includes(
+      "application/json",
+    )
+  ) {
+    data = await response.json();
+  } else {
+    const text = await response.text();
+
+    if (!response.ok) {
+      throw new Error(
+        text || "Request failed",
+      );
+    }
+
+    return text as T;
   }
 
-  return data;
+  // ========================================
+  // Error response
+  // ========================================
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "Request failed",
+    );
+  }
+
+  return data as T;
 }

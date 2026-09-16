@@ -1,4 +1,5 @@
 require("dotenv").config();
+const path = require("path");
 
 const express = require("express");
 const cors = require("cors");
@@ -24,6 +25,19 @@ const settingsRoutes = require("./routes/settingsRoutes");
 const app = express();
 
 app.use(cors());
+
+// Debug incoming requests
+app.use((req, res, next) => {
+  console.log("\n========== REQUEST ==========");
+  console.log("Method:", req.method);
+  console.log("URL:", req.originalUrl);
+  console.log("Content-Type:", req.headers["content-type"]);
+  console.log("Content-Length:", req.headers["content-length"]);
+  console.log("=============================\n");
+
+  next();
+});
+
 app.use(express.json());
 
 // Serve uploaded images
@@ -60,8 +74,8 @@ const startServer = async () => {
     await sequelize.sync();
     console.log("Database tables synchronized");
 
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on port ${PORT}`);
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
     });
   } catch (error) {
     console.error("MySQL connection failed:", error);

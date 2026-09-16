@@ -9,6 +9,7 @@ import { usePaymentMethodForm } from "@/composables/usePaymentMethodForm";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { useRemoveConfirm } from "@/composables/useRemoveConfirm";
 import Pagination from "@/components/common/Pagination";
+import { usePaymentModal } from "@/composables/usePaymentModal";
 
 export default function PaymentContent() {
   const {
@@ -25,13 +26,35 @@ export default function PaymentContent() {
   } = usePaymentMethods();
 
   const {
+    handleOpenRemoveConfirm,
+    handleCloseRemoveConfirm,
+    handleConfirmRemove,
+  } = useRemoveConfirm({
+    onRemove: removePaymentMethod,
+  });
+
+  const {
+    modalType,
+    successMessage,
+    handleCreate,
+    handleUpdate,
+    handleOpenRemove,
+    handleCloseModal,
+    handleConfirmModal,
+  } = usePaymentModal({
+    onCreate: createPaymentMethod,
+    onUpdate: updatePaymentMethod,
+    onOpenRemove: handleOpenRemoveConfirm,
+    onCloseRemove: handleCloseRemoveConfirm,
+    onConfirmRemove: handleConfirmRemove,
+  });
+
+  const {
     form,
     showAddForm,
     editingPaymentMethod,
-
     formErrors,
     paymentErrors,
-
     handleChange,
     handleCardNumberChange,
     handleSubmit,
@@ -39,17 +62,8 @@ export default function PaymentContent() {
     handleEditPaymentMethod,
     handleCloseForm,
   } = usePaymentMethodForm({
-    onCreate: createPaymentMethod,
-    onUpdate: updatePaymentMethod,
-  });
-
-  const {
-    removeId,
-    handleOpenRemoveConfirm,
-    handleCloseRemoveConfirm,
-    handleConfirmRemove,
-  } = useRemoveConfirm({
-    onRemove: removePaymentMethod,
+    onCreate: handleCreate,
+    onUpdate: handleUpdate,
   });
 
   return (
@@ -111,7 +125,7 @@ export default function PaymentContent() {
                     key={payment.id}
                     payment={payment}
                     onEdit={handleEditPaymentMethod}
-                    onRemove={handleOpenRemoveConfirm}
+                    onRemove={handleOpenRemove}
                     onSetDefault={setDefaultPaymentMethod}
                   />
                 ))}
@@ -147,13 +161,19 @@ export default function PaymentContent() {
       </PageContainer>
 
       <ConfirmModal
-        open={removeId !== null}
-        title="Remove Payment Method"
-        message="Are you sure you want to remove this payment method?"
+        open={modalType !== null}
+        title={modalType === "remove" ? "Remove Payment Method" : "Success"}
+        message={
+          modalType === "remove"
+            ? "Are you sure you want to remove this payment method?"
+            : successMessage
+        }
         cancelText="Cancel"
-        confirmText="Remove"
-        onCancel={handleCloseRemoveConfirm}
-        onConfirm={handleConfirmRemove}
+        confirmText={modalType === "remove" ? "Remove" : "Close"}
+        singleButton={modalType === "success"}
+        variant={modalType === "success" ? "success" : "danger"}
+        onCancel={handleCloseModal}
+        onConfirm={handleConfirmModal}
       />
     </>
   );
