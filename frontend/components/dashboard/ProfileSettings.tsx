@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { Camera } from "lucide-react";
 
 import type { SettingsUser, UpdateProfileData } from "@/lib/settings";
+import { useProfileSettings } from "@/composables/useProfileSettings";
 
 type ProfileSettingsProps = {
   user: SettingsUser;
@@ -22,50 +22,21 @@ export default function ProfileSettings({
   onUpdateProfile,
   onUpdateProfileImage,
 }: ProfileSettingsProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [fullName, setFullName] = useState(user.fullName);
-  const [email, setEmail] = useState(user.email);
-
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-  const BACKEND_URL = API_URL?.replace(/\/api\/?$/, "") ?? "";
-
-  const profileImageUrl = user.profileImage
-    ? `${BACKEND_URL}${user.profileImage}`
-    : null;
-
-  // Update inputs if API user changes
-  useEffect(() => {
-    setFullName(user.fullName);
-    setEmail(user.email);
-  }, [user.fullName, user.email]);
-
-  // Update profile
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    await onUpdateProfile({
-      fullName,
-      email,
-    });
-  };
-
-  // Select profile image
-  const handleImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    await onUpdateProfileImage(file);
-
-    // Allow selecting same file again
-    event.target.value = "";
-  };
+  const {
+    fileInputRef,
+    fullName,
+    email,
+    displayImageUrl,
+    setFullName,
+    setEmail,
+    handleSubmit,
+    handleImageChange,
+    handleOpenFilePicker,
+  } = useProfileSettings({
+    user,
+    onUpdateProfile,
+    onUpdateProfileImage,
+  });
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-6">
@@ -83,9 +54,9 @@ export default function ProfileSettings({
       {/* Profile image */}
       <div className="mt-6 flex items-center gap-4">
         <div className="relative">
-          {profileImageUrl ? (
+          {displayImageUrl ? (
             <img
-              src={profileImageUrl}
+              src={displayImageUrl}
               alt={user.fullName}
               className="h-20 w-20 rounded-full border border-slate-200 object-cover"
             />
@@ -98,7 +69,7 @@ export default function ProfileSettings({
           <button
             type="button"
             disabled={updatingImage}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={handleOpenFilePicker}
             className="absolute -bottom-1 -right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[#3324d8] text-white transition hover:bg-[#271bb7] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Camera size={15} />

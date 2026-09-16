@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 type ProfileModalProps = {
   fullName: string;
   email: string;
+  profileImage: string | null;
   onClose: () => void;
   onLogout: () => void;
 };
@@ -14,6 +15,7 @@ type ProfileModalProps = {
 export default function ProfileModal({
   fullName,
   email,
+  profileImage,
   onClose,
   onLogout,
 }: ProfileModalProps) {
@@ -43,18 +45,22 @@ export default function ProfileModal({
     >
       {/* User */}
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#3324d8] font-semibold text-white">
-          {fullName.charAt(0).toUpperCase()}
-        </div>
+        {profileImage ? (
+          <img
+            src={profileImage}
+            alt={fullName}
+            className="h-10 w-10 rounded-full border border-slate-200 object-cover"
+          />
+        ) : (
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#3324d8] font-semibold text-white">
+            {fullName.charAt(0).toUpperCase()}
+          </div>
+        )}
 
         <div>
-          <p className="text-sm font-semibold text-slate-900">
-            {fullName}
-          </p>
+          <p className="text-sm font-semibold text-slate-900">{fullName}</p>
 
-          <p className="text-xs text-slate-500">
-            {email}
-          </p>
+          <p className="text-xs text-slate-500">{email}</p>
         </div>
       </div>
 

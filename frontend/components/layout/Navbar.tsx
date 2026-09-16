@@ -9,11 +9,13 @@ import { useMe } from "@/composables/useMe";
 import ProfileModal from "./ProfileModal";
 import { useLogout } from "@/composables/useLogout";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import { getFileUrl } from "@/lib/fileUrl";
 
 export default function Navbar() {
   const pathname = usePathname();
 
   const { user } = useMe();
+  const profileImageUrl = getFileUrl(user?.profileImage);
   const { cartCount } = useCart();
   const { isVisible, isProfileOpen, toggleProfile, closeProfile } = useNavbar();
 
@@ -148,9 +150,17 @@ export default function Navbar() {
                     onClick={toggleProfile}
                     className="flex items-center gap-2"
                   >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3324d8] text-xs font-semibold text-white">
-                      {user.fullName.charAt(0).toUpperCase()}
-                    </div>
+                    {profileImageUrl ? (
+                      <img
+                        src={profileImageUrl}
+                        alt={user.fullName}
+                        className="h-8 w-8 rounded-full border border-slate-200 object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3324d8] text-xs font-semibold text-white">
+                        {user.fullName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
 
                     <span className="text-xs font-medium text-slate-800">
                       {user.fullName}
@@ -161,6 +171,7 @@ export default function Navbar() {
                     <ProfileModal
                       fullName={user.fullName}
                       email={user.email}
+                      profileImage={profileImageUrl}
                       onClose={closeProfile}
                       onLogout={openConfirm}
                     />

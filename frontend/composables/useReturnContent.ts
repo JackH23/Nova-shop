@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useReturn } from "@/composables/useReturn";
 
+type ModalType = "confirm" | "success" | null;
+
 export function useReturnContent(orderId: number) {
   const router = useRouter();
 
@@ -13,8 +15,7 @@ export function useReturnContent(orderId: number) {
   const [showReturnForm, setShowReturnForm] = useState(false);
   const [reason, setReason] = useState("");
   const [note, setNote] = useState("");
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [modalType, setModalType] = useState<ModalType>(null);
 
   const handleSelectItem = (itemId: number) => {
     setSelectedItems((current) =>
@@ -28,6 +29,14 @@ export function useReturnContent(orderId: number) {
     if (selectedItems.length === 0) return;
 
     setShowReturnForm(true);
+  };
+
+  const handleOpenConfirm = () => {
+    setModalType("confirm");
+  };
+
+  const handleCloseModal = () => {
+    setModalType(null);
   };
 
   const handleConfirmReturn = async () => {
@@ -47,8 +56,7 @@ export function useReturnContent(orderId: number) {
       console.log("Created return:", response.return);
       console.log("Returned items:", response.return.items);
 
-      setShowConfirmModal(false);
-      setShowSuccessModal(true);
+      setModalType("success");
     } catch (error) {
       console.error("Failed to create return:", error);
     }
@@ -63,18 +71,17 @@ export function useReturnContent(orderId: number) {
     showReturnForm,
     reason,
     note,
-    showConfirmModal,
-    showSuccessModal,
+    modalType,
     submitting,
     submitError,
 
     setReason,
     setNote,
-    setShowConfirmModal,
-    setShowSuccessModal,
 
     handleSelectItem,
     handleReturn,
+    handleOpenConfirm,
+    handleCloseModal,
     handleConfirmReturn,
     handleBackToOrder,
   };

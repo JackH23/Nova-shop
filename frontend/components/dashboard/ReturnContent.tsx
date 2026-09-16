@@ -16,16 +16,15 @@ export default function ReturnContent({ orderId }: ReturnContentProps) {
     showReturnForm,
     reason,
     note,
-    showConfirmModal,
-    showSuccessModal,
+    modalType,
     submitting,
     submitError,
     setReason,
     setNote,
-    setShowConfirmModal,
-    setShowSuccessModal,
     handleSelectItem,
     handleReturn,
+    handleOpenConfirm,
+    handleCloseModal,
     handleConfirmReturn,
     handleBackToOrder,
   } = useReturnContent(orderId);
@@ -156,7 +155,7 @@ export default function ReturnContent({ orderId }: ReturnContentProps) {
             <div className="mt-6 flex justify-end">
               <button
                 type="button"
-                onClick={() => setShowConfirmModal(true)}
+                onClick={handleOpenConfirm}
                 disabled={!reason || submitting}
                 className="rounded-md bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
@@ -168,23 +167,31 @@ export default function ReturnContent({ orderId }: ReturnContentProps) {
       </div>
 
       <ConfirmModal
-        open={showConfirmModal}
-        title="Confirm Return Request"
-        message={`Are you sure you want to return ${selectedItems.length} item(s)?`}
-        confirmText="Submit Return"
-        cancelText="Cancel"
-        onConfirm={handleConfirmReturn}
-        onCancel={() => setShowConfirmModal(false)}
-      />
-
-      <ConfirmModal
-        open={showSuccessModal}
-        title="Return Request Submitted"
-        message="Your return request has been submitted successfully."
-        confirmText="Back to Order"
-        cancelText="Close"
-        onConfirm={handleBackToOrder}
-        onCancel={() => setShowSuccessModal(false)}
+        open={modalType !== null}
+        title={
+          modalType === "confirm"
+            ? "Confirm Return Request"
+            : "Return Request Submitted"
+        }
+        message={
+          modalType === "confirm"
+            ? `Are you sure you want to return ${selectedItems.length} item(s)?`
+            : "Your return request has been submitted successfully."
+        }
+        confirmText={
+          modalType === "confirm"
+            ? submitting
+              ? "Submitting..."
+              : "Submit Return"
+            : "Back to Order"
+        }
+        cancelText={modalType === "confirm" ? "Cancel" : "Close"}
+        singleButton={modalType === "success"}
+        variant={modalType === "confirm" ? "danger" : "success"}
+        onConfirm={
+          modalType === "confirm" ? handleConfirmReturn : handleBackToOrder
+        }
+        onCancel={handleCloseModal}
       />
     </>
   );

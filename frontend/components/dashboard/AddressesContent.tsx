@@ -9,6 +9,7 @@ import { useAddressForm } from "@/composables/useAddressForm";
 import AddressForm from "@/components/dashboard/address/AddressForm";
 import Pagination from "@/components/common/Pagination";
 import { useRemoveConfirm } from "@/composables/useRemoveConfirm";
+import { useAddressModal } from "@/composables/useAddressModal";
 
 export default function AddressesContent() {
   const {
@@ -26,12 +27,26 @@ export default function AddressesContent() {
   } = useAddressContent();
 
   const {
-    removeId,
     handleOpenRemoveConfirm,
     handleCloseRemoveConfirm,
     handleConfirmRemove,
   } = useRemoveConfirm({
     onRemove: handleRemoveAddress,
+  });
+
+  const {
+    modalType,
+    handleCreate,
+    handleUpdate,
+    handleOpenRemove,
+    handleCloseModal,
+    handleConfirmModal,
+  } = useAddressModal({
+    onCreate: handleCreateAddress,
+    onUpdate: handleUpdateAddress,
+    onOpenRemove: handleOpenRemoveConfirm,
+    onCloseRemove: handleCloseRemoveConfirm,
+    onConfirmRemove: handleConfirmRemove,
   });
 
   const {
@@ -45,8 +60,8 @@ export default function AddressesContent() {
     handleEditAddress,
     handleCloseForm,
   } = useAddressForm({
-    onCreate: handleCreateAddress,
-    onUpdate: handleUpdateAddress,
+    onCreate: handleCreate,
+    onUpdate: handleUpdate,
   });
 
   return (
@@ -87,7 +102,7 @@ export default function AddressesContent() {
                     key={address.id}
                     address={address}
                     onEdit={handleEditAddress}
-                    onRemove={handleOpenRemoveConfirm}
+                    onRemove={handleOpenRemove}
                     onSetDefault={handleSetDefaultAddress}
                   />
                 ))}
@@ -130,13 +145,27 @@ export default function AddressesContent() {
       </PageContainer>
 
       <ConfirmModal
-        open={removeId !== null}
-        title="Remove Address"
-        message="Are you sure you want to remove this address?"
+        open={modalType !== null}
+        title={
+          modalType === "remove"
+            ? "Remove Address"
+            : modalType === "create-success"
+              ? "Address Added"
+              : "Address Updated"
+        }
+        message={
+          modalType === "remove"
+            ? "Are you sure you want to remove this address?"
+            : modalType === "create-success"
+              ? "Your address has been added successfully."
+              : "Your address has been updated successfully."
+        }
         cancelText="Cancel"
-        confirmText="Remove"
-        onCancel={handleCloseRemoveConfirm}
-        onConfirm={handleConfirmRemove}
+        confirmText={modalType === "remove" ? "Remove" : "Close"}
+        singleButton={modalType !== "remove"}
+        variant={modalType === "remove" ? "danger" : "success"}
+        onCancel={handleCloseModal}
+        onConfirm={handleConfirmModal}
       />
     </>
   );
