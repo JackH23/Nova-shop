@@ -8,6 +8,7 @@ type PasswordInputProps = {
   name: string;
   label?: string;
   placeholder?: string;
+  error?: string;
   showStrength?: boolean;
   value?: string;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
@@ -21,6 +22,7 @@ export default function PasswordInput({
   showStrength = false,
   value,
   onChange,
+  error,
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -52,7 +54,11 @@ export default function PasswordInput({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
-          className="password-input h-11 w-full border border-slate-300 bg-white px-3 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          className={`password-input h-11 w-full border bg-white px-3 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-500 ${
+            error
+              ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+              : "border-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          }`}
         />
 
         <button
@@ -65,6 +71,8 @@ export default function PasswordInput({
         </button>
       </div>
 
+      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+
       {/* Password strength */}
       {showStrength && (
         <div className="mt-1.5 grid grid-cols-4 gap-1">
@@ -72,9 +80,7 @@ export default function PasswordInput({
             <div
               key={level}
               className={`h-[3px] rounded-full transition-colors ${
-                strength >= level
-                  ? "bg-indigo-500"
-                  : "bg-indigo-100"
+                strength >= level ? "bg-indigo-500" : "bg-indigo-100"
               }`}
             />
           ))}

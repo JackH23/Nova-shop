@@ -3,6 +3,7 @@
 import type { ChangeEvent, FormEvent } from "react";
 import type { ChangePasswordData } from "@/lib/settings";
 import PasswordInput from "@/components/auth/PasswordInput";
+import { useChangePasswordValidation } from "@/composables/useChangePasswordValidation";
 
 type ChangePasswordFormProps = {
   form: ChangePasswordData;
@@ -21,6 +22,19 @@ export default function ChangePasswordForm({
   onSubmit,
   onClose,
 }: ChangePasswordFormProps) {
+  const { errors, validatePassword, clearError } =
+    useChangePasswordValidation();
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const isValid = validatePassword(form);
+
+    if (!isValid) return;
+
+    onSubmit(event);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
@@ -36,7 +50,7 @@ export default function ChangePasswordForm({
           </button>
         </div>
 
-        <form onSubmit={onSubmit} className="mt-5 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           <div>
             <label
               htmlFor="currentPassword"
@@ -49,7 +63,11 @@ export default function ChangePasswordForm({
               id="currentPassword"
               name="currentPassword"
               value={form.currentPassword}
-              onChange={onChange}
+              error={errors.currentPassword}
+              onChange={(e) => {
+                onChange(e);
+                clearError("currentPassword");
+              }}
             />
           </div>
 
@@ -65,7 +83,11 @@ export default function ChangePasswordForm({
               id="newPassword"
               name="newPassword"
               value={form.newPassword}
-              onChange={onChange}
+              error={errors.newPassword}
+              onChange={(e) => {
+                onChange(e);
+                clearError("newPassword");
+              }}
             />
           </div>
 
@@ -81,7 +103,11 @@ export default function ChangePasswordForm({
               id="confirmPassword"
               name="confirmPassword"
               value={form.confirmPassword}
-              onChange={onChange}
+              error={errors.confirmPassword}
+              onChange={(e) => {
+                onChange(e);
+                clearError("confirmPassword");
+              }}
             />
           </div>
 

@@ -6,6 +6,7 @@ type AuthInputProps = {
   placeholder?: string;
   value?: string;
   error?: string;
+  maxLength?: number;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
 };
 
@@ -18,6 +19,7 @@ export default function AuthInput({
   value,
   onChange,
   error,
+  maxLength,
 }: AuthInputProps) {
   return (
     <div>
@@ -34,6 +36,7 @@ export default function AuthInput({
         type={type}
         placeholder={placeholder}
         value={value}
+        maxLength={maxLength}
         onChange={onChange}
         className={`h-11 w-full border bg-white px-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 ${
           error

@@ -19,12 +19,22 @@ export function useShippingValidation(
       newErrors.email = "Invalid email address";
     }
 
+    if (!shippingData.phone?.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^\d{8,15}$/.test(shippingData.phone)) {
+      newErrors.phone = "Phone number must be 8 to 15 digits";
+    }
+
     if (!shippingData.firstName.trim()) {
       newErrors.firstName = "First name is required";
+    } else if (!/^[A-Za-z\s'-]+$/.test(shippingData.firstName)) {
+      newErrors.firstName = "First name must contain only letters";
     }
 
     if (!shippingData.lastName.trim()) {
       newErrors.lastName = "Last name is required";
+    } else if (!/^[A-Za-z\s'-]+$/.test(shippingData.lastName)) {
+      newErrors.lastName = "Last name must contain only letters";
     }
 
     if (!shippingData.address.trim()) {
@@ -33,14 +43,21 @@ export function useShippingValidation(
 
     if (!shippingData.city.trim()) {
       newErrors.city = "City is required";
+    } else if (!/^[A-Za-z\s'-]+$/.test(shippingData.city)) {
+      newErrors.city = "City must contain only letters";
     }
 
     if (!shippingData.stateProvince.trim()) {
       newErrors.stateProvince = "State / Province is required";
+    } else if (!/^[A-Za-z\s'-]+$/.test(shippingData.stateProvince)) {
+      newErrors.stateProvince =
+        "State / Province must contain only letters";
     }
 
     if (!shippingData.postalCode.trim()) {
       newErrors.postalCode = "Postal code is required";
+    } else if (!/^\d{5}$/.test(shippingData.postalCode)) {
+      newErrors.postalCode = "Postal code must be exactly 5 digits";
     }
 
     setErrors(newErrors);

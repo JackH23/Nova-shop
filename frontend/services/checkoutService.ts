@@ -40,6 +40,7 @@ export type ShippingData = {
   email: string;
   firstName: string;
   lastName: string;
+  phone: string;
   address: string;
   city: string;
   stateProvince: string;

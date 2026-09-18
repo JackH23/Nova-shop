@@ -87,6 +87,8 @@ export default function AddressForm({
               type="text"
               placeholder="+856 20 5555 1234"
               value={form.phone}
+              error={errors.phone}
+              maxLength={15}
               onChange={onChange}
             />
           </div>
