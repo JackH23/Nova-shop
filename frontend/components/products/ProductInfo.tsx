@@ -23,11 +23,7 @@ export default function ProductInfo({
     handleAddToCart,
     loading,
     error,
-  } = useProductCart(
-    product,
-    selectedVariant,
-    onProductAdded,
-  );
+  } = useProductCart(product, selectedVariant, onProductAdded);
 
   return (
     <div className="flex flex-col">
@@ -62,34 +58,36 @@ export default function ProductInfo({
       <div className="my-6 border-t border-slate-200" />
 
       {/* Color selection */}
-      <div>
-        <p className="text-sm text-slate-700">
-          Color:{" "}
-          <span className="font-medium">
-            {selectedVariant?.color_name ?? "No color"}
-          </span>
-        </p>
+      {product.variants && product.variants.length > 0 && (
+        <div>
+          <p className="text-sm text-slate-700">
+            Color:{" "}
+            <span className="font-medium">
+              {selectedVariant?.color_name ?? "Select color"}
+            </span>
+          </p>
 
-        <div className="mt-3 flex gap-3">
-          {product.variants?.map((variant) => (
-            <button
-              key={variant.id}
-              type="button"
-              title={variant.color_name}
-              aria-label={`Select ${variant.color_name}`}
-              onClick={() => onVariantChange(variant)}
-              style={{
-                backgroundColor: variant.color_hex ?? "#ffffff",
-              }}
-              className={`h-7 w-7 rounded-full border border-slate-300 ${
-                selectedVariant?.id === variant.id
-                  ? "ring-2 ring-indigo-600 ring-offset-2"
-                  : ""
-              }`}
-            />
-          ))}
+          <div className="mt-3 flex gap-3">
+            {product.variants.map((variant) => (
+              <button
+                key={variant.id}
+                type="button"
+                title={variant.color_name}
+                aria-label={`Select ${variant.color_name}`}
+                onClick={() => onVariantChange(variant)}
+                style={{
+                  backgroundColor: variant.color_hex ?? "#ffffff",
+                }}
+                className={`h-7 w-7 rounded-full border border-slate-300 ${
+                  selectedVariant?.id === variant.id
+                    ? "ring-2 ring-indigo-600 ring-offset-2"
+                    : ""
+                }`}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Quantity + Add to Cart */}
       <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -127,11 +125,7 @@ export default function ProductInfo({
         </button>
       </div>
 
-      {error && (
-        <p className="mt-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
       {/* Shipping */}
       <p className="mt-4 text-xs text-slate-600">

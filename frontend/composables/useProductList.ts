@@ -18,8 +18,8 @@ type UseProductListProps = {
 };
 
 export function useProductList({
-  minPrice = 0,
-  maxPrice = 500,
+  minPrice,
+  maxPrice,
   inStock = false,
   onSale = false,
   newArrivals = false,
@@ -30,13 +30,9 @@ export function useProductList({
 }: UseProductListProps) {
   const [state, dispatch] = useReducer(productReducer, initialProductState);
 
-  const {
-    currentPage,
-    setCurrentPage,
-    resetPage,
-  } = usePagination();
+  const { currentPage, setCurrentPage, resetPage } = usePagination();
 
-  const [sortBy, setSortBy] = useState("featured");
+  const [sortBy, setSortBy] = useState("newest");
 
   // Reset to page 1 when any filter changes
   useEffect(() => {
@@ -65,8 +61,8 @@ export function useProductList({
         const response = await productService.getProducts({
           page: currentPage,
           categoryId: categoryId ?? undefined,
-          minPrice,
-          maxPrice,
+          minPrice: minPrice === 0 && maxPrice === 500 ? undefined : minPrice,
+          maxPrice: minPrice === 0 && maxPrice === 500 ? undefined : maxPrice,
           onSale,
           newArrivals,
           inStock,
@@ -74,6 +70,15 @@ export function useProductList({
           rating: minRating,
           sortBy,
           search,
+        });
+
+        console.log("PRODUCT LIST RESPONSE:", {
+          total: response.total,
+          products: response.products.map((product) => ({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+          })),
         });
 
         dispatch({

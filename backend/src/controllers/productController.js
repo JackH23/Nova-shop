@@ -125,6 +125,10 @@ const getProducts = async (req, res) => {
         ];
         break;
 
+      case "newest":
+        order = [["created_at", "DESC"]];
+        break;
+
       default:
         order = [["created_at", "DESC"]];
         break;

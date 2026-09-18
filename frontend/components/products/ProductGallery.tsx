@@ -5,7 +5,7 @@ import Image from "next/image";
 import type { ProductImage } from "@/lib/products";
 
 type ProductGalleryProps = {
-  image: string;
+  image: string | null;
   images: ProductImage[];
   name: string;
 };
@@ -15,8 +15,24 @@ export default function ProductGallery({
   images,
   name,
 }: ProductGalleryProps) {
-  const galleryImages =
-    images.length > 0 ? images.map((item) => item.image_url) : [image];
+  const PRODUCT_IMAGE_URL =
+    process.env.NEXT_PUBLIC_PRODUCT_IMAGE_URL || "http://localhost:5001";
+
+  const getProductImageUrl = (image: string | null | undefined) => {
+    if (!image) return null;
+
+    if (image.startsWith("http")) {
+      return image;
+    }
+
+    return `${PRODUCT_IMAGE_URL}${image}`;
+  };
+
+  const galleryImages = (
+    images.length > 0 ? images.map((item) => item.image_url) : [image]
+  )
+    .map(getProductImageUrl)
+    .filter((item): item is string => Boolean(item));
 
   const [selectedImage, setSelectedImage] = useState(galleryImages[0]);
 
@@ -28,13 +44,20 @@ export default function ProductGallery({
     <div>
       {/* Main product image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-slate-100">
-        <Image
-          src={selectedImage}
-          alt={name}
-          fill
-          className="object-cover"
-          priority
-        />
+        {selectedImage ? (
+          <Image
+            src={selectedImage}
+            alt={name}
+            fill
+            unoptimized
+            className="object-cover"
+            priority
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-sm text-slate-400">
+            No Image
+          </div>
+        )}
       </div>
 
       {/* Product thumbnails */}
@@ -54,6 +77,7 @@ export default function ProductGallery({
               src={galleryImage}
               alt={`${name} thumbnail ${index + 1}`}
               fill
+              unoptimized
               className="object-cover"
             />
           </button>

@@ -26,7 +26,7 @@ export type Product = {
   stock: number;
 
   // Main image
-  image: string;
+  image: string | null;
 
   // Product color variants
   variants?: ProductVariant[];
@@ -59,7 +59,10 @@ export async function getProducts(
   page = 1,
   limit = 9
 ): Promise<ProductsResponse> {
-  return productService.getProducts(page, limit);
+  return productService.getProducts({
+    page,
+    limit,
+  });
 }
 
 export async function getProductById(

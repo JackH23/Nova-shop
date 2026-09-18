@@ -3,7 +3,7 @@ import { useState } from "react";
 type ToastProduct = {
   id: number;
   name: string;
-  image: string;
+  image: string | null;
 };
 
 type CartToast = {

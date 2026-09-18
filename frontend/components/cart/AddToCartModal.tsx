@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 type ToastProduct = {
   id: number;
   name: string;
-  image: string;
+  image: string | null;
 };
 
 type AddToCartModalProps = {

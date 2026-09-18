@@ -21,8 +21,8 @@ type ProductListProps = {
 };
 
 export default function ProductList({
-  minPrice = 0,
-  maxPrice = 500,
+  minPrice,
+  maxPrice,
   inStock = false,
   onSale = false,
   newArrivals = false,

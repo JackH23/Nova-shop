@@ -143,7 +143,13 @@ export default function Navbar() {
                           className="flex items-center gap-3 border-b border-slate-100 p-3 last:border-b-0 hover:bg-slate-50"
                         >
                           <img
-                            src={product.image || "/placeholder.png"}
+                            src={
+                              product.image
+                                ? product.image.startsWith("http")
+                                  ? product.image
+                                  : `${process.env.NEXT_PUBLIC_PRODUCT_IMAGE_URL}${product.image}`
+                                : "/placeholder.png"
+                            }
                             alt={product.name}
                             className="h-12 w-12 rounded-md object-cover"
                           />

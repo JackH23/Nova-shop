@@ -1,4 +1,5 @@
 import { apiRequest } from "@/lib/api";
+import type { ProductsResponse, ProductResponse } from "@/lib/products";
 
 export const productService = {
   getProducts: ({
@@ -80,14 +81,14 @@ export const productService = {
       url += `&search=${encodeURIComponent(search.trim())}`;
     }
 
-    return apiRequest(url, {
+    return apiRequest<ProductsResponse>(url, {
       method: "GET",
     });
   },
 
   // Get product by ID
   getProductById: (id: number) => {
-    return apiRequest(`/products/${id}`, {
+    return apiRequest<ProductResponse>(`/products/${id}`, {
       method: "GET",
     });
   },

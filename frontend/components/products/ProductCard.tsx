@@ -45,12 +45,23 @@ export default function ProductCard({
       {/* Product image */}
       <Link href={`/products/${id}`}>
         <div className="relative h-[220px] cursor-pointer overflow-hidden rounded-md bg-[#f5f5f5]">
-          <Image
-            src={image}
-            alt={name}
-            fill
-            className="object-cover transition duration-300 group-hover:scale-105"
-          />
+          {image ? (
+            <Image
+              src={
+                image.startsWith("http")
+                  ? image
+                  : `${process.env.NEXT_PUBLIC_PRODUCT_IMAGE_URL}${image}`
+              }
+              alt={name}
+              fill
+              unoptimized
+              className="object-cover transition duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
+              No Image
+            </div>
+          )}
 
           {discount && (
             <span className="absolute right-2 top-2 rounded bg-red-50 px-2 py-1 text-[10px] font-semibold text-red-500">
