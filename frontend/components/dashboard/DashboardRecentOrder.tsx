@@ -1,5 +1,6 @@
 "use client";
 
+import ProductImage from "@/components/products/ProductImage";
 import Link from "next/link";
 import type { DashboardOrder } from "@/lib/dashboard";
 
@@ -40,13 +41,13 @@ export default function DashboardRecentOrder({
       <div className="mt-4 rounded-md border border-slate-200 p-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
-            {productImage && (
-              <img
-                src={productImage}
-                alt={firstItem?.product_name ?? "Product"}
-                className="h-16 w-16 shrink-0 rounded-md border border-slate-200 object-cover"
+            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+              <ProductImage
+                image={productImage}
+                name={firstItem?.product_name ?? "Product"}
+                className="object-cover"
               />
-            )}
+            </div>
 
             <div className="min-w-0">
               <p className="text-[10px] text-slate-500">

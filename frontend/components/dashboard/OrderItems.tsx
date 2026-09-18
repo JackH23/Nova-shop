@@ -1,3 +1,5 @@
+import ProductImage from "@/components/products/ProductImage";
+
 type OrderItem = {
   id: number;
   product_id: number;
@@ -36,13 +38,13 @@ export default function OrderItems({ items }: OrderItemsProps) {
           >
             {/* Product */}
             <div className="flex min-w-0 items-center gap-4">
-              {item.product?.image && (
-                <img
-                  src={item.product.image}
-                  alt={item.product_name}
-                  className="h-16 w-16 shrink-0 rounded-md border border-slate-200 object-cover"
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+                <ProductImage
+                  image={item.product?.image}
+                  name={item.product_name}
+                  className="object-cover"
                 />
-              )}
+              </div>
 
               <div className="min-w-0">
                 <p className="font-medium text-slate-900">

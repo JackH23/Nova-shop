@@ -3,6 +3,7 @@
 import { useOrderDetail } from "@/composables/useOrderDetail";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { useReturnContent } from "@/composables/useReturnContent";
+import ProductImage from "@/components/products/ProductImage";
 
 type ReturnContentProps = {
   orderId: number;
@@ -72,13 +73,13 @@ export default function ReturnContent({ orderId }: ReturnContentProps) {
                       className="h-4 w-4 cursor-pointer accent-indigo-600"
                     />
 
-                    {item.product?.image && (
-                      <img
-                        src={item.product.image}
-                        alt={item.product_name}
-                        className="h-16 w-16 shrink-0 rounded-md border border-slate-200 object-cover"
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+                      <ProductImage
+                        image={item.product?.image}
+                        name={item.product_name}
+                        className="object-cover"
                       />
-                    )}
+                    </div>
 
                     <div>
                       <p className="text-sm font-semibold text-slate-900">

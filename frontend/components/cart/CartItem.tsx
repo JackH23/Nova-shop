@@ -1,4 +1,4 @@
-import Image from "next/image";
+import ProductImage from "@/components/products/ProductImage";
 import type { CartItem as CartItemType } from "@/lib/cart";
 
 type CartItemProps = {
@@ -17,10 +17,9 @@ export default function CartItem({
   return (
     <div className="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4">
       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-slate-100">
-        <Image
-          src={item.product.image}
-          alt={item.product.name}
-          fill
+        <ProductImage
+          image={item.product.image}
+          name={item.product.name}
           className="object-cover"
         />
       </div>

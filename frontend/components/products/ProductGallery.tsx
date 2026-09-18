@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import ProductImageView from "@/components/products/ProductImage";
 import type { ProductImage } from "@/lib/products";
 
 type ProductGalleryProps = {
@@ -15,24 +15,12 @@ export default function ProductGallery({
   images,
   name,
 }: ProductGalleryProps) {
-  const PRODUCT_IMAGE_URL =
-    process.env.NEXT_PUBLIC_PRODUCT_IMAGE_URL || "http://localhost:5001";
-
-  const getProductImageUrl = (image: string | null | undefined) => {
-    if (!image) return null;
-
-    if (image.startsWith("http")) {
-      return image;
-    }
-
-    return `${PRODUCT_IMAGE_URL}${image}`;
-  };
-
-  const galleryImages = (
-    images.length > 0 ? images.map((item) => item.image_url) : [image]
-  )
-    .map(getProductImageUrl)
-    .filter((item): item is string => Boolean(item));
+  const galleryImages =
+    images.length > 0
+      ? images.map((item) => item.image_url)
+      : image
+        ? [image]
+        : [];
 
   const [selectedImage, setSelectedImage] = useState(galleryImages[0]);
 
@@ -44,20 +32,11 @@ export default function ProductGallery({
     <div>
       {/* Main product image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-slate-100">
-        {selectedImage ? (
-          <Image
-            src={selectedImage}
-            alt={name}
-            fill
-            unoptimized
-            className="object-cover"
-            priority
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm text-slate-400">
-            No Image
-          </div>
-        )}
+        <ProductImageView
+          image={selectedImage}
+          name={name}
+          className="object-cover"
+        />
       </div>
 
       {/* Product thumbnails */}
@@ -73,11 +52,9 @@ export default function ProductGallery({
                 : "border-transparent hover:border-slate-300"
             }`}
           >
-            <Image
-              src={galleryImage}
-              alt={`${name} thumbnail ${index + 1}`}
-              fill
-              unoptimized
+            <ProductImageView
+              image={galleryImage}
+              name={`${name} thumbnail ${index + 1}`}
               className="object-cover"
             />
           </button>
