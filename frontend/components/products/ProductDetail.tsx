@@ -24,7 +24,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   const { addedProducts, handleProductAdded, removeToast } = useCartToast();
 
-  const allVariantImages = variants.flatMap((variant) => variant.images);
+  const selectedVariantImage = selectedVariant?.images?.[0]?.image_url ?? null;
 
   const handleVariantChange = (variant: ProductVariant) => {
     setSelectedVariant((current) =>
@@ -46,7 +46,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         <div className="grid gap-10 lg:grid-cols-2">
           <ProductGallery
             image={product.image}
-            images={selectedVariant ? selectedVariant.images : allVariantImages}
+            images={product.images ?? []}
+            variantImage={selectedVariantImage}
             name={product.name}
           />
 

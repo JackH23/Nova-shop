@@ -169,6 +169,17 @@ const getProductById = async (req, res) => {
       },
 
       include: [
+        // Main product gallery
+        {
+          model: ProductImage,
+          as: "images",
+          attributes: ["id", "image_url", "sort_order"],
+          required: false,
+          where: {
+            variant_id: null,
+          },
+        },
+
         {
           model: ProductVariant,
           as: "variants",
@@ -187,6 +198,14 @@ const getProductById = async (req, res) => {
       ],
 
       order: [
+        // Main product gallery
+        [
+          { model: ProductImage, as: "images" },
+          "sort_order",
+          "ASC",
+        ],
+
+        // Variant images
         [
           { model: ProductVariant, as: "variants" },
           { model: ProductImage, as: "images" },

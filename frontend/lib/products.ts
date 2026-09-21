@@ -28,6 +28,9 @@ export type Product = {
   // Main image
   image: string | null;
 
+  // Main product gallery
+  images?: ProductImage[];
+
   // Product color variants
   variants?: ProductVariant[];
 

@@ -1,64 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ProductImageView from "@/components/products/ProductImage";
+import ProductGalleryNavigation from "@/components/products/ProductGalleryNavigation";
 import type { ProductImage } from "@/lib/products";
 
 type ProductGalleryProps = {
   image: string | null;
   images: ProductImage[];
+  variantImage: string | null;
   name: string;
 };
 
 export default function ProductGallery({
   image,
   images,
+  variantImage,
   name,
 }: ProductGalleryProps) {
-  const galleryImages =
-    images.length > 0
-      ? images.map((item) => item.image_url)
-      : image
-        ? [image]
-        : [];
+  const galleryImages = Array.from(
+    new Set([
+      ...(image ? [image] : []),
+      ...images.map((item) => item.image_url),
+    ]),
+  );
 
-  const [selectedImage, setSelectedImage] = useState(galleryImages[0]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    setSelectedImage(galleryImages[0]);
-  }, [images, image]);
+  const currentImage =
+    variantImage ?? galleryImages[currentIndex];
 
   return (
     <div>
       {/* Main product image */}
       <div className="relative aspect-square overflow-hidden rounded-lg bg-slate-100">
         <ProductImageView
-          image={selectedImage}
+          image={currentImage}
           name={name}
           className="object-cover"
         />
-      </div>
 
-      {/* Product thumbnails */}
-      <div className="mt-3 flex gap-3">
-        {galleryImages.map((galleryImage, index) => (
-          <button
-            key={`${galleryImage}-${index}`}
-            type="button"
-            onClick={() => setSelectedImage(galleryImage)}
-            className={`relative h-16 w-16 overflow-hidden rounded-md border-2 transition ${
-              selectedImage === galleryImage
-                ? "border-indigo-600"
-                : "border-transparent hover:border-slate-300"
-            }`}
-          >
-            <ProductImageView
-              image={galleryImage}
-              name={`${name} thumbnail ${index + 1}`}
-              className="object-cover"
-            />
-          </button>
-        ))}
+        {!variantImage && (
+          <ProductGalleryNavigation
+            totalImages={galleryImages.length}
+            onChange={setCurrentIndex}
+            resetKey={`${image}-${images.length}`}
+          />
+        )}
       </div>
     </div>
   );
