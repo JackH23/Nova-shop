@@ -2,6 +2,7 @@ const { Op, literal } = require("sequelize");
 const Product = require("../models/Product");
 const ProductImage = require("../models/ProductImage");
 const ProductVariant = require("../models/ProductVariant");
+const ProductSpecification = require("../models/ProductSpecification");
 
 const getProducts = async (req, res) => {
   try {
@@ -169,6 +170,15 @@ const getProductById = async (req, res) => {
       },
 
       include: [
+
+        // Specifications
+        {
+          model: ProductSpecification,
+          as: "specifications",
+          attributes: ["id", "name", "value", "sort_order"],
+          required: false,
+        },
+
         // Main product gallery
         {
           model: ProductImage,
@@ -198,6 +208,13 @@ const getProductById = async (req, res) => {
       ],
 
       order: [
+        // Specifications
+        [
+          { model: ProductSpecification, as: "specifications" },
+          "sort_order",
+          "ASC",
+        ],
+
         // Main product gallery
         [
           { model: ProductImage, as: "images" },

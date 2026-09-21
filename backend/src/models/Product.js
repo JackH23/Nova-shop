@@ -69,6 +69,28 @@ const Product = sequelize.define(
       defaultValue: 0,
     },
 
+    reviews_enabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+
+    free_standard_shipping: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    free_shipping_text: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+
+    shipping_description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
     stock: {
       type: DataTypes.INTEGER,
       allowNull: false,

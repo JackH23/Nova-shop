@@ -14,6 +14,13 @@ export type ProductVariant = {
   images: ProductImage[];
 };
 
+export type ProductSpecification = {
+  id: number;
+  name: string;
+  value: string;
+  sort_order: number;
+};
+
 export type Product = {
   id: number;
   category_id: number;
@@ -24,6 +31,15 @@ export type Product = {
   original_price: string | null;
   rating: string;
   stock: number;
+
+  // Product details
+  reviews_enabled: boolean;
+
+  free_standard_shipping: boolean;
+  free_shipping_text: string | null;
+  shipping_description: string | null;
+
+  specifications?: ProductSpecification[];
 
   // Main image
   image: string | null;

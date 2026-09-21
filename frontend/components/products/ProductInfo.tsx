@@ -128,9 +128,11 @@ export default function ProductInfo({
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
       {/* Shipping */}
-      <p className="mt-4 text-xs text-slate-600">
-        🚚 Free standard shipping on orders over $100
-      </p>
+      {product.free_standard_shipping && product.free_shipping_text && (
+        <p className="mt-4 text-xs text-slate-600">
+          🚚 {product.free_shipping_text}
+        </p>
+      )}
     </div>
   );
 }

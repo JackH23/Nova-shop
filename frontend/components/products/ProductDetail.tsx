@@ -59,7 +59,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           />
         </div>
 
-        <ProductTabs />
+        <ProductTabs product={product} />
       </PageContainer>
 
       {addedProducts.map((toast, index) => (
