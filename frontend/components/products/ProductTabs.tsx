@@ -1,36 +1,35 @@
 "use client";
 
-import { useState } from "react";
 import type { Product } from "@/lib/products";
-
-type TabType = "specifications" | "reviews" | "shipping";
+import ReviewList from "./reviews/ReviewList";
+import ReviewForm from "./reviews/ReviewForm";
+import NotifyModal from "@/components/common/NotifyModal";
+import { useProductTabs } from "@/composables/useProductTabs";
 
 type ProductTabsProps = {
   product: Product;
 };
 
-export default function ProductTabs({ product }: ProductTabsProps) {
-  const hasSpecifications =
-    (product.specifications?.length ?? 0) > 0;
+export default function ProductTabs({
+  product,
+}: ProductTabsProps) {
+  const {
+    activeTab,
+    setActiveTab,
+    hasSpecifications,
+    hasReviews,
+    hasShipping,
+    hasAnyTab,
+    reviews,
+    loading,
+    submitting,
+    hasUserReviewed,
+    handleSubmitReview,
+    notification,
+    closeNotification,
+  } = useProductTabs(product);
 
-  const hasReviews = product.reviews_enabled;
-
-  const hasShipping =
-    Boolean(product.shipping_description) ||
-    Boolean(
-      product.free_standard_shipping &&
-        product.free_shipping_text,
-    );
-
-  const [activeTab, setActiveTab] = useState<TabType>(
-    hasSpecifications
-      ? "specifications"
-      : hasReviews
-        ? "reviews"
-        : "shipping",
-  );
-
-  if (!hasSpecifications && !hasReviews && !hasShipping) {
+  if (!hasAnyTab) {
     return null;
   }
 
@@ -101,10 +100,21 @@ export default function ProductTabs({ product }: ProductTabsProps) {
 
       {/* Reviews */}
       {activeTab === "reviews" && hasReviews && (
-        <div className="py-7">
-          <p className="text-sm text-slate-600">
-            Product reviews will appear here.
-          </p>
+        <div className="space-y-8 py-7">
+          {/* Existing reviews */}
+          {loading ? (
+            <p className="text-sm text-slate-500">Loading reviews...</p>
+          ) : (
+            <ReviewList reviews={reviews} />
+          )}
+
+          {/* Create review */}
+          {!hasUserReviewed && (
+            <ReviewForm
+              onSubmit={handleSubmitReview}
+              loading={submitting}
+            />
+          )}
         </div>
       )}
 
@@ -124,6 +134,8 @@ export default function ProductTabs({ product }: ProductTabsProps) {
           )}
         </div>
       )}
+
+      <NotifyModal notification={notification} onClose={closeNotification} />
     </div>
   );
 }

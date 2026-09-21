@@ -3,6 +3,7 @@ const Product = require("../models/Product");
 const ProductImage = require("../models/ProductImage");
 const ProductVariant = require("../models/ProductVariant");
 const ProductSpecification = require("../models/ProductSpecification");
+const ProductReview = require("../models/ProductReview");
 
 const getProducts = async (req, res) => {
   try {
@@ -170,6 +171,24 @@ const getProductById = async (req, res) => {
       },
 
       include: [
+        // Reviews
+        {
+          model: ProductReview,
+          as: "reviews",
+          attributes: [
+            "id",
+            "user_id",
+            "rating",
+            "title",
+            "comment",
+            "is_verified_purchase",
+            "created_at",
+          ],
+          required: false,
+          where: {
+            is_active: true,
+          },
+        },
 
         // Specifications
         {
@@ -216,11 +235,7 @@ const getProductById = async (req, res) => {
         ],
 
         // Main product gallery
-        [
-          { model: ProductImage, as: "images" },
-          "sort_order",
-          "ASC",
-        ],
+        [{ model: ProductImage, as: "images" }, "sort_order", "ASC"],
 
         // Variant images
         [
@@ -238,9 +253,24 @@ const getProductById = async (req, res) => {
       });
     }
 
+    const productData = product.toJSON();
+
+    const reviews = productData.reviews ?? [];
+
+    const reviewCount = reviews.length;
+
+    const averageRating =
+      reviewCount > 0
+        ? reviews.reduce((total, review) => total + Number(review.rating), 0) /
+          reviewCount
+        : 0;
+
+    productData.rating = Number(averageRating.toFixed(1));
+    productData.review_count = reviewCount;
+
     return res.status(200).json({
       message: "Product fetched successfully",
-      product,
+      product: productData,
     });
   } catch (error) {
     console.error("Get product detail error:", error);

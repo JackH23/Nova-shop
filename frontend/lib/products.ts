@@ -21,6 +21,16 @@ export type ProductSpecification = {
   sort_order: number;
 };
 
+export type ProductReview = {
+  id: number;
+  user_id: number;
+  rating: number;
+  title: string | null;
+  comment: string;
+  is_verified_purchase: boolean;
+  created_at: string;
+};
+
 export type Product = {
   id: number;
   category_id: number;
@@ -40,6 +50,7 @@ export type Product = {
   shipping_description: string | null;
 
   specifications?: ProductSpecification[];
+  reviews?: ProductReview[];
 
   // Main image
   image: string | null;

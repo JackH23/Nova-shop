@@ -9,6 +9,7 @@ const ReturnItem = require("./ReturnItem");
 const User = require("./User");
 const Product = require("./Product");
 const ProductSpecification = require("./ProductSpecification");
+const ProductReview = require("./ProductReview");
 const WishlistItem = require("./WishlistItem");
 const PaymentMethod = require("./PaymentMethod");
 
@@ -140,6 +141,35 @@ ProductSpecification.belongsTo(Product, {
 });
 
 // ========================================
+// Product → Reviews
+// ========================================
+
+Product.hasMany(ProductReview, {
+  foreignKey: "product_id",
+  as: "reviews",
+  onDelete: "CASCADE",
+});
+
+ProductReview.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+// ========================================
+// User → Product Reviews
+// ========================================
+
+User.hasMany(ProductReview, {
+  foreignKey: "user_id",
+  as: "productReviews",
+});
+
+ProductReview.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
+// ========================================
 // Product → Wishlist Items
 // ========================================
 
@@ -177,5 +207,6 @@ module.exports = {
   User,
   Product,
   ProductSpecification,
+  ProductReview,
   WishlistItem,
 };
