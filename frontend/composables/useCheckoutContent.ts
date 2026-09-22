@@ -4,19 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useCheckout } from "@/composables/useCheckout";
-import {
-  usePaymentValidation,
-  type PaymentData,
-} from "@/composables/usePaymentValidation";
 import { addressService } from "@/services/addressService";
 import type { CheckoutStep } from "@/components/checkout/CheckoutSteps";
-import { paymentMethodService } from "@/services/paymentMethodService";
-import type { PaymentMethod as SavedPaymentMethod } from "@/lib/paymentMethod";
 
-import type {
-  ShippingData,
-  DeliveryMethod,
-  PaymentMethod,
+import {
+  checkoutService,
+  type ShippingData,
+  type DeliveryMethod,
+  type PaymentMethod,
 } from "@/services/checkoutService";
 
 export function useCheckoutContent() {
@@ -25,9 +20,8 @@ export function useCheckoutContent() {
   const { checkout, loading, placingOrder, error, placeOrder } = useCheckout();
 
   const [step, setStep] = useState<CheckoutStep>("shipping");
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [defaultPaymentMethod, setDefaultPaymentMethod] =
-    useState<SavedPaymentMethod | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [creatingPayment, setCreatingPayment] = useState(false);
 
   const [shippingData, setShippingData] = useState<ShippingData>({
     email: "",
@@ -66,76 +60,46 @@ export function useCheckoutContent() {
     getDefaultAddress();
   }, []);
 
-  const closeConfirm = () => {
-    setShowConfirm(false);
-  };
-
   const [deliveryMethod, setDeliveryMethod] =
     useState<DeliveryMethod>("STANDARD");
 
   const [paymentMethod, setPaymentMethod] =
     useState<PaymentMethod>("CREDIT_CARD");
 
-  const [paymentData, setPaymentData] = useState<PaymentData>({
-    cardNumber: "",
-    expiryDate: "",
-    cvc: "",
-  });
-
   useEffect(() => {
-    const getDefaultPaymentMethod = async () => {
+    if (step !== "payment") return;
+    if (paymentMethod !== "CREDIT_CARD") return;
+    if (clientSecret) return;
+
+    const createStripePayment = async () => {
       try {
-        const response = await paymentMethodService.getDefaultPaymentMethod();
+        setCreatingPayment(true);
 
-        if (!response.paymentMethod) return;
+        const response = await checkoutService.createPayment(deliveryMethod);
 
-        const defaultPayment = response.paymentMethod;
-
-        setDefaultPaymentMethod(defaultPayment);
-
-        setPaymentData((prev) => ({
-          ...prev,
-          cardNumber: "",
-          expiryDate: "",
-        }));
+        setClientSecret(response.clientSecret);
       } catch (error) {
-        console.error("Failed to fetch default payment method:", error);
+        console.error("Failed to create Stripe payment:", error);
+      } finally {
+        setCreatingPayment(false);
       }
     };
 
-    getDefaultPaymentMethod();
-  }, []);
+    createStripePayment();
+  }, [step, paymentMethod, deliveryMethod, clientSecret]);
 
-  const {
-    errors: paymentErrors,
-    validatePayment,
-    handleChange: handlePaymentChange,
-  } = usePaymentValidation(paymentData, setPaymentData, {
-    requireCardNumber: !defaultPaymentMethod,
-    requireExpiry: !defaultPaymentMethod,
-    requireCvc: true,
-  });
-  const openConfirm = () => {
-    if (paymentMethod === "CREDIT_CARD") {
-      const isValid = validatePayment(paymentData);
-
-      if (!isValid) return;
-    }
-
-    setShowConfirm(true);
-  };
-
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = async (
+    paymentIntentId: string,
+  ) => {
     try {
       const response = await placeOrder({
         shipping: shippingData,
         deliveryMethod,
         paymentMethod,
+        paymentIntentId,
       });
 
       console.log("Order placed:", response.order);
-
-      setShowConfirm(false);
 
       router.push(`/checkout/success?orderId=${response.order.id}`);
     } catch (error) {
@@ -160,16 +124,8 @@ export function useCheckoutContent() {
 
     paymentMethod,
     setPaymentMethod,
-
-    defaultPaymentMethod,
-
-    paymentData,
-    paymentErrors,
-    handlePaymentChange,
-
-    showConfirm,
-    openConfirm,
-    closeConfirm,
+    clientSecret,
+    creatingPayment,
 
     handlePlaceOrder,
   };

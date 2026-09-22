@@ -6,6 +6,7 @@ const {
   getCheckout,
   placeOrder,
   getOrderById,
+  createPayment,
 } = require("../controllers/checkoutController");
 
 const router = express.Router();
@@ -18,5 +19,8 @@ router.post("/order", authMiddleware, placeOrder);
 
 // Get order by ID
 router.get("/order/:id", authMiddleware, getOrderById);
+
+// Create Stripe payment
+router.post("/create-payment", authMiddleware, createPayment);
 
 module.exports = router;

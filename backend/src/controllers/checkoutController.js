@@ -8,6 +8,7 @@ const OrderItem = require("../models/OrderItem");
 const ShippingAddress = require("../models/ShippingAddress");
 const Delivery = require("../models/Delivery");
 const Payment = require("../models/Payment");
+const stripe = require("../config/stripe");
 
 const crypto = require("crypto");
 
@@ -160,13 +161,129 @@ const getCheckout = async (req, res) => {
   }
 };
 
+const createPayment = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { deliveryMethod } = req.body;
+
+    const deliveryOptions = {
+      STANDARD: 5,
+      EXPRESS: 15,
+    };
+
+    if (!deliveryOptions[deliveryMethod]) {
+      return res.status(400).json({
+        message: "Invalid delivery method",
+      });
+    }
+
+    const cart = await Cart.findOne({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    if (!cart) {
+      return res.status(404).json({
+        message: "Cart not found",
+      });
+    }
+
+    const cartItems = await CartItem.findAll({
+      where: {
+        cart_id: cart.id,
+      },
+      include: [
+        {
+          model: Product,
+          as: "product",
+        },
+        {
+          model: ProductVariant,
+          as: "variant",
+          required: false,
+        },
+      ],
+    });
+
+    if (cartItems.length === 0) {
+      return res.status(400).json({
+        message: "Your cart is empty",
+      });
+    }
+
+    let subtotal = 0;
+
+    for (const item of cartItems) {
+      if (!item.product || !item.product.is_active) {
+        return res.status(400).json({
+          message: "A product is no longer available",
+        });
+      }
+
+      const quantity = Number(item.quantity);
+
+      const availableStock = item.variant
+        ? Number(item.variant.stock)
+        : Number(item.product.stock);
+
+      if (quantity > availableStock) {
+        return res.status(400).json({
+          message: `Not enough stock for ${item.product.name}`,
+        });
+      }
+
+      subtotal += Number(item.product.price) * quantity;
+    }
+
+    const tax = subtotal * 0.08;
+    const shippingFee = deliveryOptions[deliveryMethod];
+    const totalAmount = subtotal + tax + shippingFee;
+
+    // Stripe uses the smallest currency unit.
+    // $10.50 USD => 1050 cents
+    const amountInCents = Math.round(totalAmount * 100);
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amountInCents,
+      currency: "usd",
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      metadata: {
+        userId: String(userId),
+        cartId: String(cart.id),
+      },
+    });
+
+    return res.status(200).json({
+      message: "Payment created successfully",
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id,
+      amount: Number(totalAmount.toFixed(2)),
+    });
+  } catch (error) {
+    console.error("Create payment error:", error);
+
+    return res.status(500).json({
+      message: "Failed to create payment",
+      error: error.message,
+    });
+  }
+};
+
 const placeOrder = async (req, res) => {
   const transaction = await sequelize.transaction();
 
   try {
     const userId = req.user.id;
 
-    const { shipping, deliveryMethod, paymentMethod } = req.body;
+    const {
+      shipping,
+      deliveryMethod,
+      paymentMethod,
+      paymentIntentId,
+    } = req.body;
 
     // 1. Validate shipping information
     if (
@@ -206,6 +323,14 @@ const placeOrder = async (req, res) => {
 
       return res.status(400).json({
         message: "Invalid payment method",
+      });
+    }
+
+    if (paymentMethod === "CREDIT_CARD" && !paymentIntentId) {
+      await transaction.rollback();
+
+      return res.status(400).json({
+        message: "Payment intent is required",
       });
     }
 
@@ -317,6 +442,50 @@ const placeOrder = async (req, res) => {
     const discountAmount = 0;
 
     const totalAmount = subtotal + tax + shippingFee - discountAmount;
+
+    let stripePaymentIntent = null;
+
+    if (paymentMethod === "CREDIT_CARD") {
+      stripePaymentIntent =
+        await stripe.paymentIntents.retrieve(paymentIntentId);
+
+      if (stripePaymentIntent.status !== "succeeded") {
+        await transaction.rollback();
+
+        return res.status(400).json({
+          message: "Payment has not been completed",
+        });
+      }
+
+      const expectedAmount = Math.round(totalAmount * 100);
+
+      if (stripePaymentIntent.amount !== expectedAmount) {
+        await transaction.rollback();
+
+        return res.status(400).json({
+          message: "Payment amount does not match order total",
+        });
+      }
+
+      if (stripePaymentIntent.currency !== "usd") {
+        await transaction.rollback();
+
+        return res.status(400).json({
+          message: "Invalid payment currency",
+        });
+      }
+
+      if (
+        stripePaymentIntent.metadata?.userId !== String(userId) ||
+        stripePaymentIntent.metadata?.cartId !== String(cart.id)
+      ) {
+        await transaction.rollback();
+
+        return res.status(400).json({
+          message: "Payment does not belong to this checkout",
+        });
+      }
+    }
 
     // 8. Generate order number
     const orderNo = `ORD-${Date.now()}-${crypto
@@ -442,10 +611,20 @@ const placeOrder = async (req, res) => {
 
         amount: Number(totalAmount.toFixed(2)),
 
-        status: "PENDING",
+        status:
+          paymentMethod === "CREDIT_CARD"
+            ? "PAID"
+            : "PENDING",
 
-        transaction_id: null,
-        paid_at: null,
+        transaction_id:
+          paymentMethod === "CREDIT_CARD"
+            ? stripePaymentIntent.id
+            : null,
+
+        paid_at:
+          paymentMethod === "CREDIT_CARD"
+            ? new Date()
+            : null,
       },
       {
         transaction,
@@ -535,6 +714,7 @@ const getOrderById = async (req, res) => {
 
 module.exports = {
   getCheckout,
+  createPayment,
   placeOrder,
   getOrderById,
 };

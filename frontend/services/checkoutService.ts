@@ -55,6 +55,7 @@ export type PlaceOrderRequest = {
   shipping: ShippingData;
   deliveryMethod: DeliveryMethod;
   paymentMethod: PaymentMethod;
+  paymentIntentId?: string;
 };
 
 export type PlacedOrder = {
@@ -78,6 +79,13 @@ export type PlaceOrderResponse = {
   order: PlacedOrder;
 };
 
+export type CreatePaymentResponse = {
+  message: string;
+  clientSecret: string;
+  paymentIntentId: string;
+  amount: number;
+};
+
 export const checkoutService = {
   // Get checkout information
   getCheckout: () => {
@@ -99,5 +107,15 @@ export const checkoutService = {
     return apiRequest(`/checkout/order/${orderId}`, {
       method: "GET",
     }) as Promise<GetOrderResponse>;
+  },
+
+  // Create Stripe PaymentIntent
+  createPayment: (deliveryMethod: DeliveryMethod) => {
+    return apiRequest("/checkout/create-payment", {
+      method: "POST",
+      body: JSON.stringify({
+        deliveryMethod,
+      }),
+    }) as Promise<CreatePaymentResponse>;
   },
 };

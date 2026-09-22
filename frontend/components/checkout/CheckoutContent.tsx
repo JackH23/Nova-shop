@@ -7,7 +7,13 @@ import CheckoutSteps from "./CheckoutSteps";
 import PageContainer from "@/components/common/PageContainer";
 import DeliveryMethod from "./DeliveryMethod";
 import { useCheckoutContent } from "@/composables/useCheckoutContent";
-import ConfirmModal from "@/components/common/ConfirmModal";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import StripePaymentConfirm from "./StripePaymentConfirm";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+);
 
 export default function CheckoutContent() {
   const {
@@ -23,15 +29,9 @@ export default function CheckoutContent() {
     setDeliveryMethod,
     paymentMethod,
     setPaymentMethod,
-    defaultPaymentMethod,
-    paymentData,
-    paymentErrors,
-    handlePaymentChange,
 
-    showConfirm,
-    openConfirm,
-    closeConfirm,
-
+    clientSecret,
+    creatingPayment,
     handlePlaceOrder,
   } = useCheckoutContent();
 
@@ -75,15 +75,32 @@ export default function CheckoutContent() {
               )}
 
               {step === "payment" && (
-                <PaymentMethod
-                  paymentMethod={paymentMethod}
-                  defaultPaymentMethod={defaultPaymentMethod}
-                  paymentData={paymentData}
-                  errors={paymentErrors}
-                  onPaymentMethodChange={setPaymentMethod}
-                  onPaymentChange={handlePaymentChange}
-                  onBack={() => setStep("delivery")}
-                />
+                <>
+                  {creatingPayment && (
+                    <div className="rounded-lg border border-slate-200 bg-white p-6">
+                      Loading payment...
+                    </div>
+                  )}
+
+                  {clientSecret && (
+                    <Elements
+                      stripe={stripePromise}
+                      options={{
+                        clientSecret,
+                      }}
+                    >
+                      <PaymentMethod
+                        paymentMethod={paymentMethod}
+                        onPaymentMethodChange={setPaymentMethod}
+                        onBack={() => setStep("delivery")}
+                      />
+
+                      <div className="mt-4">
+                        <StripePaymentConfirm onSuccess={handlePlaceOrder} />
+                      </div>
+                    </Elements>
+                  )}
+                </>
               )}
             </div>
 
@@ -93,23 +110,13 @@ export default function CheckoutContent() {
                 checkout={checkout}
                 step={step}
                 deliveryMethod={deliveryMethod}
-                placingOrder={placingOrder}
-                onPlaceOrder={openConfirm}
+                placingOrder={placingOrder || creatingPayment}
+                onPlaceOrder={() => {}}
               />
             </div>
           </div>
         </PageContainer>
       </main>
-
-      <ConfirmModal
-        open={showConfirm}
-        title="Confirm Order"
-        message="Are you sure you want to place this order?"
-        cancelText="Cancel"
-        confirmText="Place Order"
-        onCancel={closeConfirm}
-        onConfirm={handlePlaceOrder}
-      />
     </>
   );
 }

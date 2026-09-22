@@ -1,35 +1,18 @@
 "use client";
 
 import { CreditCard } from "lucide-react";
-import AuthInput from "@/components/auth/AuthInput";
-import IconInput from "@/components/auth/IconInput";
 import type { PaymentMethod as PaymentMethodType } from "@/services/checkoutService";
-import type { PaymentMethod as SavedPaymentMethod } from "@/lib/paymentMethod";
-import type {
-  PaymentData,
-  PaymentErrors,
-} from "@/composables/usePaymentValidation";
+import { PaymentElement } from "@stripe/react-stripe-js";
 
 type PaymentMethodProps = {
   paymentMethod: PaymentMethodType;
-  defaultPaymentMethod: SavedPaymentMethod | null;
-
-  paymentData: PaymentData;
-  errors: PaymentErrors;
-
   onPaymentMethodChange: (method: PaymentMethodType) => void;
-  onPaymentChange: (field: keyof PaymentData, value: string) => void;
-
   onBack: () => void;
 };
 
 export default function PaymentMethod({
   paymentMethod,
-  defaultPaymentMethod,
-  paymentData,
-  errors,
   onPaymentMethodChange,
-  onPaymentChange,
   onBack,
 }: PaymentMethodProps) {
   return (
@@ -80,50 +63,9 @@ export default function PaymentMethod({
         </div>
 
         {paymentMethod === "CREDIT_CARD" && (
-          <div className="mt-6 space-y-4">
-            <IconInput
-              id="cardNumber"
-              name="cardNumber"
-              label="Card Number"
-              placeholder="0000 0000 0000 0000"
-              icon={<CreditCard size={16} />}
-              value={
-                paymentData.cardNumber ||
-                (defaultPaymentMethod
-                  ? `•••• •••• •••• ${defaultPaymentMethod.last_four}`
-                  : "")
-              }
-              error={errors.cardNumber}
-              onChange={(e) => onPaymentChange("cardNumber", e.target.value)}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <AuthInput
-                id="expiryDate"
-                name="expiryDate"
-                label="Expiry Date"
-                type="text"
-                placeholder="MM/YY"
-                value={
-                  paymentData.expiryDate ||
-                  (defaultPaymentMethod
-                    ? `${defaultPaymentMethod.expiry_month}/${defaultPaymentMethod.expiry_year}`
-                    : "")
-                }
-                error={errors.expiryDate}
-                onChange={(e) => onPaymentChange("expiryDate", e.target.value)}
-              />
-
-              <AuthInput
-                id="cvc"
-                name="cvc"
-                label="CVC"
-                type="password"
-                placeholder="Enter CVC"
-                value={paymentData.cvc}
-                error={errors.cvc}
-                onChange={(e) => onPaymentChange("cvc", e.target.value)}
-              />
+          <div className="mt-6">
+            <div className="rounded-md border border-slate-200 p-4">
+              <PaymentElement />
             </div>
           </div>
         )}
