@@ -1,7 +1,6 @@
 "use client";
 
 import { useReducer } from "react";
-import { useRouter } from "next/navigation";
 
 import {
   loginReducer,
@@ -11,8 +10,7 @@ import {
 import { authService } from "@/services/authService";
 import { validation } from "@/validations/validation";
 
-export function useLogin() {
-  const router = useRouter();
+export function useLogin(onSuccess?: () => void) {
 
   const [state, dispatch] = useReducer(
     loginReducer,
@@ -77,7 +75,7 @@ export function useLogin() {
         localStorage.removeItem("refreshToken");
       }
 
-      router.push("/home");
+      onSuccess?.();
     } catch (error) {
       dispatch({
         type: "SET_ERROR",

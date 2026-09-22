@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { OAuth2Client } = require("google-auth-library");
+const { sendVerificationEmail } = require("../services/emailService");
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -50,8 +51,6 @@ const register = async (req, res) => {
       100000 + Math.random() * 900000,
     ).toString();
 
-    console.log("Email verification code:", verificationCode);
-
     // Verification code expires in 10 minutes
     const verificationCodeExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -65,12 +64,16 @@ const register = async (req, res) => {
       termsAcceptedAt: new Date(),
     });
 
+    await sendVerificationEmail(user.email, verificationCode);
+
     return res.status(201).json({
-      message: "Account created successfully",
+      message: "Registration successful. Please verify your email.",
+      requiresVerification: true,
       user: {
         id: user.id,
         fullName: user.fullName,
         email: user.email,
+        isVerified: user.isVerified,
       },
     });
   } catch (error) {
@@ -111,6 +114,14 @@ const login = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(401).json({
         message: "Invalid email or password",
+      });
+    }
+
+    if (!user.isVerified) {
+      return res.status(403).json({
+        message: "Please verify your email before logging in.",
+        requiresVerification: true,
+        email: user.email,
       });
     }
 
@@ -338,7 +349,7 @@ const resendVerificationCode = async (req, res) => {
 
     await user.save();
 
-    console.log("New email verification code:", verificationCode);
+    await sendVerificationEmail(user.email, verificationCode);
 
     return res.status(200).json({
       message: "Verification code resent successfully",

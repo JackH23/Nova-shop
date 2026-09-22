@@ -1,13 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { X } from "lucide-react";
 import LoginForm from "@/components/auth/LoginForm";
 import GoogleButton from "@/components/auth/GoogleButton";
 
 export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#f8f9ff] px-4 py-10">
-      <div className="w-full max-w-[395px] rounded-xl border border-[#d9dbea] bg-white px-7 py-8 shadow-sm">
+      <div className="relative w-full max-w-[395px] rounded-xl border border-[#d9dbea] bg-white px-7 py-8 shadow-sm">
+
+        <Link
+          href="/home"
+          aria-label="Back to home"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+        >
+          <X size={20} />
+        </Link>
 
         {/* Header */}
         <div className="mb-6 text-center">

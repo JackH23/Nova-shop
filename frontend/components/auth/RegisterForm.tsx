@@ -6,13 +6,19 @@ import TermsCheckbox from "./TermsCheckbox";
 import SubmitButton from "./SubmitButton";
 import { useRegister } from "@/composables/useRegister";
 
-export default function RegisterForm() {
+type RegisterFormProps = {
+  onSuccess?: (email: string) => void;
+};
+
+export default function RegisterForm({
+  onSuccess,
+}: RegisterFormProps) {
 
   const {
     state,
     dispatch,
     handleSubmit,
-  } = useRegister();
+  } = useRegister(onSuccess);
 
   const {
     fullName,

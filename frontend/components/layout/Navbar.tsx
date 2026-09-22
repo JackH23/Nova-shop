@@ -11,25 +11,30 @@ import { useMe } from "@/composables/useMe";
 import ProfileModal from "./ProfileModal";
 import { useLogout } from "@/composables/useLogout";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import { useAuth } from "@/components/shared/auth/AuthModalProvider";
 import { getFileUrl } from "@/lib/fileUrl";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [search, setSearch] = useState("");
+  const auth = useAuth();
 
-  const {
-    filteredProducts: searchResults,
-    loading: searching,
-  } = useProductList({
-    search,
-  });
+  const { filteredProducts: searchResults, loading: searching } =
+    useProductList({
+      search,
+    });
 
-  const { user } = useMe();
+  const { user, refreshUser } = useMe();
   const profileImageUrl = getFileUrl(user?.profileImage);
   const { cartCount } = useCart();
   const { isVisible, isProfileOpen, toggleProfile, closeProfile } = useNavbar();
 
-  const { logout, showConfirm, openConfirm, closeConfirm } = useLogout();
+  const {
+    logout,
+    showConfirm,
+    openConfirm,
+    closeConfirm,
+  } = useLogout(refreshUser);
 
   return (
     <>
@@ -234,12 +239,15 @@ export default function Navbar() {
                   )}
                 </div>
               ) : (
-                <Link
-                  href="/login"
-                  className="text-[#3324d8] transition hover:opacity-70"
+                <button
+                  type="button"
+                  onClick={auth.openLogin}
+                  className="flex items-center gap-1.5 text-[#3324d8] transition hover:opacity-70"
                 >
                   <UserRound size={18} strokeWidth={1.8} />
-                </Link>
+
+                  <span className="text-xs font-medium">Login</span>
+                </button>
               )}
             </div>
           </div>

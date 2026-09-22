@@ -2,7 +2,11 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 let refreshPromise: Promise<string> | null = null;
 
-function getStoredToken(key: string) {
+// ========================================
+// Get stored token
+// ========================================
+
+export function getStoredToken(key: string) {
   if (typeof window === "undefined") {
     return null;
   }
@@ -13,24 +17,62 @@ function getStoredToken(key: string) {
   );
 }
 
+// ========================================
+// Check authentication
+// ========================================
+
+export function hasAuthToken() {
+  return Boolean(
+    getStoredToken("accessToken") ||
+      getStoredToken("refreshToken"),
+  );
+}
+
+// ========================================
+// Save access token
+// ========================================
+
 function saveAccessToken(accessToken: string) {
   if (typeof window === "undefined") {
     return;
   }
 
-  // If refreshToken is stored in localStorage,
-  // Remember Me was enabled.
+  // Remember Me enabled
   if (localStorage.getItem("refreshToken")) {
     localStorage.setItem(
       "accessToken",
       accessToken,
+    );
+
+    sessionStorage.removeItem(
+      "accessToken",
     );
   } else {
     sessionStorage.setItem(
       "accessToken",
       accessToken,
     );
+
+    localStorage.removeItem(
+      "accessToken",
+    );
   }
+}
+
+// ========================================
+// Clear authentication
+// ========================================
+
+function clearAuthTokens() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+
+  sessionStorage.removeItem("accessToken");
+  sessionStorage.removeItem("refreshToken");
 }
 
 // ========================================
@@ -102,13 +144,7 @@ function createHeaders(
     }
   }
 
-  // FormData request
-  //
-  // Do NOT manually set multipart/form-data.
-  // Browser automatically creates:
-  //
-  // multipart/form-data;
-  // boundary=----WebKitFormBoundary...
+  // FormData
   if (isFormData) {
     headers.delete("Content-Type");
   }
@@ -135,7 +171,13 @@ export async function apiRequest<T = any>(
   const accessToken =
     getStoredToken("accessToken");
 
+  const refreshToken =
+    getStoredToken("refreshToken");
+
+  // ========================================
   // First request
+  // ========================================
+
   let response = await fetch(
     `${API_URL}${endpoint}`,
     {
@@ -149,61 +191,87 @@ export async function apiRequest<T = any>(
   );
 
   // ========================================
-  // Access token expired
+  // Authentication endpoints
+  // ========================================
+
+  const isAuthEndpoint =
+    endpoint === "/auth/login" ||
+    endpoint === "/auth/google" ||
+    endpoint === "/auth/refresh-token";
+
+  // ========================================
+  // 401 Unauthorized
   // ========================================
 
   if (
     response.status === 401 &&
-    endpoint !== "/auth/login" &&
-    endpoint !== "/auth/google" &&
-    endpoint !== "/auth/refresh-token"
+    !isAuthEndpoint
   ) {
-    try {
-      if (!refreshPromise) {
-        refreshPromise =
-          refreshAccessToken().finally(
-            () => {
-              refreshPromise = null;
-            },
-          );
-      }
+    // ========================================
+    // Guest user
+    // ========================================
+    //
+    // User never logged in.
+    // Do NOT redirect.
+    // Do NOT refresh.
+    //
+    // Home page must remain accessible.
+    // ========================================
 
-      const newAccessToken =
-        await refreshPromise;
-
-      // Retry original request
-      response = await fetch(
-        `${API_URL}${endpoint}`,
-        {
-          ...options,
-
-          headers: createHeaders(
-            options,
-            newAccessToken,
-          ),
-        },
+    if (!accessToken && !refreshToken) {
+      throw new Error(
+        "Authentication required.",
       );
-    } catch {
-      // Refresh token invalid/expired
-      if (typeof window !== "undefined") {
-        localStorage.removeItem(
-          "accessToken",
-        );
+    }
 
-        localStorage.removeItem(
-          "refreshToken",
-        );
+    // ========================================
+    // Try refresh token
+    // ========================================
 
-        sessionStorage.removeItem(
-          "accessToken",
-        );
+    if (refreshToken) {
+      try {
+        if (!refreshPromise) {
+          refreshPromise =
+            refreshAccessToken().finally(
+              () => {
+                refreshPromise = null;
+              },
+            );
+        }
 
-        sessionStorage.removeItem(
-          "refreshToken",
-        );
+        const newAccessToken =
+          await refreshPromise;
 
-        window.location.href = "/login";
+        // Retry original request
+        response = await fetch(
+          `${API_URL}${endpoint}`,
+          {
+            ...options,
+
+            headers: createHeaders(
+              options,
+              newAccessToken,
+            ),
+          },
+        );
+      } catch {
+        // ========================================
+        // Session expired
+        // ========================================
+
+        clearAuthTokens();
+
+        // IMPORTANT:
+        // Do NOT redirect to /login.
+        //
+        // Login is now a modal.
+        throw new Error(
+          "Your session has expired. Please login again.",
+        );
       }
+    } else {
+      // Access token exists but refresh token doesn't
+      clearAuthTokens();
 
       throw new Error(
         "Your session has expired. Please login again.",

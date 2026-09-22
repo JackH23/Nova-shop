@@ -1,11 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function useLogout() {
-  const router = useRouter();
-
+export function useLogout(onSuccess?: () => void) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const openConfirm = () => {
@@ -23,7 +20,9 @@ export function useLogout() {
     sessionStorage.removeItem("accessToken");
     sessionStorage.removeItem("refreshToken");
 
-    router.push("/login");
+    setShowConfirm(false);
+
+    onSuccess?.();
   };
 
   return {

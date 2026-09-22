@@ -1,19 +1,26 @@
 "use client";
 
-import Link from "next/link";
 import AuthInput from "./AuthInput";
 import PasswordInput from "./PasswordInput";
 import SubmitButton from "./SubmitButton";
 import { useLogin } from "@/composables/useLogin";
 import FormError from "@/components/auth/FormError";
 
-export default function LoginForm() {
+type LoginFormProps = {
+  onSuccess?: () => void;
+  onForgotPassword?: () => void;
+};
+
+export default function LoginForm({
+  onSuccess,
+  onForgotPassword,
+}: LoginFormProps) {
 
   const {
     state,
     dispatch,
     handleSubmit,
-  } = useLogin();
+  } = useLogin(onSuccess);
 
   return (
     <form
@@ -51,12 +58,13 @@ export default function LoginForm() {
             Password
           </label>
 
-          <Link
-            href="/forgot-password"
+          <button
+            type="button"
+            onClick={onForgotPassword}
             className="text-xs text-indigo-600 hover:underline"
           >
             Forgot password?
-          </Link>
+          </button>
         </div>
 
         <PasswordInput

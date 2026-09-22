@@ -1,20 +1,41 @@
-import Link from "next/link";
+"use client";
+
 import { X } from "lucide-react";
 import RegisterForm from "@/components/auth/RegisterForm";
 import GoogleButton from "@/components/auth/GoogleButton";
 
-export default function RegisterPage() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f8f9ff] px-4 py-8">
-      <div className="relative w-full max-w-[430px] overflow-hidden rounded-xl border border-[#dfe3f0] bg-white shadow-sm">
+type RegisterModalProps = {
+  open: boolean;
+  onClose: () => void;
+  onOpenLogin: () => void;
+  onOpenVerifyEmail: (email: string) => void;
+};
 
-        <Link
-          href="/home"
-          aria-label="Back to home"
+export default function RegisterModal({
+  open,
+  onClose,
+  onOpenLogin,
+  onOpenVerifyEmail,
+}: RegisterModalProps) {
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-[430px] overflow-hidden rounded-xl border border-[#dfe3f0] bg-white shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close register"
           className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
         >
           <X size={20} />
-        </Link>
+        </button>
 
         {/* Main content */}
         <div className="px-5 pb-5 pt-6 sm:px-7">
@@ -50,10 +71,8 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          {/* Google button */}
           <GoogleButton />
 
-          {/* Divider */}
           <div className="my-5 flex items-center gap-3">
             <div className="h-px flex-1 bg-slate-200" />
 
@@ -64,23 +83,23 @@ export default function RegisterPage() {
             <div className="h-px flex-1 bg-slate-200" />
           </div>
 
-          {/* Register form */}
-          <RegisterForm />
+          <RegisterForm onSuccess={onOpenVerifyEmail} />
         </div>
 
         {/* Footer */}
         <div className="border-t border-slate-200 bg-indigo-50/40 px-5 py-4 text-center">
           <p className="text-xs text-slate-500">
             Already have an account?{" "}
-            <Link
-              href="/login"
+            <button
+              type="button"
+              onClick={onOpenLogin}
               className="font-medium text-indigo-600 hover:underline"
             >
               Sign In
-            </Link>
+            </button>
           </p>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

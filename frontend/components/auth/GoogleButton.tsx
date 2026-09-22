@@ -11,9 +11,7 @@ declare global {
         id: {
           initialize: (config: {
             client_id: string;
-            callback: (response: {
-              credential: string;
-            }) => void;
+            callback: (response: { credential: string }) => void;
           }) => void;
 
           renderButton: (
@@ -25,7 +23,7 @@ declare global {
               text?: string;
               shape?: string;
               width?: number;
-            }
+            },
           ) => void;
         };
       };
@@ -35,55 +33,46 @@ declare global {
 
 type GoogleButtonProps = {
   text?: string;
+  onSuccess?: () => void;
 };
 
 export default function GoogleButton({
   text = "Continue with Google",
+  onSuccess,
 }: GoogleButtonProps) {
   const buttonRef = useRef<HTMLDivElement>(null);
 
-  const {
-    loading,
-    error,
-    handleGoogleLogin,
-  } = useGoogleAuth();
+  const { loading, error, handleGoogleLogin } = useGoogleAuth();
 
   const initializeGoogle = () => {
-    const clientId =
-      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-    if (
-      !clientId ||
-      !window.google ||
-      !buttonRef.current
-    ) {
+    if (!clientId || !window.google || !buttonRef.current) {
       return;
     }
 
     window.google.accounts.id.initialize({
       client_id: clientId,
 
-      callback: (response) => {
-        handleGoogleLogin(
-          response.credential,
-          false
-        );
+      callback: async (response) => {
+        const success = await handleGoogleLogin(response.credential, false);
+
+        if (success) {
+          onSuccess?.();
+        }
       },
     });
 
     buttonRef.current.innerHTML = "";
 
-    window.google.accounts.id.renderButton(
-      buttonRef.current,
-      {
-        type: "standard",
-        theme: "outline",
-        size: "large",
-        text: "continue_with",
-        shape: "rectangular",
-        width: 339,
-      }
-    );
+    window.google.accounts.id.renderButton(buttonRef.current, {
+      type: "standard",
+      theme: "outline",
+      size: "large",
+      text: "continue_with",
+      shape: "rectangular",
+      width: 339,
+    });
   };
 
   useEffect(() => {
@@ -100,10 +89,7 @@ export default function GoogleButton({
         onLoad={initializeGoogle}
       />
 
-      <div
-        ref={buttonRef}
-        className="flex w-full justify-center"
-      />
+      <div ref={buttonRef} className="flex w-full justify-center" />
 
       {loading && (
         <p className="mt-2 text-center text-sm text-slate-500">
@@ -112,9 +98,7 @@ export default function GoogleButton({
       )}
 
       {error && (
-        <p className="mt-2 text-center text-sm text-red-600">
-          {error}
-        </p>
+        <p className="mt-2 text-center text-sm text-red-600">{error}</p>
       )}
     </>
   );

@@ -11,7 +11,9 @@ import {
 
 import { authService } from "@/services/authService";
 
-export function useRegister() {
+export function useRegister(
+  onSuccess?: (email: string) => void
+) {
   const router = useRouter();
 
   const [state, dispatch] = useReducer(registerReducer, initialRegisterState);
@@ -63,7 +65,7 @@ export function useRegister() {
         acceptTerms: state.acceptTerms,
       });
 
-      router.push(`/verify-email?email=${encodeURIComponent(state.email)}`);
+      onSuccess?.(state.email.trim());
     } catch (error) {
       dispatch({
         type: "SET_ERROR",

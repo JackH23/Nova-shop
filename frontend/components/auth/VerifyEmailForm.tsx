@@ -1,21 +1,25 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { useVerifyEmail } from "@/composables/useVerifyEmail";
 import ResendCode from "@/components/auth/ResendCode";
 import SubmitButton from "@/components/auth/SubmitButton";
 import FormError from "@/components/auth/FormError";
 
-export default function VerifyEmailForm() {
-  const searchParams = useSearchParams();
-  const email = searchParams.get("email") || "";
+type VerifyEmailFormProps = {
+  email: string;
+  onSuccess?: () => void;
+};
 
+export default function VerifyEmailForm({
+  email,
+  onSuccess,
+}: VerifyEmailFormProps) {
   const {
     state,
     dispatch,
     handleSubmit,
     handleResendCode,
-  } = useVerifyEmail(email);
+  } = useVerifyEmail(email, onSuccess);
 
   return (
     <>

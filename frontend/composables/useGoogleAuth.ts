@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { authService } from "@/services/authService";
 
 export function useGoogleAuth() {
-  const router = useRouter();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -53,7 +51,7 @@ export function useGoogleAuth() {
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
 
-      router.push("/dashboard");
+      return true;
     } catch (error) {
       setError(
         error instanceof Error

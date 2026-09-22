@@ -1,7 +1,6 @@
 "use client";
 
 import { useReducer } from "react";
-import { useRouter } from "next/navigation";
 
 import {
   verifyEmailReducer,
@@ -11,8 +10,10 @@ import {
 import { authService } from "@/services/authService";
 import { validation } from "@/validations/validation";
 
-export function useVerifyEmail(email: string) {
-  const router = useRouter();
+export function useVerifyEmail(
+  email: string,
+  onSuccess?: () => void,
+) {
 
   const [state, dispatch] = useReducer(
     verifyEmailReducer,
@@ -43,7 +44,7 @@ export function useVerifyEmail(email: string) {
         code: state.code.trim(),
       });
 
-      router.push("/login");
+      onSuccess?.();
     } catch (error) {
       dispatch({
         type: "SET_ERROR",
