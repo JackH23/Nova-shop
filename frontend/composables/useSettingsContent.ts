@@ -2,21 +2,18 @@
 
 import { useCallback, useEffect, useReducer } from "react";
 import { settingsService } from "@/services/settingsService";
+import { useAuth } from "@/components/shared/auth/AuthModalProvider";
 import {
   settingsReducer,
   initialSettingsState,
 } from "@/reducers/settingsReducer";
 
-import type {
-  UpdateProfileData,
-  ChangePasswordData,
-} from "@/lib/settings";
+import type { UpdateProfileData, ChangePasswordData } from "@/lib/settings";
 
 export function useSettingsContent() {
-  const [state, dispatch] = useReducer(
-    settingsReducer,
-    initialSettingsState,
-  );
+  const [state, dispatch] = useReducer(settingsReducer, initialSettingsState);
+
+  const { openLogin } = useAuth();
 
   // ================================
   // Get account settings
@@ -41,6 +38,19 @@ export function useSettingsContent() {
         value: response.user,
       });
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          value: "",
+        });
+
+        openLogin();
+        return;
+      }
+
       dispatch({
         type: "SET_ERROR",
         value:
@@ -54,15 +64,13 @@ export function useSettingsContent() {
         value: false,
       });
     }
-  }, []);
+  }, [openLogin]);
 
   // ================================
   // Update profile
   // ================================
 
-  const handleUpdateProfile = async (
-    data: UpdateProfileData,
-  ) => {
+  const handleUpdateProfile = async (data: UpdateProfileData) => {
     try {
       dispatch({
         type: "SET_UPDATING_PROFILE",
@@ -74,8 +82,7 @@ export function useSettingsContent() {
         value: "",
       });
 
-      const response =
-        await settingsService.updateProfile(data);
+      const response = await settingsService.updateProfile(data);
 
       dispatch({
         type: "UPDATE_PROFILE",
@@ -87,12 +94,23 @@ export function useSettingsContent() {
 
       return true;
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          value: "",
+        });
+
+        openLogin();
+        return false;
+      }
+
       dispatch({
         type: "SET_ERROR",
         value:
-          error instanceof Error
-            ? error.message
-            : "Failed to update profile",
+          error instanceof Error ? error.message : "Failed to update profile",
       });
 
       return false;
@@ -108,9 +126,7 @@ export function useSettingsContent() {
   // Update profile image
   // ================================
 
-  const handleUpdateProfileImage = async (
-    file: File,
-  ) => {
+  const handleUpdateProfileImage = async (file: File) => {
     try {
       dispatch({
         type: "SET_UPDATING_IMAGE",
@@ -122,8 +138,7 @@ export function useSettingsContent() {
         value: "",
       });
 
-      const response =
-        await settingsService.updateProfileImage(file);
+      const response = await settingsService.updateProfileImage(file);
 
       dispatch({
         type: "UPDATE_PROFILE_IMAGE",
@@ -132,6 +147,19 @@ export function useSettingsContent() {
 
       return response.user;
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          value: "",
+        });
+
+        openLogin();
+        throw error;
+      }
+
       dispatch({
         type: "SET_ERROR",
         value:
@@ -153,9 +181,7 @@ export function useSettingsContent() {
   // Change password
   // ================================
 
-  const handleChangePassword = async (
-    data: ChangePasswordData,
-  ) => {
+  const handleChangePassword = async (data: ChangePasswordData) => {
     try {
       dispatch({
         type: "SET_CHANGING_PASSWORD",
@@ -171,12 +197,23 @@ export function useSettingsContent() {
 
       return true;
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          value: "",
+        });
+
+        openLogin();
+        return false;
+      }
+
       dispatch({
         type: "SET_ERROR",
         value:
-          error instanceof Error
-            ? error.message
-            : "Failed to change password",
+          error instanceof Error ? error.message : "Failed to change password",
       });
 
       return false;
@@ -204,8 +241,7 @@ export function useSettingsContent() {
         value: "",
       });
 
-      const response =
-        await settingsService.deleteAccount();
+      const response = await settingsService.deleteAccount();
 
       dispatch({
         type: "RESET",
@@ -213,12 +249,23 @@ export function useSettingsContent() {
 
       return response;
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          value: "",
+        });
+
+        openLogin();
+        throw error;
+      }
+
       dispatch({
         type: "SET_ERROR",
         value:
-          error instanceof Error
-            ? error.message
-            : "Failed to delete account",
+          error instanceof Error ? error.message : "Failed to delete account",
       });
 
       throw error;

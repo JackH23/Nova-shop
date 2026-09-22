@@ -5,6 +5,7 @@ import {
   reviewService,
   type CreateReviewData,
 } from "@/services/reviewService";
+import { useAuth } from "@/components/shared/auth/AuthModalProvider";
 
 export type ProductReview = {
   id: number;
@@ -27,6 +28,8 @@ export function useProductReviews(productId: number) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { openLogin } = useAuth();
+
   const getReviews = useCallback(async () => {
     try {
       setLoading(true);
@@ -47,17 +50,39 @@ export function useProductReviews(productId: number) {
     }
   }, [productId]);
 
-  const createReview = async (data: CreateReviewData) => {
+  const createReview = async (
+    data: CreateReviewData,
+  ): Promise<boolean> => {
     try {
       setSubmitting(true);
       setError(null);
 
-      await reviewService.createReview(productId, data);
+      await reviewService.createReview(
+        productId,
+        data,
+      );
 
       await getReviews();
 
       return true;
     } catch (error) {
+      // ========================================
+      // Unauthorized
+      // ========================================
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        setError(null);
+
+        openLogin();
+
+        return false;
+      }
+
+      // ========================================
+      // Other errors
+      // ========================================
       setError(
         error instanceof Error
           ? error.message

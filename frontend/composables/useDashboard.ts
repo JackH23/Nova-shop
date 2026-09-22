@@ -2,16 +2,16 @@
 
 import { useCallback, useEffect, useReducer } from "react";
 import { dashboardService } from "@/services/dashboardService";
+import { useAuth } from "@/components/shared/auth/AuthModalProvider";
 import {
   dashboardReducer,
   initialDashboardState,
 } from "@/reducers/dashboardReducer";
 
 export function useDashboard() {
-  const [state, dispatch] = useReducer(
-    dashboardReducer,
-    initialDashboardState,
-  );
+  const [state, dispatch] = useReducer(dashboardReducer, initialDashboardState);
+
+  const { openLogin } = useAuth();
 
   const getDashboardSummary = useCallback(async () => {
     try {
@@ -32,14 +32,25 @@ export function useDashboard() {
         value: response.dashboard,
       });
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          value: "",
+        });
+
+        openLogin();
+        return;
+      }
+
       console.error("Failed to fetch dashboard summary:", error);
 
       dispatch({
         type: "SET_ERROR",
         value:
-          error instanceof Error
-            ? error.message
-            : "Failed to load dashboard",
+          error instanceof Error ? error.message : "Failed to load dashboard",
       });
     } finally {
       dispatch({
@@ -47,7 +58,7 @@ export function useDashboard() {
         value: false,
       });
     }
-  }, []);
+  }, [openLogin]);
 
   useEffect(() => {
     getDashboardSummary();

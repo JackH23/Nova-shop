@@ -1,15 +1,12 @@
 "use client";
 
 import { useReducer, useState } from "react";
-import type {
-  Product,
-  ProductVariant,
-} from "@/lib/products";
+import axios from "axios";
+
+import type { Product, ProductVariant } from "@/lib/products";
 import { cartService } from "@/services/cartService";
-import {
-  cartReducer,
-  initialCartState,
-} from "@/reducers/cartReducer";
+import { cartReducer, initialCartState } from "@/reducers/cartReducer";
+import { useAuth } from "@/components/shared/auth/AuthModalProvider";
 
 export function useProductCart(
   product: Product,
@@ -18,10 +15,9 @@ export function useProductCart(
 ) {
   const [quantity, setQuantity] = useState(1);
 
-  const [state, dispatch] = useReducer(
-    cartReducer,
-    initialCartState,
-  );
+  const [state, dispatch] = useReducer(cartReducer, initialCartState);
+
+  const { openLogin } = useAuth();
 
   const decreaseQuantity = () => {
     setQuantity((current) => Math.max(1, current - 1));
@@ -32,7 +28,6 @@ export function useProductCart(
   };
 
   const handleAddToCart = async () => {
-
     if (product.variants?.length && !selectedVariant) {
       dispatch({
         type: "SET_ERROR",
@@ -71,6 +66,22 @@ export function useProductCart(
 
       return response;
     } catch (error) {
+      console.log("ADD TO CART ERROR:", error);
+
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          value: "",
+        });
+
+        openLogin();
+
+        return null;
+      }
+
       dispatch({
         type: "SET_ERROR",
         value:

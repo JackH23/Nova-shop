@@ -4,6 +4,7 @@ import { useCallback, useEffect, useReducer } from "react";
 import { addressService } from "@/services/addressService";
 import { usePagination } from "@/composables/usePagination";
 import { addressReducer, initialAddressState } from "@/reducers/addressReducer";
+import { useAuth } from "@/components/shared/auth/AuthModalProvider";
 
 import type { CreateAddressData, UpdateAddressData } from "@/lib/address";
 
@@ -11,6 +12,7 @@ export function useAddressContent() {
   const [state, dispatch] = useReducer(addressReducer, initialAddressState);
 
   const { currentPage, setCurrentPage } = usePagination();
+  const { openLogin } = useAuth();
 
   // Get all addresses
   const getAddresses = useCallback(async () => {
@@ -46,6 +48,19 @@ export function useAddressContent() {
         },
       });
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          value: "",
+        });
+
+        openLogin();
+        return;
+      }
+
       dispatch({
         type: "SET_ERROR",
         value:

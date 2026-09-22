@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useReducer } from "react";
 import { wishlistService } from "@/services/wishlistService";
+import { useAuth } from "@/components/shared/auth/AuthModalProvider";
 import {
   initialWishlistState,
   wishlistReducer,
@@ -12,6 +13,7 @@ export function useWishlist() {
   const [state, dispatch] = useReducer(wishlistReducer, initialWishlistState);
 
   const { currentPage, setCurrentPage } = usePagination();
+  const { openLogin } = useAuth();
 
   // ========================================
   // Get wishlist
@@ -49,6 +51,19 @@ export function useWishlist() {
         },
       });
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          value: "",
+        });
+
+        openLogin();
+        return;
+      }
+
       dispatch({
         type: "SET_ERROR",
         value:
@@ -60,7 +75,7 @@ export function useWishlist() {
         value: false,
       });
     }
-  }, [currentPage]);
+  }, [currentPage, openLogin]);
 
   // ========================================
   // Add product to wishlist
@@ -83,6 +98,19 @@ export function useWishlist() {
 
         return true;
       } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message === "Authentication required."
+        ) {
+          dispatch({
+            type: "SET_ERROR",
+            value: "",
+          });
+
+          openLogin();
+          return false;
+        }
+
         dispatch({
           type: "SET_ERROR",
           value:
@@ -94,39 +122,55 @@ export function useWishlist() {
         return false;
       }
     },
-    [getWishlist],
+    [getWishlist, openLogin],
   );
 
   // ========================================
   // Remove product from wishlist
   // ========================================
-  const removeFromWishlist = useCallback(async (productId: number) => {
-    dispatch({
-      type: "SET_ERROR",
-      value: "",
-    });
-
-    try {
-      await wishlistService.removeFromWishlist(productId);
-
-      dispatch({
-        type: "REMOVE_WISHLIST_ITEM",
-        value: productId,
-      });
-
-      return true;
-    } catch (error) {
+  const removeFromWishlist = useCallback(
+    async (productId: number) => {
       dispatch({
         type: "SET_ERROR",
-        value:
-          error instanceof Error
-            ? error.message
-            : "Failed to remove product from wishlist",
+        value: "",
       });
 
-      return false;
-    }
-  }, []);
+      try {
+        await wishlistService.removeFromWishlist(productId);
+
+        dispatch({
+          type: "REMOVE_WISHLIST_ITEM",
+          value: productId,
+        });
+
+        return true;
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message === "Authentication required."
+        ) {
+          dispatch({
+            type: "SET_ERROR",
+            value: "",
+          });
+
+          openLogin();
+          return false;
+        }
+
+        dispatch({
+          type: "SET_ERROR",
+          value:
+            error instanceof Error
+              ? error.message
+              : "Failed to remove product from wishlist",
+        });
+
+        return false;
+      }
+    },
+    [openLogin],
+  );
 
   // ========================================
   // Load wishlist when page opens

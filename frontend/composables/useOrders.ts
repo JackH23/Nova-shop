@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useReducer } from "react";
 import { dashboardService } from "@/services/dashboardService";
+import { useAuth } from "@/components/shared/auth/AuthModalProvider";
 import {
   dashboardReducer,
   initialDashboardState,
@@ -12,6 +13,7 @@ export function useOrders() {
   const [state, dispatch] = useReducer(dashboardReducer, initialDashboardState);
 
   const { currentPage, setCurrentPage } = usePagination();
+  const { openLogin } = useAuth();
 
   const limit = 5;
 
@@ -40,6 +42,19 @@ export function useOrders() {
         },
       });
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          value: "",
+        });
+
+        openLogin();
+        return;
+      }
+
       console.error("Failed to fetch orders:", error);
 
       dispatch({
@@ -52,7 +67,7 @@ export function useOrders() {
         value: false,
       });
     }
-  }, [currentPage, limit]);
+  }, [currentPage, openLogin]);
 
   useEffect(() => {
     getOrders();

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useReducer, useState } from "react";
 import { useCartToast } from "@/composables/useCartToast";
 import { cartService } from "@/services/cartService";
 import { cartReducer, initialCartState } from "@/reducers/cartReducer";
+import { useAuth } from "@/components/shared/auth/AuthModalProvider";
 import type { CartItem } from "@/lib/cart";
 
 export function useCartContent() {
@@ -11,6 +12,7 @@ export function useCartContent() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [updateError, setUpdateError] = useState("");
+  const { openLogin } = useAuth();
 
   const itemsPerPage = 5;
 
@@ -41,6 +43,19 @@ export function useCartContent() {
         value: response.pagination,
       });
     } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Authentication required."
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          value: "",
+        });
+
+        openLogin();
+        return;
+      }
+
       dispatch({
         type: "SET_ERROR",
         value: error instanceof Error ? error.message : "Failed to fetch cart",
@@ -51,7 +66,7 @@ export function useCartContent() {
         value: false,
       });
     }
-  }, [currentPage]);
+  }, [currentPage, openLogin]);
 
   // Increase quantity
   const handleIncrease = async (item: CartItem) => {
@@ -70,9 +85,7 @@ export function useCartContent() {
       window.dispatchEvent(new Event("cart-updated"));
     } catch (error) {
       setUpdateError(
-        error instanceof Error
-          ? error.message
-          : "Failed to update cart item",
+        error instanceof Error ? error.message : "Failed to update cart item",
       );
     }
   };
@@ -98,9 +111,7 @@ export function useCartContent() {
       window.dispatchEvent(new Event("cart-updated"));
     } catch (error) {
       setUpdateError(
-        error instanceof Error
-          ? error.message
-          : "Failed to update cart item",
+        error instanceof Error ? error.message : "Failed to update cart item",
       );
     }
   };

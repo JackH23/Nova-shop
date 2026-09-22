@@ -6,6 +6,7 @@ import type {
   UpdatePaymentMethodData,
 } from "@/lib/paymentMethod";
 import { paymentMethodService } from "@/services/paymentMethodService";
+import { useAuth } from "@/components/shared/auth/AuthModalProvider";
 
 import {
   initialPaymentMethodState,
@@ -17,6 +18,8 @@ export function usePaymentMethods() {
     paymentMethodReducer,
     initialPaymentMethodState,
   );
+
+  const { openLogin } = useAuth();
 
   // Get payment methods
   const getPaymentMethods = useCallback(
@@ -56,6 +59,19 @@ export function usePaymentMethods() {
           },
         });
       } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message === "Authentication required."
+        ) {
+          dispatch({
+            type: "SET_ERROR",
+            value: "",
+          });
+
+          openLogin();
+          return;
+        }
+
         console.error("Get payment methods error:", error);
 
         dispatch({
@@ -69,7 +85,7 @@ export function usePaymentMethods() {
         });
       }
     },
-    [],
+    [openLogin],
   );
 
   // Create payment method
