@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   useElements,
   useStripe,
@@ -14,11 +15,14 @@ export default function StripePaymentConfirm({
 }: StripePaymentConfirmProps) {
   const stripe = useStripe();
   const elements = useElements();
+  const [loading, setLoading] = useState(false);
 
   const handleConfirmPayment = async () => {
     if (!stripe || !elements) {
       return;
     }
+
+    setLoading(true);
 
     const { error, paymentIntent } =
       await stripe.confirmPayment({
@@ -42,10 +46,10 @@ export default function StripePaymentConfirm({
     <button
       type="button"
       onClick={handleConfirmPayment}
-      disabled={!stripe}
+      disabled={!stripe || loading}
       className="w-full rounded-md bg-indigo-600 px-4 py-3 font-semibold text-white disabled:opacity-50"
     >
-      Confirm Payment
+      {loading ? "Processing Payment..." : "Confirm Payment"}
     </button>
   );
 }

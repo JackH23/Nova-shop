@@ -1,13 +1,14 @@
 import { LockKeyhole } from "lucide-react";
 import type { CheckoutData, DeliveryMethod } from "@/services/checkoutService";
 import type { CheckoutStep } from "./CheckoutSteps";
+import StripePaymentConfirm from "./StripePaymentConfirm";
 
 type CheckoutSummaryProps = {
   checkout: CheckoutData;
   step: CheckoutStep;
   deliveryMethod: DeliveryMethod;
   placingOrder: boolean;
-  onPlaceOrder: () => void;
+  onPaymentSuccess: (paymentIntentId: string) => Promise<void>;
 };
 
 export default function CheckoutSummary({
@@ -15,7 +16,7 @@ export default function CheckoutSummary({
   step,
   deliveryMethod,
   placingOrder,
-  onPlaceOrder,
+  onPaymentSuccess,
 }: CheckoutSummaryProps) {
   const shippingFee = deliveryMethod === "EXPRESS" ? 15 : 5;
 
@@ -94,19 +95,20 @@ export default function CheckoutSummary({
         <span>${total.toFixed(2)}</span>
       </div>
 
-      <button
-        type="button"
-        onClick={onPlaceOrder}
-        disabled={step !== "payment" || placingOrder}
-        className={`mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-md font-semibold text-white transition ${
-          step === "payment" && !placingOrder
-            ? "bg-indigo-600 hover:bg-indigo-700"
-            : "cursor-not-allowed bg-slate-300"
-        }`}
-      >
-        <LockKeyhole size={16} />
-        {placingOrder ? "Placing Order..." : "Place Order"}
-      </button>
+      {step === "payment" && !placingOrder ? (
+        <div className="mt-5">
+          <StripePaymentConfirm onSuccess={onPaymentSuccess} />
+        </div>
+      ) : (
+        <button
+          type="button"
+          disabled
+          className="mt-5 flex h-12 w-full cursor-not-allowed items-center justify-center gap-2 rounded-md bg-slate-300 font-semibold text-white"
+        >
+          <LockKeyhole size={16} />
+          Place Order
+        </button>
+      )}
 
       <p className="mt-3 text-center text-xs text-slate-500">
         256-bit encryption for secure payment
