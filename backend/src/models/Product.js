@@ -154,11 +154,6 @@ const Product = sequelize.define(
   },
 );
 
-Product.hasMany(ProductImage, {
-  foreignKey: "product_id",
-  as: "images",
-});
-
 Product.hasMany(ProductVariant, {
   foreignKey: "product_id",
   as: "variants",

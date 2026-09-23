@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 
-import type { ReturnRequest } from "@/l";
+import type { ReturnRequest } from "@/lib/returns";
 import { returnService } from "@/services/returnService";
 
 export function useReturnDetail(

@@ -6,11 +6,13 @@ const Return = require("./Return");
 const ReturnItem = require("./ReturnItem");
 const ReturnAdminImage = require("./ReturnAdminImage");
 
-// Wishlist
 const User = require("./User");
+
 const Product = require("./Product");
+const ProductImage = require("./ProductImage");
 const ProductSpecification = require("./ProductSpecification");
 const ProductReview = require("./ProductReview");
+
 const WishlistItem = require("./WishlistItem");
 const PaymentMethod = require("./PaymentMethod");
 
@@ -172,6 +174,21 @@ ProductReview.belongsTo(Product, {
 });
 
 // ========================================
+// Product → Images
+// ========================================
+
+Product.hasMany(ProductImage, {
+  foreignKey: "product_id",
+  as: "images",
+  onDelete: "CASCADE",
+});
+
+ProductImage.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+
+// ========================================
 // User → Product Reviews
 // ========================================
 
@@ -224,9 +241,12 @@ module.exports = {
   ReturnAdminImage,
 
   User,
+
   Product,
+  ProductImage,
   ProductSpecification,
   ProductReview,
+
   WishlistItem,
   PaymentMethod,
 };

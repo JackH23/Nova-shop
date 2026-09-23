@@ -18,12 +18,46 @@ export type CreateReturnItem = {
 };
 
 // ========================================
+// Product Image
+// ========================================
+
+export type ReturnProductImage = {
+  id: number;
+
+  product_id: number;
+  variant_id: number | null;
+
+  image_url: string;
+  sort_order: number;
+
+  created_at: string;
+  updated_at?: string;
+};
+
+// ========================================
+// Product
+// ========================================
+
+export type ReturnProduct = {
+  id: number;
+
+  name: string;
+
+  // Main product image
+  image: string | null;
+
+  // Gallery / variant images
+  images: ReturnProductImage[];
+};
+
+// ========================================
 // Order Item
 // ========================================
 
 export type ReturnOrderItem = {
   id: number;
   order_id: number;
+
   product_id: number;
   variant_id: number | null;
 
@@ -35,6 +69,9 @@ export type ReturnOrderItem = {
 
   created_at: string;
   updated_at: string;
+
+  // Product information
+  product?: ReturnProduct | null;
 };
 
 // ========================================
@@ -43,6 +80,7 @@ export type ReturnOrderItem = {
 
 export type ReturnItem = {
   id: number;
+
   return_id: number;
   order_item_id: number;
 
@@ -88,6 +126,7 @@ export type CreateReturnData = {
 
 export type ReturnRequest = {
   id: number;
+
   order_id: number;
   user_id: number;
 
