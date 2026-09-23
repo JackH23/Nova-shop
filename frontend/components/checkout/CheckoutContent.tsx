@@ -46,6 +46,28 @@ export default function CheckoutContent() {
     return null;
   }
 
+  if (placingOrder) {
+    return (
+      <main className="min-h-screen bg-slate-50">
+        <PageContainer>
+          <div className="flex min-h-[600px] items-center justify-center">
+            <div className="text-center">
+              <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600" />
+
+              <h2 className="mt-4 text-lg font-semibold text-slate-900">
+                Creating your order...
+              </h2>
+
+              <p className="mt-2 text-sm text-slate-500">
+                Please don't close or refresh this page.
+              </p>
+            </div>
+          </div>
+        </PageContainer>
+      </main>
+    );
+  }
+
   const checkoutGrid = (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
       {/* Left */}
@@ -92,6 +114,7 @@ export default function CheckoutContent() {
           checkout={checkout}
           step={step}
           deliveryMethod={deliveryMethod}
+          paymentMethod={paymentMethod}
           placingOrder={placingOrder || creatingPayment}
           onPaymentSuccess={handlePlaceOrder}
         />

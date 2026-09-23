@@ -17,29 +17,54 @@ import {
 export function useCheckoutContent() {
   const router = useRouter();
 
-  const { checkout, loading, placingOrder, error, placeOrder } = useCheckout();
+  const {
+    checkout,
+    loading,
+    placingOrder,
+    error,
+    placeOrder,
+  } = useCheckout();
 
-  const [step, setStep] = useState<CheckoutStep>("shipping");
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [creatingPayment, setCreatingPayment] = useState(false);
+  const [step, setStep] =
+    useState<CheckoutStep>("shipping");
 
-  const [shippingData, setShippingData] = useState<ShippingData>({
-    email: "",
-    firstName: "",
-    lastName: "",
-    phone: "",
-    address: "",
-    city: "",
-    stateProvince: "",
-    postalCode: "",
-  });
+  const [clientSecret, setClientSecret] =
+    useState<string | null>(null);
+
+  const [creatingPayment, setCreatingPayment] =
+    useState(false);
+
+  const [shippingData, setShippingData] =
+    useState<ShippingData>({
+      email: "",
+      firstName: "",
+      lastName: "",
+      phone: "",
+      address: "",
+      city: "",
+      stateProvince: "",
+      postalCode: "",
+    });
+
+  const [deliveryMethod, setDeliveryMethodState] =
+    useState<DeliveryMethod>("STANDARD");
+
+  const [paymentMethod, setPaymentMethodState] =
+    useState<PaymentMethod>("CREDIT_CARD");
+
+  // ========================================
+  // Get default shipping address
+  // ========================================
 
   useEffect(() => {
     const getDefaultAddress = async () => {
       try {
-        const response = await addressService.getDefaultAddress();
+        const response =
+          await addressService.getDefaultAddress();
 
-        if (!response.address) return;
+        if (!response.address) {
+          return;
+        }
 
         const defaultAddress = response.address;
 
@@ -50,43 +75,114 @@ export function useCheckoutContent() {
           phone: defaultAddress.phone ?? "",
           address: defaultAddress.address,
           city: defaultAddress.city,
-          stateProvince: defaultAddress.state_province ?? "",
-          postalCode: defaultAddress.postal_code ?? "",
+          stateProvince:
+            defaultAddress.state_province ?? "",
+          postalCode:
+            defaultAddress.postal_code ?? "",
         });
       } catch (error) {
-        console.error("Failed to fetch default address:", error);
+        console.error(
+          "Failed to fetch default address:",
+          error,
+        );
       }
     };
+
     getDefaultAddress();
   }, []);
 
-  const [deliveryMethod, setDeliveryMethod] =
-    useState<DeliveryMethod>("STANDARD");
+  // ========================================
+  // Change delivery method
+  // ========================================
 
-  const [paymentMethod, setPaymentMethod] =
-    useState<PaymentMethod>("CREDIT_CARD");
+  const handleDeliveryMethodChange = (
+    method: DeliveryMethod,
+  ) => {
+    setDeliveryMethodState(method);
+
+    // Shipping price changes.
+    // Do not reuse the old PaymentIntent.
+    setClientSecret(null);
+  };
+
+  // ========================================
+  // Change payment method
+  // ========================================
+
+  const handlePaymentMethodChange = (
+    method: PaymentMethod,
+  ) => {
+    setPaymentMethodState(method);
+
+    // Stripe clientSecret belongs only
+    // to the credit-card payment flow.
+    if (method !== "CREDIT_CARD") {
+      setClientSecret(null);
+    }
+  };
+
+  // ========================================
+  // Create Stripe PaymentIntent
+  // ========================================
 
   useEffect(() => {
-    if (step !== "payment") return;
-    if (paymentMethod !== "CREDIT_CARD") return;
-    if (clientSecret) return;
+    if (step !== "payment") {
+      return;
+    }
+
+    if (paymentMethod !== "CREDIT_CARD") {
+      return;
+    }
+
+    if (clientSecret) {
+      return;
+    }
+
+    let cancelled = false;
 
     const createStripePayment = async () => {
       try {
         setCreatingPayment(true);
 
-        const response = await checkoutService.createPayment(deliveryMethod);
+        const response =
+          await checkoutService.createPayment(
+            deliveryMethod,
+          );
+
+        if (cancelled) {
+          return;
+        }
 
         setClientSecret(response.clientSecret);
       } catch (error) {
-        console.error("Failed to create Stripe payment:", error);
+        if (!cancelled) {
+          console.error(
+            "Failed to create Stripe payment:",
+            error,
+          );
+        }
       } finally {
-        setCreatingPayment(false);
+        if (!cancelled) {
+          setCreatingPayment(false);
+        }
       }
     };
 
     createStripePayment();
-  }, [step, paymentMethod, deliveryMethod, clientSecret]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    step,
+    paymentMethod,
+    deliveryMethod,
+    clientSecret,
+  ]);
+
+  // ========================================
+  // Place order after payment succeeds
+  // ========================================
 
   const handlePlaceOrder = async (
     paymentIntentId: string,
@@ -99,11 +195,23 @@ export function useCheckoutContent() {
         paymentIntentId,
       });
 
-      console.log("Order placed:", response.order);
+      console.log(
+        "Order placed:",
+        response.order,
+      );
 
-      router.push(`/checkout/success?orderId=${response.order.id}`);
+      // PaymentIntent has already succeeded.
+      // Never reuse its clientSecret.
+      setClientSecret(null);
+
+      router.replace(
+        `/checkout/success?orderId=${response.order.id}`,
+      );
     } catch (error) {
-      console.error("Place order failed:", error);
+      console.error(
+        "Place order failed:",
+        error,
+      );
     }
   };
 
@@ -120,10 +228,13 @@ export function useCheckoutContent() {
     setShippingData,
 
     deliveryMethod,
-    setDeliveryMethod,
+    setDeliveryMethod:
+      handleDeliveryMethodChange,
 
     paymentMethod,
-    setPaymentMethod,
+    setPaymentMethod:
+      handlePaymentMethodChange,
+
     clientSecret,
     creatingPayment,
 

@@ -1,5 +1,9 @@
 import { LockKeyhole } from "lucide-react";
-import type { CheckoutData, DeliveryMethod } from "@/services/checkoutService";
+import type {
+  CheckoutData,
+  DeliveryMethod,
+  PaymentMethod,
+} from "@/services/checkoutService";
 import type { CheckoutStep } from "./CheckoutSteps";
 import StripePaymentConfirm from "./StripePaymentConfirm";
 
@@ -7,6 +11,7 @@ type CheckoutSummaryProps = {
   checkout: CheckoutData;
   step: CheckoutStep;
   deliveryMethod: DeliveryMethod;
+  paymentMethod: PaymentMethod;
   placingOrder: boolean;
   onPaymentSuccess: (paymentIntentId: string) => Promise<void>;
 };
@@ -15,6 +20,7 @@ export default function CheckoutSummary({
   checkout,
   step,
   deliveryMethod,
+  paymentMethod,
   placingOrder,
   onPaymentSuccess,
 }: CheckoutSummaryProps) {
@@ -97,7 +103,19 @@ export default function CheckoutSummary({
 
       {step === "payment" && !placingOrder ? (
         <div className="mt-5">
-          <StripePaymentConfirm onSuccess={onPaymentSuccess} />
+          {paymentMethod === "CREDIT_CARD" && (
+            <StripePaymentConfirm onSuccess={onPaymentSuccess} />
+          )}
+
+          {paymentMethod === "PAYPAL" && (
+            <button
+              type="button"
+              disabled
+              className="flex h-12 w-full cursor-not-allowed items-center justify-center rounded-md bg-[#ffc439] font-semibold text-slate-900 opacity-70"
+            >
+              PayPal payment is not connected yet
+            </button>
+          )}
         </div>
       ) : (
         <button
@@ -106,7 +124,8 @@ export default function CheckoutSummary({
           className="mt-5 flex h-12 w-full cursor-not-allowed items-center justify-center gap-2 rounded-md bg-slate-300 font-semibold text-white"
         >
           <LockKeyhole size={16} />
-          Place Order
+
+          {placingOrder ? "Creating Order..." : "Place Order"}
         </button>
       )}
 

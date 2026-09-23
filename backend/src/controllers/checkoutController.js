@@ -9,6 +9,9 @@ const ShippingAddress = require("../models/ShippingAddress");
 const Delivery = require("../models/Delivery");
 const Payment = require("../models/Payment");
 const stripe = require("../config/stripe");
+const User = require("../models/User");
+
+const { sendAdminOrderNotification } = require("../services/emailService");
 
 const crypto = require("crypto");
 
@@ -278,12 +281,8 @@ const placeOrder = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const {
-      shipping,
-      deliveryMethod,
-      paymentMethod,
-      paymentIntentId,
-    } = req.body;
+    const { shipping, deliveryMethod, paymentMethod, paymentIntentId } =
+      req.body;
 
     // 1. Validate shipping information
     if (
@@ -603,7 +602,7 @@ const placeOrder = async (req, res) => {
     );
 
     // 14. Create payment
-    await Payment.create(
+    const payment = await Payment.create(
       {
         order_id: order.id,
 
@@ -611,20 +610,12 @@ const placeOrder = async (req, res) => {
 
         amount: Number(totalAmount.toFixed(2)),
 
-        status:
-          paymentMethod === "CREDIT_CARD"
-            ? "PAID"
-            : "PENDING",
+        status: paymentMethod === "CREDIT_CARD" ? "PAID" : "PENDING",
 
         transaction_id:
-          paymentMethod === "CREDIT_CARD"
-            ? stripePaymentIntent.id
-            : null,
+          paymentMethod === "CREDIT_CARD" ? stripePaymentIntent.id : null,
 
-        paid_at:
-          paymentMethod === "CREDIT_CARD"
-            ? new Date()
-            : null,
+        paid_at: paymentMethod === "CREDIT_CARD" ? new Date() : null,
       },
       {
         transaction,
@@ -641,6 +632,25 @@ const placeOrder = async (req, res) => {
 
     // 16. Everything succeeded
     await transaction.commit();
+
+    // Send notification to admin after order is committed
+    try {
+      const customer = await User.findByPk(userId, {
+        attributes: ["id", "fullName", "email"],
+      });
+
+      if (customer) {
+        await sendAdminOrderNotification({
+          order,
+          payment,
+          customer,
+        });
+
+        console.log(`Admin notified for order ${order.order_no}`);
+      }
+    } catch (emailError) {
+      console.error("Failed to send admin order notification:", emailError);
+    }
 
     return res.status(201).json({
       message: "Order placed successfully",

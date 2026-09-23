@@ -24,11 +24,69 @@ const sendVerificationEmail = async (email, code) => {
 
       <p>This code expires in 10 minutes.</p>
 
-      <p>If you didn't create a NovaShop account, you can ignore this email.</p>
+      <p>
+        If you didn't create a NovaShop account,
+        you can ignore this email.
+      </p>
+    `,
+  });
+};
+
+// Admin notification after customer places an order
+const sendAdminOrderNotification = async ({
+  order,
+  payment,
+  customer,
+}) => {
+  await transporter.sendMail({
+    from: `"NovaShop" <${process.env.EMAIL_USER}>`,
+
+    to: process.env.ADMIN_EMAIL,
+
+    subject: `New Order - ${order.order_no}`,
+
+    html: `
+      <h2>New Order Received</h2>
+
+      <p>
+        <strong>Order Number:</strong>
+        ${order.order_no}
+      </p>
+
+      <p>
+        <strong>Customer:</strong>
+        ${customer.fullName}
+      </p>
+
+      <p>
+        <strong>Customer Email:</strong>
+        ${customer.email}
+      </p>
+
+      <p>
+        <strong>Total:</strong>
+        $${Number(order.total_amount).toFixed(2)}
+      </p>
+
+      <p>
+        <strong>Payment Method:</strong>
+        ${payment.payment_method}
+      </p>
+
+      <p>
+        <strong>Payment Status:</strong>
+        ${payment.status}
+      </p>
+
+      <p>
+        <strong>Transaction ID:</strong>
+        ${payment.transaction_id ?? "N/A"}
+      </p>
     `,
   });
 };
 
 module.exports = {
   sendVerificationEmail,
+  sendAdminOrderNotification,
 };
