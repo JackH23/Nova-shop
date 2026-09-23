@@ -100,7 +100,11 @@ const getProductReviews = async (req, res) => {
         {
           model: User,
           as: "user",
-          attributes: ["id", "fullName"],
+          attributes: [
+            "id",
+            "fullName",
+            "profileImage",
+          ],
         },
       ],
 

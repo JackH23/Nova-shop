@@ -21,14 +21,29 @@ export type ProductSpecification = {
   sort_order: number;
 };
 
+export type ReviewUser = {
+  id: number;
+  fullName: string;
+  profileImage: string | null;
+};
+
 export type ProductReview = {
   id: number;
+  product_id: number;
   user_id: number;
+  order_id: number | null;
+
   rating: number;
   title: string | null;
   comment: string;
+
   is_verified_purchase: boolean;
+  is_active: boolean;
+
   created_at: string;
+  updated_at: string;
+
+  user: ReviewUser;
 };
 
 export type Product = {

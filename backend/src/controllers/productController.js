@@ -26,6 +26,8 @@ const getProducts = async (req, res) => {
 
     const where = {
       is_active: true,
+      status: "ACTIVE",
+      online_store_enabled: true,
     };
 
     // Search filter
@@ -166,8 +168,10 @@ const getProductById = async (req, res) => {
 
     const product = await Product.findOne({
       where: {
-        id: id,
+        id,
         is_active: true,
+        status: "ACTIVE",
+        online_store_enabled: true,
       },
 
       include: [
