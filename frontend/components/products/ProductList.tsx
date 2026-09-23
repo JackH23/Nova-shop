@@ -18,6 +18,7 @@ type ProductListProps = {
   minDiscount?: number;
   minRating?: number;
   onProductAdded?: (product: Product) => void;
+  onCartError?: (message: string) => void;
 };
 
 export default function ProductList({
@@ -31,6 +32,7 @@ export default function ProductList({
   minDiscount = 0,
   minRating = 0,
   onProductAdded,
+  onCartError,
 }: ProductListProps) {
   const {
     currentPage,
@@ -87,6 +89,7 @@ export default function ProductList({
             key={product.id}
             product={product}
             onProductAdded={onProductAdded}
+            onCartError={onCartError}
             isWishlisted={wishlist.some(
               (item) => item.product_id === product.id,
             )}

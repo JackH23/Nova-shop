@@ -117,6 +117,7 @@ export function useCartContent() {
   };
 
   // Remove product
+  // Remove product
   const handleRemove = async (item: CartItem) => {
     try {
       dispatch({
@@ -129,8 +130,17 @@ export function useCartContent() {
       // Show removed success toast
       handleProductRemoved(item.product);
 
-      // Refresh cart page
-      await getCart();
+      const currentItems = state.cart?.items ?? [];
+
+      // If we removed the last item on this page
+      // and we're not on page 1,
+      // go back to the previous page.
+      if (currentItems.length === 1 && currentPage > 1) {
+        setCurrentPage((page) => page - 1);
+      } else {
+        // Otherwise refresh the current page
+        await getCart();
+      }
 
       // Refresh Navbar cart count
       window.dispatchEvent(new Event("cart-updated"));

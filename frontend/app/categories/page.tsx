@@ -1,14 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { useProductFilters } from "@/composables/useProductFilters";
 import CategoryFilters from "@/components/products/CategoryFilters";
 import ProductList from "@/components/products/ProductList";
 import PageContainer from "@/components/common/PageContainer";
 import AddToCartModal from "@/components/cart/AddToCartModal";
+import ConfirmModal from "@/components/common/ConfirmModal";
 import { useCartToast } from "@/composables/useCartToast";
 import { useCategories } from "@/composables/useCategories";
 
 export default function CategoriesPage() {
+  const [cartError, setCartError] = useState("");
+
   const {
     categoryId,
     setCategoryId,
@@ -57,6 +61,7 @@ export default function CategoriesPage() {
             inStock={inStock}
             onSale={onSale}
             onProductAdded={handleProductAdded}
+            onCartError={setCartError}
           />
         </div>
       </PageContainer>
@@ -69,6 +74,16 @@ export default function CategoriesPage() {
           onClose={() => removeToast(toast.id)}
         />
       ))}
+
+      <ConfirmModal
+        open={!!cartError}
+        title="Unable to Add to Cart"
+        message={cartError}
+        confirmText="OK"
+        cancelText="Close"
+        onConfirm={() => setCartError("")}
+        onCancel={() => setCartError("")}
+      />
     </>
   );
 }

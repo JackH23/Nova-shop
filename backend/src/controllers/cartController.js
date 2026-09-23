@@ -91,6 +91,8 @@ const addToCart = async (req, res) => {
     const userId = req.user.id;
     const { product_id, variant_id, quantity = 1 } = req.body;
 
+    const requestedQuantity = Number(quantity);
+
     // Product ID is required
     if (!product_id) {
       return res.status(400).json({
@@ -99,7 +101,7 @@ const addToCart = async (req, res) => {
     }
 
     // Quantity must be at least 1
-    if (quantity < 1) {
+    if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1) {
       return res.status(400).json({
         message: "Quantity must be at least 1",
       });
@@ -136,11 +138,15 @@ const addToCart = async (req, res) => {
       }
     }
 
-    const availableStock = variant ? variant.stock : product.stock;
+    const availableStock = Number(variant ? variant.stock : product.stock);
 
-    if (quantity > availableStock) {
+    if (requestedQuantity > availableStock) {
       return res.status(400).json({
-        message: "Not enough stock",
+        message: `Not enough stock for ${product.name}`,
+        productId: product.id,
+        variantId: variant?.id ?? null,
+        availableStock,
+        requestedQuantity,
       });
     }
 
@@ -168,12 +174,20 @@ const addToCart = async (req, res) => {
     });
 
     if (cartItem) {
-      // Product already exists → increase quantity
-      const newQuantity = cartItem.quantity + quantity;
+      const currentQuantity = Number(cartItem.quantity);
+
+      const newQuantity =
+        currentQuantity + requestedQuantity;
 
       if (newQuantity > availableStock) {
         return res.status(400).json({
-          message: "Not enough stock",
+          message: `Not enough stock for ${product.name}`,
+          productId: product.id,
+          variantId: variant?.id ?? null,
+          availableStock,
+          currentCartQuantity: currentQuantity,
+          requestedQuantity,
+          requestedTotalQuantity: newQuantity,
         });
       }
 
@@ -185,7 +199,7 @@ const addToCart = async (req, res) => {
         cart_id: cart.id,
         product_id: product_id,
         variant_id: variant_id,
-        quantity: quantity,
+        quantity: requestedQuantity,
       });
     }
 
@@ -270,9 +284,13 @@ const updateCartItem = async (req, res) => {
       availableStock = variant.stock;
     }
 
-    if (quantity > availableStock) {
+    if (Number(quantity) > Number(availableStock)) {
       return res.status(400).json({
-        message: "Not enough stock",
+        message: `Not enough stock for ${product.name}`,
+        productId: product.id,
+        variantId: cartItem.variant_id ?? null,
+        availableStock: Number(availableStock),
+        requestedQuantity: Number(quantity),
       });
     }
 

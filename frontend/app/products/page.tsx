@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import AddToCartModal from "@/components/cart/AddToCartModal";
+import ConfirmModal from "@/components/common/ConfirmModal";
 import { useProductFilters } from "@/composables/useProductFilters";
-import CategoryFilters from "@/components/products/CategoryFilters";
 import ProductList from "@/components/products/ProductList";
 import PageContainer from "@/components/common/PageContainer";
 import { useCartToast } from "@/composables/useCartToast";
 
 export default function ProductsPage() {
+  const [cartError, setCartError] = useState("");
+
   const {
     addedProducts,
     handleProductAdded,
@@ -27,23 +30,12 @@ export default function ProductsPage() {
     <>
       <PageContainer>
         <div className="flex flex-col gap-10 md:flex-row">
-          {/* Left filters */}
-          {/* <CategoryFilters
-            activeCategoryId={categoryId}
-            onCategoryChange={setCategoryId}
-            minPrice={minPrice}
-            maxPrice={maxPrice}
-            onMinPriceChange={setMinPrice}
-            onMaxPriceChange={setMaxPrice}
-            showAvailability={false}
-          /> */}
-
-          {/* Right product list */}
           <ProductList
             minPrice={minPrice}
             maxPrice={maxPrice}
             categoryId={categoryId}
             onProductAdded={handleProductAdded}
+            onCartError={setCartError}
           />
         </div>
       </PageContainer>
@@ -56,6 +48,16 @@ export default function ProductsPage() {
           onClose={() => removeToast(toast.id)}
         />
       ))}
+
+      <ConfirmModal
+        open={!!cartError}
+        title="Unable to Add to Cart"
+        message={cartError}
+        confirmText="OK"
+        cancelText="Close"
+        onConfirm={() => setCartError("")}
+        onCancel={() => setCartError("")}
+      />
     </>
   );
 }

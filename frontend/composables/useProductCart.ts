@@ -12,6 +12,7 @@ export function useProductCart(
   product: Product,
   selectedVariant: ProductVariant | null,
   onProductAdded?: (product: Product) => void,
+  onCartError?: (message: string) => void,
 ) {
   const [quantity, setQuantity] = useState(1);
 
@@ -82,13 +83,19 @@ export function useProductCart(
         return null;
       }
 
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to add product to cart";
+
       dispatch({
         type: "SET_ERROR",
-        value:
-          error instanceof Error
-            ? error.message
-            : "Failed to add product to cart",
+        value: message,
       });
+
+      onCartError?.(message);
+
+      return null;
 
       return null;
     } finally {

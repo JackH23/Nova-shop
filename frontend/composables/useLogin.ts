@@ -2,24 +2,15 @@
 
 import { useReducer } from "react";
 
-import {
-  loginReducer,
-  initialLoginState,
-} from "@/reducers/loginReducer";
+import { loginReducer, initialLoginState } from "@/reducers/loginReducer";
 
 import { authService } from "@/services/authService";
 import { validation } from "@/validations/validation";
 
 export function useLogin(onSuccess?: () => void) {
+  const [state, dispatch] = useReducer(loginReducer, initialLoginState);
 
-  const [state, dispatch] = useReducer(
-    loginReducer,
-    initialLoginState
-  );
-
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     dispatch({ type: "SET_ERROR", value: "" });
@@ -27,8 +18,7 @@ export function useLogin(onSuccess?: () => void) {
     const emailError = validation.email(state.email);
     const passwordError = validation.password(state.password);
 
-    const validationError =
-      emailError || passwordError;
+    const validationError = emailError || passwordError;
 
     if (validationError) {
       dispatch({
@@ -47,42 +37,22 @@ export function useLogin(onSuccess?: () => void) {
         rememberMe: state.rememberMe,
       });
 
-      if (state.rememberMe) {
-        localStorage.setItem(
-          "accessToken",
-          response.accessToken
-        );
+      localStorage.setItem("accessToken", response.accessToken);
 
-        localStorage.setItem(
-          "refreshToken",
-          response.refreshToken
-        );
+      localStorage.setItem("refreshToken", response.refreshToken);
 
-        sessionStorage.removeItem("accessToken");
-        sessionStorage.removeItem("refreshToken");
-      } else {
-        sessionStorage.setItem(
-          "accessToken",
-          response.accessToken
-        );
+      // Clean old session tokens
+      sessionStorage.removeItem("accessToken");
+      sessionStorage.removeItem("refreshToken");
 
-        sessionStorage.setItem(
-          "refreshToken",
-          response.refreshToken
-        );
-
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-      }
+      // Tell Navbar/useMe that user has logged in
+      window.dispatchEvent(new Event("auth-changed"));
 
       onSuccess?.();
     } catch (error) {
       dispatch({
         type: "SET_ERROR",
-        value:
-          error instanceof Error
-            ? error.message
-            : "Login failed",
+        value: error instanceof Error ? error.message : "Login failed",
       });
     } finally {
       dispatch({

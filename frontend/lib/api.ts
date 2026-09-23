@@ -11,10 +11,51 @@ export function getStoredToken(key: string) {
     return null;
   }
 
-  return (
-    localStorage.getItem(key) ||
-    sessionStorage.getItem(key)
-  );
+  return localStorage.getItem(key);
+}
+
+// ========================================
+// Check JWT expiration
+// ========================================
+
+function isTokenExpired(token: string | null) {
+  if (!token) {
+    return true;
+  }
+
+  try {
+    const payload = JSON.parse(
+      atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")),
+    );
+
+    if (!payload.exp) {
+      return true;
+    }
+
+    return Date.now() >= payload.exp * 1000;
+  } catch {
+    return true;
+  }
+}
+
+// ========================================
+// Check refresh token
+// ========================================
+
+function getValidRefreshToken() {
+  const refreshToken = getStoredToken("refreshToken");
+
+  if (!refreshToken) {
+    return null;
+  }
+
+  if (isTokenExpired(refreshToken)) {
+    clearAuthTokens();
+
+    return null;
+  }
+
+  return refreshToken;
 }
 
 // ========================================
@@ -22,10 +63,17 @@ export function getStoredToken(key: string) {
 // ========================================
 
 export function hasAuthToken() {
-  return Boolean(
-    getStoredToken("accessToken") ||
-      getStoredToken("refreshToken"),
-  );
+  const accessToken = getStoredToken("accessToken");
+
+  const refreshToken = getStoredToken("refreshToken");
+
+  if (refreshToken && isTokenExpired(refreshToken)) {
+    clearAuthTokens();
+
+    return false;
+  }
+
+  return Boolean(accessToken || refreshToken);
 }
 
 // ========================================
@@ -37,26 +85,7 @@ function saveAccessToken(accessToken: string) {
     return;
   }
 
-  // Remember Me enabled
-  if (localStorage.getItem("refreshToken")) {
-    localStorage.setItem(
-      "accessToken",
-      accessToken,
-    );
-
-    sessionStorage.removeItem(
-      "accessToken",
-    );
-  } else {
-    sessionStorage.setItem(
-      "accessToken",
-      accessToken,
-    );
-
-    localStorage.removeItem(
-      "accessToken",
-    );
-  }
+  localStorage.setItem("accessToken", accessToken);
 }
 
 // ========================================
@@ -71,8 +100,14 @@ function clearAuthTokens() {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
 
+  // Remove tokens from old implementation
   sessionStorage.removeItem("accessToken");
   sessionStorage.removeItem("refreshToken");
+
+  // Notify Navbar/useMe
+  window.dispatchEvent(
+    new Event("auth-changed"),
+  );
 }
 
 // ========================================
@@ -80,12 +115,13 @@ function clearAuthTokens() {
 // ========================================
 
 async function refreshAccessToken() {
-  const refreshToken =
-    getStoredToken("refreshToken");
+  const refreshToken = getValidRefreshToken();
 
   if (!refreshToken) {
+    clearAuthTokens();
+
     throw new Error(
-      "Refresh token not found",
+      "Refresh token expired or not found",
     );
   }
 
@@ -107,12 +143,25 @@ async function refreshAccessToken() {
   const data = await response.json();
 
   if (!response.ok) {
+    clearAuthTokens();
+
     throw new Error(
       data.message ||
         "Unable to refresh access token",
     );
   }
 
+  if (!data.accessToken) {
+    clearAuthTokens();
+
+    throw new Error(
+      "New access token was not returned",
+    );
+  }
+
+  // IMPORTANT:
+  // Replace access token only.
+  // Do NOT remove refresh token.
   saveAccessToken(data.accessToken);
 
   return data.accessToken;
@@ -122,25 +171,16 @@ async function refreshAccessToken() {
 // Create request headers
 // ========================================
 
-function createHeaders(
-  options: RequestInit,
-  accessToken: string | null,
-) {
-  const headers = new Headers(
-    options.headers,
-  );
+function createHeaders(options: RequestInit, accessToken: string | null) {
+  const headers = new Headers(options.headers);
 
   const isFormData =
-    typeof FormData !== "undefined" &&
-    options.body instanceof FormData;
+    typeof FormData !== "undefined" && options.body instanceof FormData;
 
   // JSON request
   if (!isFormData) {
     if (!headers.has("Content-Type")) {
-      headers.set(
-        "Content-Type",
-        "application/json",
-      );
+      headers.set("Content-Type", "application/json");
     }
   }
 
@@ -151,10 +191,7 @@ function createHeaders(
 
   // Authorization
   if (accessToken) {
-    headers.set(
-      "Authorization",
-      `Bearer ${accessToken}`,
-    );
+    headers.set("Authorization", `Bearer ${accessToken}`);
   }
 
   return headers;
@@ -168,27 +205,28 @@ export async function apiRequest<T = any>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const accessToken =
-    getStoredToken("accessToken");
+  const accessToken = getStoredToken("accessToken");
+
+  const storedRefreshToken = getStoredToken("refreshToken");
 
   const refreshToken =
-    getStoredToken("refreshToken");
+    storedRefreshToken && !isTokenExpired(storedRefreshToken)
+      ? storedRefreshToken
+      : null;
+
+  if (storedRefreshToken && !refreshToken) {
+    clearAuthTokens();
+  }
 
   // ========================================
   // First request
   // ========================================
 
-  let response = await fetch(
-    `${API_URL}${endpoint}`,
-    {
-      ...options,
+  let response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
 
-      headers: createHeaders(
-        options,
-        accessToken,
-      ),
-    },
-  );
+    headers: createHeaders(options, accessToken),
+  });
 
   // ========================================
   // Authentication endpoints
@@ -203,10 +241,7 @@ export async function apiRequest<T = any>(
   // 401 Unauthorized
   // ========================================
 
-  if (
-    response.status === 401 &&
-    !isAuthEndpoint
-  ) {
+  if (response.status === 401 && !isAuthEndpoint) {
     // ========================================
     // Guest user
     // ========================================
@@ -219,9 +254,7 @@ export async function apiRequest<T = any>(
     // ========================================
 
     if (!accessToken && !refreshToken) {
-      throw new Error(
-        "Authentication required.",
-      );
+      throw new Error("Authentication required.");
     }
 
     // ========================================
@@ -231,29 +264,19 @@ export async function apiRequest<T = any>(
     if (refreshToken) {
       try {
         if (!refreshPromise) {
-          refreshPromise =
-            refreshAccessToken().finally(
-              () => {
-                refreshPromise = null;
-              },
-            );
+          refreshPromise = refreshAccessToken().finally(() => {
+            refreshPromise = null;
+          });
         }
 
-        const newAccessToken =
-          await refreshPromise;
+        const newAccessToken = await refreshPromise;
 
         // Retry original request
-        response = await fetch(
-          `${API_URL}${endpoint}`,
-          {
-            ...options,
+        response = await fetch(`${API_URL}${endpoint}`, {
+          ...options,
 
-            headers: createHeaders(
-              options,
-              newAccessToken,
-            ),
-          },
-        );
+          headers: createHeaders(options, newAccessToken),
+        });
       } catch {
         // ========================================
         // Session expired
@@ -265,17 +288,13 @@ export async function apiRequest<T = any>(
         // Do NOT redirect to /login.
         //
         // Login is now a modal.
-        throw new Error(
-          "Your session has expired. Please login again.",
-        );
+        throw new Error("Your session has expired. Please login again.");
       }
     } else {
       // Access token exists but refresh token doesn't
       clearAuthTokens();
 
-      throw new Error(
-        "Your session has expired. Please login again.",
-      );
+      throw new Error("Your session has expired. Please login again.");
     }
   }
 
@@ -283,24 +302,17 @@ export async function apiRequest<T = any>(
   // Parse response
   // ========================================
 
-  const contentType =
-    response.headers.get("content-type");
+  const contentType = response.headers.get("content-type");
 
   let data: any;
 
-  if (
-    contentType?.includes(
-      "application/json",
-    )
-  ) {
+  if (contentType?.includes("application/json")) {
     data = await response.json();
   } else {
     const text = await response.text();
 
     if (!response.ok) {
-      throw new Error(
-        text || "Request failed",
-      );
+      throw new Error(text || "Request failed");
     }
 
     return text as T;
@@ -311,9 +323,7 @@ export async function apiRequest<T = any>(
   // ========================================
 
   if (!response.ok) {
-    throw new Error(
-      data.message || "Request failed",
-    );
+    throw new Error(data.message || "Request failed");
   }
 
   return data as T;

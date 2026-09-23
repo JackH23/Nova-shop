@@ -9,6 +9,7 @@ import type { Product } from "@/lib/products";
 type ProductCardProps = {
   product: Product;
   onProductAdded?: (product: Product) => void;
+  onCartError?: (message: string) => void;
   onAddWishlist?: (productId: number) => void;
   onRemoveWishlist?: (productId: number) => void;
   isWishlisted?: boolean;
@@ -18,6 +19,7 @@ type ProductCardProps = {
 export default function ProductCard({
   product,
   onProductAdded,
+  onCartError,
   onAddWishlist,
   onRemoveWishlist,
   isWishlisted = false,
@@ -27,6 +29,7 @@ export default function ProductCard({
     product,
     null,
     onProductAdded,
+    onCartError,
   );
 
   const { id, name, description, price, original_price, image } = product;

@@ -4,60 +4,57 @@ import { useState } from "react";
 import { authService } from "@/services/authService";
 
 export function useGoogleAuth() {
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleGoogleLogin = async (
     credential: string,
-    rememberMe = false
+    rememberMe = false,
   ) => {
     setError("");
     setLoading(true);
 
     try {
-      const response = await authService.googleLogin({
-        credential,
-        rememberMe,
-      });
+      const response =
+        await authService.googleLogin({
+          credential,
+          rememberMe,
+        });
 
-      if (rememberMe) {
-        localStorage.setItem(
-          "accessToken",
-          response.accessToken
-        );
-        localStorage.setItem(
-          "refreshToken",
-          response.refreshToken
-        );
+      // Always store authentication tokens
+      // in localStorage
+      localStorage.setItem(
+        "accessToken",
+        response.accessToken,
+      );
 
-        sessionStorage.removeItem("accessToken");
-        sessionStorage.removeItem("refreshToken");
-      } else {
-        sessionStorage.setItem(
-          "accessToken",
-          response.accessToken
-        );
-        sessionStorage.setItem(
-          "refreshToken",
-          response.refreshToken
-        );
+      localStorage.setItem(
+        "refreshToken",
+        response.refreshToken,
+      );
 
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-      }
+      // Clean old sessionStorage tokens
+      sessionStorage.removeItem("accessToken");
+      sessionStorage.removeItem("refreshToken");
 
-      // Remove old token key from previous implementation
+      // Clean old token implementation
       localStorage.removeItem("token");
       sessionStorage.removeItem("token");
+
+      // Tell Navbar/useMe that login changed
+      window.dispatchEvent(
+        new Event("auth-changed"),
+      );
 
       return true;
     } catch (error) {
       setError(
         error instanceof Error
           ? error.message
-          : "Google login failed"
+          : "Google login failed",
       );
+
+      return false;
     } finally {
       setLoading(false);
     }

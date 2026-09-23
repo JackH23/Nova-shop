@@ -11,10 +11,7 @@ export function useCart() {
 
   useEffect(() => {
     const getCart = async () => {
-      // ========================================
       // Guest user
-      // ========================================
-      // Don't request protected cart API
       if (!hasAuthToken()) {
         setCart([]);
         setCartCount(0);
@@ -22,23 +19,17 @@ export function useCart() {
       }
 
       try {
-        const response =
-          await cartService.getCart();
+        const response = await cartService.getCart();
 
-        const items =
-          response.cart?.items ?? [];
+        const items = response.cart?.items ?? [];
 
         setCart(items);
 
-        const totalQuantity = items.reduce(
-          (
-            total: number,
-            item: CartItem,
-          ) => total + item.quantity,
-          0,
+        // IMPORTANT:
+        // Use totalQuantity from backend because items are paginated
+        setCartCount(
+          Number(response.cart?.totalQuantity ?? 0),
         );
-
-        setCartCount(totalQuantity);
       } catch (error) {
         console.error(
           "Failed to fetch cart:",
@@ -50,19 +41,23 @@ export function useCart() {
       }
     };
 
-    // Initial cart fetch
+    // Initial fetch
     getCart();
 
-    // Refresh cart when cart changes
+    // Listen for cart changes
+    const handleCartUpdated = () => {
+      getCart();
+    };
+
     window.addEventListener(
       "cart-updated",
-      getCart,
+      handleCartUpdated,
     );
 
     return () => {
       window.removeEventListener(
         "cart-updated",
-        getCart,
+        handleCartUpdated,
       );
     };
   }, []);

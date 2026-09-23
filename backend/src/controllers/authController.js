@@ -217,11 +217,18 @@ const refreshToken = async (req, res) => {
 
 const me = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id, {
-      attributes: ["id", "fullName", "email", "isVerified"],
-
-      attributes: ["id", "fullName", "email", "profileImage", "isVerified"],
-    });
+    const user = await User.findByPk(
+      req.user.id,
+      {
+        attributes: [
+          "id",
+          "fullName",
+          "email",
+          "profileImage",
+          "isVerified",
+        ],
+      },
+    );
 
     if (!user) {
       return res.status(404).json({
@@ -233,7 +240,10 @@ const me = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error("Get current user error:", error);
+    console.error(
+      "Get current user error:",
+      error,
+    );
 
     return res.status(500).json({
       message: "Internal server error",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useReducer } from "react";
+
 import { authService } from "@/services/authService";
 import { meReducer, initialMeState } from "@/reducers/meReducer";
 
@@ -10,14 +11,24 @@ export function useMe() {
   const [state, dispatch] = useReducer(meReducer, initialMeState);
 
   const refreshUser = useCallback(async () => {
-    const token =
-      localStorage.getItem("accessToken") ||
-      sessionStorage.getItem("accessToken");
+    if (typeof window === "undefined") {
+      return;
+    }
 
-    if (!token) {
+    const accessToken = localStorage.getItem("accessToken");
+
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    // No authentication at all
+    if (!accessToken && !refreshToken) {
       dispatch({
         type: "SET_USER",
         value: null,
+      });
+
+      dispatch({
+        type: "SET_ERROR",
+        value: "",
       });
 
       dispatch({
@@ -33,7 +44,27 @@ export function useMe() {
       value: true,
     });
 
+    dispatch({
+      type: "SET_ERROR",
+      value: "",
+    });
+
     try {
+      // apiRequest handles:
+      //
+      // access token valid
+      // → /me succeeds
+      //
+      // access token expired
+      // → 401
+      // → refresh token
+      // → new access token
+      // → retry /me
+      //
+      // refresh token expired
+      // → clear tokens
+      // → throw error
+
       if (!meRequest) {
         meRequest = authService.getMe().finally(() => {
           meRequest = null;
@@ -42,11 +73,16 @@ export function useMe() {
 
       const response = await meRequest;
 
+      console.log("GET ME RESPONSE:", response);
+
       dispatch({
         type: "SET_USER",
         value: response.user,
       });
     } catch (error) {
+      // apiRequest clears tokens when
+      // refresh token is expired/invalid.
+
       dispatch({
         type: "SET_USER",
         value: null,
@@ -64,8 +100,22 @@ export function useMe() {
     }
   }, []);
 
+  // Check user when Navbar/page first loads
   useEffect(() => {
     refreshUser();
+  }, [refreshUser]);
+
+  // Listen for login/logout changes
+  useEffect(() => {
+    const handleAuthChange = () => {
+      refreshUser();
+    };
+
+    window.addEventListener("auth-changed", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("auth-changed", handleAuthChange);
+    };
   }, [refreshUser]);
 
   return {
