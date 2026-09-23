@@ -4,22 +4,39 @@ const Order = require("../models/Order");
 const OrderItem = require("../models/OrderItem");
 const Return = require("../models/Return");
 const ReturnItem = require("../models/ReturnItem");
+const ReturnAdminImage = require(
+  "../models/ReturnAdminImage",
+);
 
+// ========================================
 // Create return request
+// ========================================
+
 const createReturn = async (req, res) => {
-  const transaction = await sequelize.transaction();
+  const transaction =
+    await sequelize.transaction();
 
   try {
     const userId = req.user.id;
 
-    const { order_id, reason, note, items } = req.body;
+    const {
+      order_id,
+      reason,
+      note,
+      items,
+    } = req.body;
 
     // Validate request
-    if (!order_id || !reason || !items?.length) {
+    if (
+      !order_id ||
+      !reason ||
+      !items?.length
+    ) {
       await transaction.rollback();
 
       return res.status(400).json({
-        message: "Order, reason and return items are required",
+        message:
+          "Order, reason and return items are required",
       });
     }
 
@@ -29,12 +46,14 @@ const createReturn = async (req, res) => {
         id: order_id,
         user_id: userId,
       },
+
       include: [
         {
           model: OrderItem,
           as: "items",
         },
       ],
+
       transaction,
     });
 
@@ -51,7 +70,8 @@ const createReturn = async (req, res) => {
       await transaction.rollback();
 
       return res.status(400).json({
-        message: "Only delivered orders can be returned",
+        message:
+          "Only delivered orders can be returned",
       });
     }
 
@@ -61,175 +81,291 @@ const createReturn = async (req, res) => {
 
     // Validate every selected item
     for (const item of items) {
-      const orderItem = order.items.find(
-        (orderItem) => orderItem.id === Number(item.order_item_id),
-      );
+      const orderItem =
+        order.items.find(
+          (orderItem) =>
+            orderItem.id ===
+            Number(
+              item.order_item_id,
+            ),
+        );
 
       if (!orderItem) {
         await transaction.rollback();
 
         return res.status(400).json({
-          message: `Order item ${item.order_item_id} not found`,
+          message:
+            `Order item ${item.order_item_id} not found`,
         });
       }
 
-      const quantity = Number(item.quantity);
+      const quantity =
+        Number(item.quantity);
 
       if (
         !Number.isInteger(quantity) ||
         quantity < 1 ||
-        quantity > orderItem.quantity
+        quantity >
+          orderItem.quantity
       ) {
         await transaction.rollback();
 
         return res.status(400).json({
-          message: `Invalid return quantity for ${orderItem.product_name}`,
+          message:
+            `Invalid return quantity for ${orderItem.product_name}`,
         });
       }
 
-      const itemRefundAmount = Number(orderItem.unit_price) * quantity;
+      const itemRefundAmount =
+        Number(
+          orderItem.unit_price,
+        ) * quantity;
 
-      refundAmount += itemRefundAmount;
+      refundAmount +=
+        itemRefundAmount;
 
       returnItemsData.push({
-        order_item_id: orderItem.id,
+        order_item_id:
+          orderItem.id,
+
         quantity,
-        refund_amount: itemRefundAmount,
+
+        refund_amount:
+          itemRefundAmount,
       });
     }
 
     // Create return
-    const returnRequest = await Return.create(
-      {
-        order_id,
-        user_id: userId,
-        status: "REQUESTED",
-        reason,
-        note: note || null,
-        refund_amount: refundAmount,
-      },
-      {
-        transaction,
-      },
-    );
+    const returnRequest =
+      await Return.create(
+        {
+          order_id,
+
+          user_id:
+            userId,
+
+          status:
+            "REQUESTED",
+
+          reason,
+
+          note:
+            note || null,
+
+          refund_amount:
+            refundAmount,
+        },
+
+        {
+          transaction,
+        },
+      );
 
     // Create return items
     await ReturnItem.bulkCreate(
-      returnItemsData.map((item) => ({
-        return_id: returnRequest.id,
-        ...item,
-      })),
+      returnItemsData.map(
+        (item) => ({
+          return_id:
+            returnRequest.id,
+
+          ...item,
+        }),
+      ),
+
       {
         transaction,
       },
     );
+
     await transaction.commit();
 
-    const createdReturn = await Return.findByPk(returnRequest.id, {
-      include: [
+    const createdReturn =
+      await Return.findByPk(
+        returnRequest.id,
         {
-          model: ReturnItem,
-          as: "items",
           include: [
             {
-              model: OrderItem,
-              as: "order_item",
+              model:
+                ReturnItem,
+
+              as: "items",
+
+              include: [
+                {
+                  model:
+                    OrderItem,
+
+                  as: "order_item",
+                },
+              ],
             },
           ],
         },
-      ],
-    });
+      );
 
     return res.status(201).json({
-      message: "Return request created successfully",
-      return: createdReturn,
+      message:
+        "Return request created successfully",
+
+      return:
+        createdReturn,
     });
   } catch (error) {
     await transaction.rollback();
 
-    console.error("Create return error:", error);
+    console.error(
+      "Create return error:",
+      error,
+    );
 
     return res.status(500).json({
-      message: "Internal server error",
+      message:
+        "Internal server error",
     });
   }
 };
 
+// ========================================
 // Get logged-in customer's returns
-const getReturns = async (req, res) => {
+// ========================================
+
+const getReturns = async (
+  req,
+  res,
+) => {
   try {
-    const returns = await Return.findAll({
-      where: {
-        user_id: req.user.id,
-      },
-
-      include: [
-        {
-          model: ReturnItem,
-          as: "items",
-          include: [
-            {
-              model: OrderItem,
-              as: "order_item",
-            },
-          ],
+    const returns =
+      await Return.findAll({
+        where: {
+          user_id:
+            req.user.id,
         },
-      ],
 
-      order: [["created_at", "DESC"]],
-    });
+        include: [
+          {
+            model:
+              ReturnItem,
+
+            as: "items",
+
+            include: [
+              {
+                model:
+                  OrderItem,
+
+                as: "order_item",
+              },
+            ],
+          },
+        ],
+
+        order: [
+          [
+            "created_at",
+            "DESC",
+          ],
+        ],
+      });
 
     return res.status(200).json({
-      message: "Returns fetched successfully",
+      message:
+        "Returns fetched successfully",
+
       returns,
     });
   } catch (error) {
-    console.error("Get returns error:", error);
+    console.error(
+      "Get returns error:",
+      error,
+    );
 
     return res.status(500).json({
-      message: "Internal server error",
+      message:
+        "Internal server error",
     });
   }
 };
 
+// ========================================
 // Get one return
-const getReturnById = async (req, res) => {
-  try {
-    const returnRequest = await Return.findOne({
-      where: {
-        id: req.params.id,
-        user_id: req.user.id,
-      },
+// ========================================
 
-      include: [
-        {
-          model: ReturnItem,
-          as: "items",
-          include: [
-            {
-              model: OrderItem,
-              as: "order_item",
-            },
-          ],
+const getReturnById = async (
+  req,
+  res,
+) => {
+  try {
+    const returnRequest =
+      await Return.findOne({
+        where: {
+          id: req.params.id,
+
+          // Important:
+          // customer can only see own return
+          user_id:
+            req.user.id,
         },
-      ],
-    });
+
+        include: [
+          // Return products
+          {
+            model:
+              ReturnItem,
+
+            as: "items",
+
+            include: [
+              {
+                model:
+                  OrderItem,
+
+                as: "order_item",
+              },
+            ],
+          },
+
+          // Admin rejection images
+          {
+            model:
+              ReturnAdminImage,
+
+            as: "admin_images",
+
+            required: false,
+
+            attributes: [
+              "id",
+              "return_id",
+              "image_url",
+              "created_at",
+            ],
+          },
+        ],
+      });
 
     if (!returnRequest) {
       return res.status(404).json({
-        message: "Return request not found",
+        message:
+          "Return request not found",
       });
     }
 
     return res.status(200).json({
-      message: "Return fetched successfully",
-      return: returnRequest,
+      message:
+        "Return fetched successfully",
+
+      return:
+        returnRequest,
     });
   } catch (error) {
-    console.error("Get return error:", error);
+    console.error(
+      "Get return error:",
+      error,
+    );
 
     return res.status(500).json({
-      message: "Internal server error",
+      message:
+        "Internal server error",
     });
   }
 };

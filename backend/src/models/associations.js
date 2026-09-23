@@ -4,6 +4,7 @@ const Delivery = require("./Delivery");
 const Payment = require("./Payment");
 const Return = require("./Return");
 const ReturnItem = require("./ReturnItem");
+const ReturnAdminImage = require("./ReturnAdminImage");
 
 // Wishlist
 const User = require("./User");
@@ -81,6 +82,21 @@ Order.hasMany(Return, {
 Return.belongsTo(Order, {
   foreignKey: "order_id",
   as: "order",
+});
+
+// ========================================
+// Return → Admin Images
+// ========================================
+
+Return.hasMany(ReturnAdminImage, {
+  foreignKey: "return_id",
+  as: "admin_images",
+  onDelete: "CASCADE",
+});
+
+ReturnAdminImage.belongsTo(Return, {
+  foreignKey: "return_id",
+  as: "return",
 });
 
 // ========================================
@@ -202,11 +218,15 @@ module.exports = {
   OrderItem,
   Delivery,
   Payment,
+
   Return,
   ReturnItem,
+  ReturnAdminImage,
+
   User,
   Product,
   ProductSpecification,
   ProductReview,
   WishlistItem,
+  PaymentMethod,
 };

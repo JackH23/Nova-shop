@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import {
   LayoutDashboard,
   Package,
+  RotateCcw,
   Heart,
   MapPin,
   CreditCard,
@@ -21,6 +23,11 @@ const menuItems = [
     label: "Orders",
     href: "/dashboard/orders",
     icon: Package,
+  },
+  {
+    label: "Returns",
+    href: "/dashboard/returns",
+    icon: RotateCcw,
   },
   {
     label: "Wishlist",
@@ -82,7 +89,9 @@ export default function DashboardSidebar() {
             >
               <Icon size={16} />
 
-              <span>{item.label}</span>
+              <span>
+                {item.label}
+              </span>
             </Link>
           );
         })}
