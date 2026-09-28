@@ -160,7 +160,14 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Login error:", {
+      name: error?.name,
+      message: error?.message,
+      original: error?.original?.message,
+      parent: error?.parent?.message,
+      code: error?.original?.code || error?.parent?.code,
+      stack: error?.stack,
+    });
 
     return res.status(500).json({
       message: "Internal server error",
