@@ -2,5 +2,13 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "nova-shop-backend",
   "main": "src/worker.js",
-  "compatibility_date": "2026-09-28"
+  "compatibility_date": "2026-09-28",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "ae44e8ab08e943568d0bf50dc677b831"
+    }
+  ]
 }
