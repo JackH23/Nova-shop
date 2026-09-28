@@ -1,45 +1,49 @@
-const rateLimit = require("express-rate-limit");
+const attempts = new Map();
 
-const loginRateLimiter = rateLimit({
-  // 15-minute window
-  windowMs: 15 * 60 * 1000,
+const WINDOW_MS = 15 * 60 * 1000;
+const MAX_ATTEMPTS = 5;
 
-  // Maximum 5 attempts per IP
-  limit: 5,
+const loginRateLimiter = (req, res, next) => {
+  const ip =
+    req.headers["cf-connecting-ip"] ||
+    req.headers["x-forwarded-for"] ||
+    req.ip ||
+    "unknown";
 
-  standardHeaders: "draft-8",
-  legacyHeaders: false,
+  const now = Date.now();
 
-  handler: (req, res) => {
-    const resetTime = req.rateLimit.resetTime;
+  let record = attempts.get(ip);
 
-    let retryAfterSeconds = 15 * 60;
+  if (!record || now >= record.resetAt) {
+    record = {
+      count: 0,
+      resetAt: now + WINDOW_MS,
+    };
+  }
 
-    if (resetTime) {
-      retryAfterSeconds = Math.max(
-        1,
-        Math.ceil(
-          (resetTime.getTime() - Date.now()) / 1000,
-        ),
-      );
-    }
+  record.count += 1;
+  attempts.set(ip, record);
 
-    const minutes = Math.floor(
-      retryAfterSeconds / 60,
+  if (record.count > MAX_ATTEMPTS) {
+    const retryAfterSeconds = Math.max(
+      1,
+      Math.ceil((record.resetAt - now) / 1000),
     );
 
-    const seconds =
-      retryAfterSeconds % 60;
+    const minutes = Math.floor(retryAfterSeconds / 60);
+    const seconds = retryAfterSeconds % 60;
+
+    res.setHeader("Retry-After", retryAfterSeconds);
 
     return res.status(429).json({
       message: "Too many login attempts.",
       retryAfterSeconds,
-      retryAfterMinutes: Math.ceil(
-        retryAfterSeconds / 60,
-      ),
+      retryAfterMinutes: Math.ceil(retryAfterSeconds / 60),
       retryAfterText: `${minutes}m ${seconds}s`,
     });
-  },
-});
+  }
+
+  next();
+};
 
 module.exports = loginRateLimiter;

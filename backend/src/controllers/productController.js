@@ -26,7 +26,6 @@ const getProducts = async (req, res) => {
 
     const where = {
       is_active: true,
-      status: "ACTIVE",
       online_store_enabled: true,
     };
 
@@ -170,7 +169,6 @@ const getProductById = async (req, res) => {
       where: {
         id,
         is_active: true,
-        status: "ACTIVE",
         online_store_enabled: true,
       },
 
