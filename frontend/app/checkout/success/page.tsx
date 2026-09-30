@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useOrderDetail } from "@/composables/useOrderDetail";
 
-export default function OrderSuccessPage() {
+function OrderSuccessContent() {
   const searchParams = useSearchParams();
-
   const orderIdParam = searchParams.get("orderId");
-
   const orderId = orderIdParam ? Number(orderIdParam) : null;
 
   const { order, loading, error } = useOrderDetail(orderId);
@@ -29,12 +28,10 @@ export default function OrderSuccessPage() {
   return (
     <main className="flex min-h-[70vh] items-center justify-center bg-slate-50 px-4 py-12">
       <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
-        {/* Success icon */}
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100">
           <Check className="text-indigo-600" size={28} />
         </div>
 
-        {/* Message */}
         <h1 className="mt-6 text-2xl font-bold text-slate-900">
           Thank you for your order!
         </h1>
@@ -43,7 +40,6 @@ export default function OrderSuccessPage() {
           Your order has been placed successfully and is being processed.
         </p>
 
-        {/* Order information */}
         <div className="mt-6 rounded-md border border-slate-200 bg-slate-50 p-4">
           <div className="flex items-center justify-between gap-4">
             <span className="text-sm text-slate-500">Order Number</span>
@@ -54,7 +50,6 @@ export default function OrderSuccessPage() {
           </div>
         </div>
 
-        {/* Actions */}
         <div className="mt-6 grid grid-cols-2 gap-3">
           <Link
             href={`/dashboard/orders/${order.id}`}
@@ -72,5 +67,13 @@ export default function OrderSuccessPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function OrderSuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading order...</div>}>
+      <OrderSuccessContent />
+    </Suspense>
   );
 }
