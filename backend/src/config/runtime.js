@@ -15,6 +15,7 @@ function setWorkerEnv(env) {
     "GOOGLE_CLIENT_ID",
     "FRONTEND_URL",
     "R2_PUBLIC_URL",
+    "R2_PUBLIC_URL",
   ];
 
   for (const key of passthrough) {
