@@ -1,11 +1,10 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import VerifyResetCodeForm from "@/components/auth/VerifyResetCodeForm";
 
 export default function VerifyResetCodePage() {
-
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#f8f9ff] px-4">
-      {/* Brand */}
       <div className="mt-8 flex items-center gap-2 text-indigo-600">
         <div className="h-5 w-5 rotate-45 rounded-sm bg-indigo-600" />
 
@@ -14,14 +13,11 @@ export default function VerifyResetCodePage() {
         </span>
       </div>
 
-      {/* Card */}
       <div className="mt-7 w-full max-w-[395px] rounded-xl border border-[#d9dbea] bg-white px-7 py-7 shadow-sm">
-        {/* Icon */}
         <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
           <CodeIcon />
         </div>
 
-        {/* Header */}
         <div className="mb-6">
           <h1 className="text-xl font-bold text-slate-900">
             Verify reset code
@@ -32,10 +28,10 @@ export default function VerifyResetCodePage() {
           </p>
         </div>
 
-        {/* Form */}
-        <VerifyResetCodeForm />
+        <Suspense fallback={<VerifyResetCodeFallback />}>
+          <VerifyResetCodeForm />
+        </Suspense>
 
-        {/* Back */}
         <div className="mt-5 text-center">
           <Link
             href="/forgot-password"
@@ -46,6 +42,14 @@ export default function VerifyResetCodePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+function VerifyResetCodeFallback() {
+  return (
+    <p className="py-4 text-center text-sm text-slate-500">
+      Loading verification form...
+    </p>
   );
 }
 
