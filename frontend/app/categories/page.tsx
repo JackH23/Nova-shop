@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useProductFilters } from "@/composables/useProductFilters";
 import CategoryFilters from "@/components/products/CategoryFilters";
 import ProductList from "@/components/products/ProductList";
@@ -10,7 +10,7 @@ import ConfirmModal from "@/components/common/ConfirmModal";
 import { useCartToast } from "@/composables/useCartToast";
 import { useCategories } from "@/composables/useCategories";
 
-export default function CategoriesPage() {
+function CategoriesContent() {
   const [cartError, setCartError] = useState("");
 
   const {
@@ -85,5 +85,13 @@ export default function CategoriesPage() {
         onCancel={() => setCartError("")}
       />
     </>
+  );
+}
+
+export default function CategoriesPage() {
+  return (
+    <Suspense fallback={<div>Loading categories...</div>}>
+      <CategoriesContent />
+    </Suspense>
   );
 }
