@@ -24,19 +24,13 @@ const upload = multer({
     if (!allowedTypes.has(file.mimetype)) {
       return cb(new Error("Only JPG, PNG and WEBP images are allowed"));
     }
-
     cb(null, true);
   },
 });
 
 router.get("/", authMiddleware, getAccountSettings);
 router.put("/profile", authMiddleware, updateProfile);
-router.put(
-  "/profile-image",
-  authMiddleware,
-  upload.single("profileImage"),
-  updateProfileImage,
-);
+router.put("/profile-image", authMiddleware, upload.single("profileImage"), updateProfileImage);
 router.put("/password", authMiddleware, changePassword);
 router.delete("/", authMiddleware, deleteAccount);
 
