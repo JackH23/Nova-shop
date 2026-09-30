@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import VerifyEmailForm from "@/components/auth/VerifyEmailForm";
 
 export default function VerifyEmailPage() {
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email") ?? "";
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#f8f9ff] px-4">
@@ -34,7 +39,7 @@ export default function VerifyEmailPage() {
         </div>
 
         {/* Verify email form */}
-        <VerifyEmailForm />
+        <VerifyEmailForm email={email} />
 
         {/* Back */}
         <div className="mt-5 text-center">
