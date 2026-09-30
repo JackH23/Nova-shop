@@ -4,6 +4,12 @@
   "main": "worker.js",
   "compatibility_date": "2026-09-30",
   "compatibility_flags": ["nodejs_compat"],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "73cea7bc13eb4f04a1b7683f786f177d"
+    }
+  ],
   "r2_buckets": [
     {
       "binding": "UPLOADS",
