@@ -1,7 +1,6 @@
 const path = require("path");
 const express = require("express");
 const runtime = require("./config/runtime");
-const runtime = require("./config/runtime");
 const cors = require("cors");
 
 // Load Sequelize associations
