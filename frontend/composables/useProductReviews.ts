@@ -6,20 +6,10 @@ import {
   type CreateReviewData,
 } from "@/services/reviewService";
 import { useAuth } from "@/components/shared/auth/AuthModalProvider";
+import type { ProductReview } from "@/lib/products";
 
-export type ProductReview = {
-  id: number;
-  product_id: number;
-  user_id: number;
-  rating: number;
-  title: string | null;
-  comment: string;
-  is_verified_purchase: boolean;
-  created_at: string;
-  user?: {
-    id: number;
-    fullName: string;
-  };
+type ProductReviewsResponse = {
+  reviews?: ProductReview[];
 };
 
 export function useProductReviews(productId: number) {
@@ -36,7 +26,7 @@ export function useProductReviews(productId: number) {
       setError(null);
 
       const response =
-        await reviewService.getProductReviews(productId);
+        (await reviewService.getProductReviews(productId)) as ProductReviewsResponse;
 
       setReviews(response.reviews ?? []);
     } catch (error) {
@@ -66,9 +56,6 @@ export function useProductReviews(productId: number) {
 
       return true;
     } catch (error) {
-      // ========================================
-      // Unauthorized
-      // ========================================
       if (
         error instanceof Error &&
         error.message === "Authentication required."
@@ -80,9 +67,6 @@ export function useProductReviews(productId: number) {
         return false;
       }
 
-      // ========================================
-      // Other errors
-      // ========================================
       setError(
         error instanceof Error
           ? error.message
