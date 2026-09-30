@@ -18,7 +18,6 @@ type CategoryProductListProps = {
 
 export default function CategoryProductList({
   category,
-  products,
   minPrice = 0,
   maxPrice = 500,
   inStock = false,
@@ -35,18 +34,15 @@ export default function CategoryProductList({
     currentPage,
     setCurrentPage,
     totalPages,
-    startIndex,
-    itemsPerPage: productsPerPage,
     paginatedItems: paginatedProducts,
     sortBy,
     setSortBy,
   } = useProductList({
-    products,
     minPrice,
     maxPrice,
     inStock,
     onSale,
-    category,
+    search: categoryName,
   });
 
   return (
@@ -72,24 +68,14 @@ export default function CategoryProductList({
 
       {/* Product content */}
       <div className="mt-8">
-        {/* Product count + Sort */}
         <div className="mb-5 flex items-center justify-between">
           <p className="text-sm text-slate-600">
-            {filteredProducts.length === 0
-              ? "Showing 0 products"
-              : `Showing ${startIndex + 1}-${Math.min(
-                  startIndex + productsPerPage,
-                  filteredProducts.length,
-                )} of ${filteredProducts.length} products`}
+            Showing {filteredProducts.length} products
           </p>
 
-          <ProductSort
-            value={sortBy}
-            onChange={setSortBy}
-          />
+          <ProductSort value={sortBy} onChange={setSortBy} />
         </div>
 
-        {/* Products */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {paginatedProducts.map((product) => (
             <ProductCard
@@ -100,7 +86,6 @@ export default function CategoryProductList({
           ))}
         </div>
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
