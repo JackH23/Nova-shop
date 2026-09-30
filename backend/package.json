@@ -7,7 +7,8 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "dev:cloudflare": "npx wrangler dev",
-    "deploy:cloudflare": "npx wrangler deploy"
+    "deploy:cloudflare": "npx wrangler deploy",
+    "db:neon:init": "node src/scripts/initNeonDatabase.js"
   },
   "keywords": [],
   "author": "",

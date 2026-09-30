@@ -1,5 +1,6 @@
 const path = require("path");
 const express = require("express");
+const runtime = require("./config/runtime");
 const cors = require("cors");
 
 // Load Sequelize associations
@@ -33,6 +34,17 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  req.workerEnv = runtime.getWorkerEnv();
+  next();
+});
+
+// Expose the current Worker environment to routes that need Cloudflare bindings.
+app.use((req, res, next) => {
+  req.workerEnv = runtime.getWorkerEnv();
+  next();
+});
 
 // Local Node development can serve files from disk. Cloudflare Workers do not
 // provide a persistent local filesystem, so production uploads should move to
