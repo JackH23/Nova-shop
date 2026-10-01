@@ -8,19 +8,8 @@ async function getTransporter() {
     throw new Error("EMAIL_USER and EMAIL_APP_PASSWORD are required");
   }
 
-  let host = "smtp.gmail.com";
+  const host = "smtp.gmail.com";
   const port = 587;
-
-  if (process.env.CLOUDFLARE_WORKER === "true") {
-    const dns = require("node:dns").promises;
-    const addresses = await dns.resolve4(host);
-
-    if (!addresses.length) {
-      throw new Error("Gmail SMTP DNS returned no IPv4 address");
-    }
-
-    host = addresses[0];
-  }
 
   console.log("SMTP connection target:", {
     worker: process.env.CLOUDFLARE_WORKER,
