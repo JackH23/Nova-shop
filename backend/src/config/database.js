@@ -49,4 +49,49 @@ const sequelize = isProduction
       },
     );
 
+// Models retain their definitions and associations on this Sequelize instance.
+// Only the connection manager is request-scoped; model queries and transactions
+// resolve it through AsyncLocalStorage, including concurrent Express requests.
+if (isCloudflareWorker) {
+  const { AsyncLocalStorage } = require("node:async_hooks");
+  const requests = new AsyncLocalStorage();
+  const definitionManager = sequelize.connectionManager;
+
+  Object.defineProperty(sequelize, "connectionManager", {
+    configurable: true,
+    get() {
+      return requests.getStore()?.database.connectionManager ?? definitionManager;
+    },
+  });
+
+  sequelize.withRequestDatabase = (next) => {
+    const database = new Sequelize(process.env.DATABASE_URL, {
+      dialect: "postgres",
+      dialectModule: pg,
+      dialectOptions: {},
+      pool: { max: 5, min: 0, acquire: 30000, idle: 1000, evict: 1000, maxUses: 1 },
+      logging: false,
+    });
+
+    // Log connection failures as one event instead of a split stack trace.
+    const manager = database.connectionManager;
+    const acquire = manager.getConnection.bind(manager);
+    manager.getConnection = async (...args) => {
+      try {
+        return await acquire(...args);
+      } catch (error) {
+        console.error("Database connection error details:", JSON.stringify({
+          name: error.name,
+          message: error.message,
+          code: error.original?.code ?? error.parent?.code,
+          cause: error.original?.message ?? error.parent?.message,
+        }));
+        throw error;
+      }
+    };
+
+    return requests.run({ database }, () => next(database));
+  };
+}
+
 module.exports = sequelize;
