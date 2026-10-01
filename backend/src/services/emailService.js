@@ -9,6 +9,7 @@ async function getTransporter() {
   }
 
   let host = "smtp.gmail.com";
+  const port = 587;
 
   if (process.env.CLOUDFLARE_WORKER === "true") {
     const dns = require("node:dns").promises;
@@ -24,13 +25,14 @@ async function getTransporter() {
   console.log("SMTP connection target:", {
     worker: process.env.CLOUDFLARE_WORKER,
     host,
-    port: 465,
+    port,
   });
 
   return nodemailer.createTransport({
     host,
-    port: 465,
-    secure: true,
+    port,
+    secure: false,
+    requireTLS: true,
     tls: {
       servername: "smtp.gmail.com",
     },
@@ -80,11 +82,7 @@ const sendVerificationEmail = async (email, code) => {
   });
 };
 
-const sendAdminOrderNotification = async ({
-  order,
-  payment,
-  customer,
-}) => {
+const sendAdminOrderNotification = async ({ order, payment, customer }) => {
   const adminEmail = process.env.ADMIN_EMAIL?.trim();
 
   if (!adminEmail) {
