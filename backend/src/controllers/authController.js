@@ -7,6 +7,7 @@ const { sendVerificationEmail } = require("../services/emailService");
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const register = async (req, res) => {
+  let registrationStage = "validation";
   try {
     const { fullName, email, password, confirmPassword, acceptTerms } =
       req.body;
@@ -33,6 +34,7 @@ const register = async (req, res) => {
     }
 
     // Check if email already exists
+    registrationStage = "find-user";
     const existingUser = await User.findOne({
       where: { email },
     });
@@ -44,6 +46,7 @@ const register = async (req, res) => {
     }
 
     // Hash password before saving
+    registrationStage = "hash-password";
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Generate 6-digit verification code
@@ -55,6 +58,7 @@ const register = async (req, res) => {
     const verificationCodeExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     // Create user
+    registrationStage = "create-user";
     const user = await User.create({
       fullName,
       email,
@@ -64,7 +68,11 @@ const register = async (req, res) => {
       termsAcceptedAt: new Date(),
     });
 
+    registrationStage = "send-verification-email";
+    console.log("Registration: user created; sending verification email");
     await sendVerificationEmail(user.email, verificationCode);
+    console.log("Registration: verification email sent");
+    registrationStage = "respond";
 
     return res.status(201).json({
       message: "Registration successful. Please verify your email.",
@@ -77,6 +85,7 @@ const register = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Register failure stage:", registrationStage);
     console.error("Register error:", error);
 
     return res.status(500).json({
