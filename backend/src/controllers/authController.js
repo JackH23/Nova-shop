@@ -86,7 +86,17 @@ const register = async (req, res) => {
     });
   } catch (error) {
     console.error("Register failure stage:", registrationStage);
-    console.error("Register error:", error);
+    console.error(
+      "Register error details:",
+      JSON.stringify({
+        name: error?.name,
+        message: error?.message ?? String(error),
+        code: error?.code,
+        command: error?.command,
+        responseCode: error?.responseCode,
+        cause: error?.cause?.message,
+      }),
+    );
 
     return res.status(500).json({
       message: "Internal server error",
@@ -226,18 +236,9 @@ const refreshToken = async (req, res) => {
 
 const me = async (req, res) => {
   try {
-    const user = await User.findByPk(
-      req.user.id,
-      {
-        attributes: [
-          "id",
-          "fullName",
-          "email",
-          "profileImage",
-          "isVerified",
-        ],
-      },
-    );
+    const user = await User.findByPk(req.user.id, {
+      attributes: ["id", "fullName", "email", "profileImage", "isVerified"],
+    });
 
     if (!user) {
       return res.status(404).json({
@@ -249,10 +250,7 @@ const me = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error(
-      "Get current user error:",
-      error,
-    );
+    console.error("Get current user error:", error);
 
     return res.status(500).json({
       message: "Internal server error",
