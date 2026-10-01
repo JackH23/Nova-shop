@@ -2,6 +2,9 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "nova-shop-customer-api",
   "main": "worker.js",
+  "vars": {
+    "EMAIL_USER": "sihalardjacky@gmail.com"
+  },
   "compatibility_date": "2026-09-30",
   "compatibility_flags": ["nodejs_compat"],
   "hyperdrive": [
