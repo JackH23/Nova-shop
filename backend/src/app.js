@@ -21,6 +21,26 @@ const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 
+// Scope database connections to the HTTP request, before any route runs.
+if (process.env.CLOUDFLARE_WORKER === "true") {
+  const sequelize = require("./config/database");
+  app.use((req, res, next) => {
+    sequelize.withRequestDatabase((database) => {
+      let closed = false;
+      const cleanup = () => {
+        if (closed) return;
+        closed = true;
+        database.close().catch((error) => {
+          console.error("Database cleanup error:", error.name, error.message);
+        });
+      };
+      res.once("finish", cleanup);
+      res.once("close", cleanup);
+      next();
+    });
+  });
+}
+
 app.use(cors());
 
 app.use((req, res, next) => {
