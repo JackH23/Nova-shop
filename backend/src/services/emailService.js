@@ -41,7 +41,62 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
+
+async function sendWithGmailApi(options) {
+  const names = ["EMAIL_USER", "GMAIL_CLIENT_ID", "GMAIL_CLIENT_SECRET", "GMAIL_REFRESH_TOKEN"];
+  const settings = Object.fromEntries(names.map(name => [name, process.env[name]?.trim()]));
+  for (const name of names) {
+    if (!settings[name]) throw new Error(name + " is required for Gmail API");
+  }
+
+  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: settings.GMAIL_CLIENT_ID,
+      client_secret: settings.GMAIL_CLIENT_SECRET,
+      refresh_token: settings.GMAIL_REFRESH_TOKEN,
+      grant_type: "refresh_token",
+    }),
+    signal: AbortSignal.timeout(15000),
+  });
+  const token = await tokenResponse.json();
+  if (!tokenResponse.ok || !token.access_token) {
+    throw new Error("Gmail OAuth token refresh failed: " + (token.error || tokenResponse.status));
+  }
+
+  // Nodemailer only builds the MIME message here; it opens no SMTP connection.
+  const composer = nodemailer.createTransport({
+    streamTransport: true,
+    buffer: true,
+    newline: "windows",
+  });
+  const message = await composer.sendMail({
+    ...options,
+    from: { name: "NovaShop", address: settings.EMAIL_USER },
+  });
+  const response = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token.access_token,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ raw: message.message.toString("base64url") }),
+    signal: AbortSignal.timeout(20000),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error("Gmail API send failed: " + response.status + " " + (result.error?.status || ""));
+  }
+  console.log("Gmail API: email accepted");
+  return result;
+}
+
 async function sendEmail(options) {
+  if (process.env.CLOUDFLARE_WORKER === "true") {
+    return sendWithGmailApi(options);
+  }
+
   const transporter = await getTransporter();
 
   try {
