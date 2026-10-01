@@ -21,6 +21,12 @@ async function getTransporter() {
     host = addresses[0];
   }
 
+  console.log("SMTP connection target:", {
+    worker: process.env.CLOUDFLARE_WORKER,
+    host,
+    port: 465,
+  });
+
   return nodemailer.createTransport({
     host,
     port: 465,
