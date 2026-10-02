@@ -70,7 +70,19 @@ app.use((req, res, next) => {
 // provide a persistent local filesystem, so production uploads should move to
 // object storage (for example, R2) before relying on this route in production.
 if (process.env.CLOUDFLARE_WORKER !== "true") {
-  app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+  // Customer uploads, including customer profile images
+  app.use(
+    "/uploads",
+    express.static(path.join(__dirname, "../uploads")),
+  );
+
+  // Product images uploaded through admin
+  app.use(
+    "/uploads/products",
+    express.static(
+      "D:/pull from git/Nova-shop-admin/backend/uploads/products",
+    ),
+  );
 }
 
 app.use("/api/auth", authRoutes);

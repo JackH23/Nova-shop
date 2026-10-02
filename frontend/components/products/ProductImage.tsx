@@ -16,8 +16,7 @@ export default function ProductImage({
   unoptimized = true,
 }: ProductImageProps) {
   const PRODUCT_IMAGE_URL =
-    process.env.NEXT_PUBLIC_PRODUCT_IMAGE_URL ||
-    "http://localhost:5001";
+    process.env.NEXT_PUBLIC_PRODUCT_IMAGE_URL;
 
   const imageUrl = image
     ? image.startsWith("http")
