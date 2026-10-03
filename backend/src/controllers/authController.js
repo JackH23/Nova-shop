@@ -2,7 +2,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { OAuth2Client } = require("google-auth-library");
-const { sendVerificationEmail } = require("../services/emailService");
+const {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+} = require("../services/emailService");
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -414,10 +417,10 @@ const forgotPassword = async (req, res) => {
 
     await user.save();
 
-    console.log("Password reset code:", resetCode);
+    await sendPasswordResetEmail(user.email, resetCode);
 
     return res.status(200).json({
-      message: "Password reset code generated successfully",
+      message: "Password reset code sent successfully",
     });
   } catch (error) {
     console.error("Forgot password error:", error);
