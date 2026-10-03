@@ -137,6 +137,14 @@ async function removeProfileImage(req, image) {
 const updateProfileImage = async (req, res) => {
   let newImage;
   let saved = false;
+
+  const startedAt = Date.now();
+
+  const logTime = (step) => {
+    console.log(
+      `[profile-image] ${step}: ${Date.now() - startedAt}ms`,
+    );
+  };
   try {
     if (!req.file?.buffer) {
       return res.status(400).json({ message: "Profile image is required" });
@@ -147,6 +155,7 @@ const updateProfileImage = async (req, res) => {
       return res.status(400).json({ message: "Use JPG, PNG or WEBP up to 5MB" });
     }
     const user = await User.findByPk(req.user.id);
+    logTime("user fetched");
     if (!user) return res.status(404).json({ message: "User not found" });
     const oldImage = user.profileImage;
     const filename = user.id + "-" + randomUUID() + "." + extension;
@@ -164,13 +173,23 @@ const updateProfileImage = async (req, res) => {
       await fs.promises.writeFile(path.join(directory, filename), req.file.buffer);
     }
 
+    logTime("image stored");
+
     user.profileImage = newImage;
+
     await user.save();
+
+    logTime("database updated");
+
     saved = true;
-    // Cleanup failure must not turn a successful update into a failed upload.
-    await removeProfileImage(req, oldImage).catch(error => {
+
+    // Cleanup old image without delaying the successful response.
+    removeProfileImage(req, oldImage).catch(error => {
       console.error("Old profile image cleanup failed:", error.message);
     });
+
+    logTime("sending response");
+
     return res.status(200).json({
       message: "Profile image updated successfully",
       user: {
