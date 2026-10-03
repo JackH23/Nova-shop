@@ -8,7 +8,7 @@ type VerifyResetCodeModalProps = {
   email: string;
   onClose: () => void;
   onBack: () => void;
-  onSuccess: () => void;
+  onSuccess: (code: string) => void;
 };
 
 export default function VerifyResetCodeModal({
