@@ -46,6 +46,7 @@ export default function ProfileModal({
       {/* User */}
       <Link
         href="/dashboard/settings"
+        prefetch={false}
         onClick={onClose}
         className="flex items-center gap-3 rounded-md p-2 transition hover:bg-slate-50"
       >
@@ -72,6 +73,7 @@ export default function ProfileModal({
       <div className="mt-4 border-t border-slate-100 pt-3">
         <Link
           href="/dashboard/orders"
+          prefetch={false}
           onClick={onClose}
           className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
         >
