@@ -12,51 +12,35 @@ import { validation } from "@/validations/validation";
 
 export function useVerifyResetCode(
   email: string,
-  onSuccess?: () => void,
+  onSuccess?: (code: string) => void,
 ) {
   const [state, dispatch] = useReducer(
     verifyResetCodeReducer,
     initialVerifyResetCodeState,
   );
 
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    dispatch({ type: "SET_ERROR", value: "" });
 
-    dispatch({
-      type: "SET_ERROR",
-      value: "",
-    });
-
-    const codeError = validation.required(
-      state.code,
-      "Verification code",
-    );
+    const codeError = validation.required(state.code, "Verification code");
 
     if (codeError) {
-      dispatch({
-        type: "SET_ERROR",
-        value: codeError,
-      });
-
+      dispatch({ type: "SET_ERROR", value: codeError });
       return;
     }
 
-    dispatch({
-      type: "SET_LOADING",
-      value: true,
-    });
+    dispatch({ type: "SET_LOADING", value: true });
 
     try {
+      const code = state.code.trim();
+
       await authService.verifyResetCode({
         email: email.trim(),
-        code: state.code.trim(),
+        code,
       });
 
-      // Verification succeeded.
-      // Open ResetPasswordModal instead of navigating to a page.
-      onSuccess?.();
+      onSuccess?.(code);
     } catch (error) {
       dispatch({
         type: "SET_ERROR",
@@ -66,38 +50,22 @@ export function useVerifyResetCode(
             : "Reset code verification failed",
       });
     } finally {
-      dispatch({
-        type: "SET_LOADING",
-        value: false,
-      });
+      dispatch({ type: "SET_LOADING", value: false });
     }
   };
 
   const handleResendCode = async () => {
-    dispatch({
-      type: "SET_ERROR",
-      value: "",
-    });
+    dispatch({ type: "SET_ERROR", value: "" });
 
     if (!email.trim()) {
-      dispatch({
-        type: "SET_ERROR",
-        value: "Email is required",
-      });
-
+      dispatch({ type: "SET_ERROR", value: "Email is required" });
       return;
     }
 
-    dispatch({
-      type: "SET_LOADING",
-      value: true,
-    });
+    dispatch({ type: "SET_LOADING", value: true });
 
     try {
-      await authService.forgotPassword({
-        email: email.trim(),
-      });
-
+      await authService.forgotPassword({ email: email.trim() });
       console.log("Reset code resent successfully");
     } catch (error) {
       dispatch({
@@ -108,17 +76,9 @@ export function useVerifyResetCode(
             : "Failed to resend reset code",
       });
     } finally {
-      dispatch({
-        type: "SET_LOADING",
-        value: false,
-      });
+      dispatch({ type: "SET_LOADING", value: false });
     }
   };
 
-  return {
-    state,
-    dispatch,
-    handleSubmit,
-    handleResendCode,
-  };
+  return { state, dispatch, handleSubmit, handleResendCode };
 }
