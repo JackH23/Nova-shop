@@ -4,7 +4,7 @@
   "main": "worker.js",
   "vars": {
     "EMAIL_USER": "sihalardjacky@gmail.com",
-    "JWT_ACCESS_EXPIRES_IN": "1m",
+    "JWT_ACCESS_EXPIRES_IN": "15m",
     "JWT_REFRESH_EXPIRES_IN": "7d"
   },
   "compatibility_date": "2026-09-30",
