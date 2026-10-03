@@ -100,10 +100,23 @@ async function sendEmail(options) {
   const transporter = await getTransporter();
 
   try {
-    return await transporter.sendMail({
+    const result = await transporter.sendMail({
       from: `"NovaShop" <${process.env.EMAIL_USER.trim()}>`,
       ...options,
     });
+
+    console.log("SMTP email accepted:", {
+      messageId: result.messageId,
+      accepted: result.accepted,
+      rejected: result.rejected,
+      response: result.response,
+    });
+
+    if (!result.accepted?.length) {
+      throw new Error("SMTP server did not accept the recipient");
+    }
+
+    return result;
   } finally {
     transporter.close();
   }
@@ -112,7 +125,8 @@ async function sendEmail(options) {
 const sendVerificationEmail = async (email, code) => {
   return sendEmail({
     to: email,
-    subject: "Verify your NovaShop account",
+    subject: "Your NovaShop verification code",
+    text: `Your NovaShop verification code is: ${code}. This code expires in 10 minutes.`,
     html: `
       <h2>Verify your email</h2>
       <p>Your verification code is:</p>
@@ -129,7 +143,8 @@ const sendVerificationEmail = async (email, code) => {
 const sendPasswordResetEmail = async (email, code) => {
   return sendEmail({
     to: email,
-    subject: "Reset your NovaShop password",
+    subject: "Your NovaShop password reset code",
+    text: `Your NovaShop password reset code is: ${code}. This code expires in 10 minutes.`,
     html: `
       <h2>Reset your password</h2>
       <p>Your password reset code is:</p>
