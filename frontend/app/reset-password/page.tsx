@@ -1,6 +1,23 @@
+"use client";
+
 import Link from "next/link";
 import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
+
+function ResetPasswordContent() {
+  const searchParams = useSearchParams();
+
+  const email = searchParams.get("email") || "";
+  const code = searchParams.get("code") || "";
+
+  return (
+    <ResetPasswordForm
+      email={email}
+      code={code}
+    />
+  );
+}
 
 export default function ResetPasswordPage() {
   return (
@@ -29,7 +46,7 @@ export default function ResetPasswordPage() {
         </div>
 
         <Suspense fallback={<div>Loading reset password form...</div>}>
-          <ResetPasswordForm />
+          <ResetPasswordContent />
         </Suspense>
 
         <div className="mt-6 text-center">
