@@ -3,10 +3,14 @@
   "name": "nova-shop-customer-api",
   "main": "worker.js",
   "vars": {
-    "EMAIL_USER": "sihalardjacky@gmail.com"
+    "EMAIL_USER": "sihalardjacky@gmail.com",
+    "JWT_ACCESS_EXPIRES_IN": "1m",
+    "JWT_REFRESH_EXPIRES_IN": "7d"
   },
   "compatibility_date": "2026-09-30",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",
