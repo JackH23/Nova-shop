@@ -48,7 +48,7 @@ export default function Navbar() {
         {/* Free shipping bar */}
         <div className="bg-[#3324d8] py-1.5 text-center text-[10px] font-semibold text-white">
           Free Shipping on Orders Over $100.{" "}
-          <Link href="/products" className="underline">
+          <Link href="/products" prefetch={false} className="underline">
             Shop Now
           </Link>
         </div>
@@ -57,7 +57,7 @@ export default function Navbar() {
         <div className="border-b border-slate-200">
           <div className="mx-auto flex h-[70px] max-w-[1440px] items-center px-9">
             {/* Logo */}
-            <Link href="/home" className="text-[18px] font-bold text-[#3324d8]">
+            <Link href="/home" prefetch={false} className="text-[18px] font-bold text-[#3324d8]">
               NovaShop
             </Link>
 
@@ -67,6 +67,7 @@ export default function Navbar() {
               {/* Shop */}
               <Link
                 href="/products"
+                prefetch={false}
                 className={`flex h-full items-center border-b-2 transition ${
                   pathname.startsWith("/products")
                     ? "border-[#4b3cf0] text-[#3324d8]"
@@ -79,6 +80,7 @@ export default function Navbar() {
               {/* Categories */}
               <Link
                 href="/categories"
+                prefetch={false}
                 className={`flex h-full items-center border-b-2 transition ${
                   pathname.startsWith("/categories")
                     ? "border-[#4b3cf0] text-[#3324d8]"
@@ -91,6 +93,7 @@ export default function Navbar() {
               {/* Deals */}
               <Link
                 href="/deals"
+                prefetch={false}
                 className={`flex h-full items-center border-b-2 transition ${
                   pathname.startsWith("/deals")
                     ? "border-[#4b3cf0] text-[#3324d8]"
@@ -103,6 +106,7 @@ export default function Navbar() {
               {/* New Arrivals */}
               <Link
                 href="/new-arrivals"
+                prefetch={false}
                 className={`flex h-full items-center border-b-2 transition ${
                   pathname.startsWith("/new-arrivals")
                     ? "border-[#4b3cf0] text-[#3324d8]"
@@ -142,6 +146,7 @@ export default function Navbar() {
                         <Link
                           key={product.id}
                           href={`/products/${product.id}`}
+                          prefetch={false}
                           onClick={() => {
                             setSearch("");
                           }}
@@ -182,6 +187,7 @@ export default function Navbar() {
               {/* Wishlist */}
               <Link
                 href="/dashboard/wishlist"
+                prefetch={false}
                 className="text-[#3324d8] transition hover:opacity-70"
                 aria-label="Wishlist"
               >
@@ -191,6 +197,7 @@ export default function Navbar() {
               {/* Cart */}
               <Link
                 href="/cart"
+                prefetch={false}
                 className="relative text-[#3324d8] transition hover:opacity-70"
                 aria-label="Cart"
               >
