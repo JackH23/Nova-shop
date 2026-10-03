@@ -106,7 +106,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password, rememberMe } = req.body;
+    const { email, password } = req.body;
 
     // Check required fields
     if (!email || !password) {
@@ -152,7 +152,7 @@ const login = async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1m",
+        expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
       },
     );
 
@@ -164,7 +164,7 @@ const login = async (req, res) => {
       },
       process.env.JWT_REFRESH_SECRET,
       {
-        expiresIn: rememberMe === true ? "30d" : "1d",
+        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
       },
     );
 
@@ -217,7 +217,7 @@ const refreshToken = async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1m",
+        expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
       },
     );
 
@@ -545,7 +545,7 @@ const resetPassword = async (req, res) => {
 
 const googleLogin = async (req, res) => {
   try {
-    const { credential, rememberMe } = req.body;
+    const { credential } = req.body;
 
     if (!credential) {
       return res.status(400).json({
@@ -622,7 +622,7 @@ const googleLogin = async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1m",
+        expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
       },
     );
 
@@ -634,7 +634,7 @@ const googleLogin = async (req, res) => {
       },
       process.env.JWT_REFRESH_SECRET,
       {
-        expiresIn: rememberMe === true ? "30d" : "1d",
+        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
       },
     );
 

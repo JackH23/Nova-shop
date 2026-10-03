@@ -2,7 +2,7 @@ import Link from "next/link";
 
 type EmptyStateProps = {
   title: string;
-  description: string;
+  description?: string;
   actionText?: string;
   actionHref?: string;
 };
@@ -19,9 +19,11 @@ export default function EmptyState({
         {title}
       </h2>
 
-      <p className="mt-2 text-sm text-slate-500">
-        {description}
-      </p>
+      {description && (
+        <p className="mt-2 text-sm text-slate-500">
+          {description}
+        </p>
+      )}
 
       {actionText && actionHref && (
         <Link

@@ -9,6 +9,8 @@ import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartContent } from "@/composables/useCartContent";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import LoadingState from "@/components/common/LoadingState";
+import ErrorState from "@/components/common/ErrorState";
 
 export default function CartContent() {
   const {
@@ -42,9 +44,9 @@ export default function CartContent() {
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
           <div>
             {loading ? (
-              <p>Loading cart...</p>
+              <LoadingState message="Loading cart..." />
             ) : error ? (
-              <p className="text-red-600">{error}</p>
+              <ErrorState message={error} />
             ) : cart.length === 0 ? (
               <EmptyState
                 title="Your cart is empty"

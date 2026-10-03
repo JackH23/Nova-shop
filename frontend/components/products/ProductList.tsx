@@ -6,6 +6,9 @@ import ProductCard from "./ProductCard";
 import Pagination from "@/components/common/Pagination";
 import type { Product } from "@/lib/products";
 import ProductSort from "./ProductSort";
+import LoadingState from "@/components/common/LoadingState";
+import ErrorState from "@/components/common/ErrorState";
+import EmptyState from "@/components/common/EmptyState";
 
 type ProductListProps = {
   minPrice?: number;
@@ -57,11 +60,19 @@ export default function ProductList({
   const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
 
   if (loading) {
-    return <div className="flex-1">Loading products...</div>;
+    return (
+      <div className="flex-1">
+        <LoadingState message="Loading products..." />
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="flex-1">{error}</div>;
+    return (
+      <div className="flex-1">
+        <ErrorState message={error} />
+      </div>
+    );
   }
 
   return (
@@ -82,30 +93,40 @@ export default function ProductList({
         <ProductSort value={sortBy} onChange={setSortBy} />
       </div>
 
-      {/* Product cards */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {paginatedProducts.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onProductAdded={onProductAdded}
-            onCartError={onCartError}
-            isWishlisted={wishlist.some(
-              (item) => item.product_id === product.id,
-            )}
-            onAddWishlist={addToWishlist}
-            onRemoveWishlist={removeFromWishlist}
-          />
-        ))}
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
+      {/* Empty state / Product cards */}
+      {paginatedProducts.length === 0 ? (
+        <EmptyState
+          title="No products found"
+          description="Try changing your filters or selecting another category."
         />
+      ) : (
+        <>
+          {/* Product cards */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {paginatedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onProductAdded={onProductAdded}
+                onCartError={onCartError}
+                isWishlisted={wishlist.some(
+                  (item) => item.product_id === product.id,
+                )}
+                onAddWishlist={addToWishlist}
+                onRemoveWishlist={removeFromWishlist}
+              />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
+        </>
       )}
     </div>
   );

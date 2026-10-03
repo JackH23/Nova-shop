@@ -145,7 +145,7 @@ export function useSettingsContent() {
         value: response.user.profileImage,
       });
 
-      return response.user;
+      return true;
     } catch (error) {
       if (
         error instanceof Error &&
@@ -157,7 +157,7 @@ export function useSettingsContent() {
         });
 
         openLogin();
-        throw error;
+        return false;
       }
 
       dispatch({
@@ -168,7 +168,7 @@ export function useSettingsContent() {
             : "Failed to update profile image",
       });
 
-      throw error;
+      return false;
     } finally {
       dispatch({
         type: "SET_UPDATING_IMAGE",

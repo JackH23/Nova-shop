@@ -16,7 +16,6 @@ export interface VerifyEmailData {
 export interface LoginData {
   email: string;
   password: string;
-  rememberMe: boolean;
 }
 
 export interface RefreshTokenData {
@@ -25,7 +24,6 @@ export interface RefreshTokenData {
 
 export interface GoogleLoginData {
   credential: string;
-  rememberMe: boolean;
 }
 
 export interface ResendVerificationCodeData {

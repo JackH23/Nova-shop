@@ -28,12 +28,14 @@ export default function SettingsContent() {
     modalType,
     handlePasswordChange,
     handleProfileUpdate,
+    handleProfileImageUpload,
     handleOpenDelete,
     handleCloseModal,
     handleConfirmModal,
   } = useSettingsModal({
     onChangePassword: handleChangePassword,
     onUpdateProfile: handleUpdateProfile,
+    onUpdateProfileImage: handleUpdateProfileImage,
     onDeleteAccount: handleDeleteAccount,
   });
 
@@ -82,7 +84,7 @@ export default function SettingsContent() {
                   updatingProfile={updatingProfile}
                   updatingImage={updatingImage}
                   onUpdateProfile={handleProfileUpdate}
-                  onUpdateProfileImage={handleUpdateProfileImage}
+                  onUpdateProfileImage={handleProfileImageUpload}
                 />
               )}
 

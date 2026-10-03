@@ -1,7 +1,6 @@
 export type LoginState = {
   email: string;
   password: string;
-  rememberMe: boolean;
   loading: boolean;
   error: string;
 };
@@ -9,7 +8,6 @@ export type LoginState = {
 export const initialLoginState: LoginState = {
   email: "",
   password: "",
-  rememberMe: false,
   loading: false,
   error: "",
 };
@@ -20,10 +18,6 @@ export type LoginAction =
       field: "email" | "password";
       value: string;
     }
-  | {
-    type: "SET_REMEMBER_ME";
-    value: boolean;
-  }
   | {
       type: "SET_LOADING";
       value: boolean;
@@ -42,12 +36,6 @@ export function loginReducer(
       return {
         ...state,
         [action.field]: action.value,
-      };
-
-    case "SET_REMEMBER_ME":
-      return {
-        ...state,
-        rememberMe: action.value,
       };
 
     case "SET_LOADING":

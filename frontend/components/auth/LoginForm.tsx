@@ -82,7 +82,7 @@ export default function LoginForm({
       </div>
 
       {/* Remember me */}
-      <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-700">
+      {/* <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-700">
         <input
           type="checkbox"
           name="remember"
@@ -97,7 +97,7 @@ export default function LoginForm({
         />
 
         <span>Remember me for 30 days</span>
-      </label>
+      </label> */}
 
       {/* Submit */}
       <SubmitButton>

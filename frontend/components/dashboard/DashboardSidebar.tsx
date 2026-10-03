@@ -39,11 +39,11 @@ const menuItems = [
     href: "/dashboard/addresses",
     icon: MapPin,
   },
-  {
-    label: "Payment",
-    href: "/dashboard/payment",
-    icon: CreditCard,
-  },
+  // {
+  //   label: "Payment",
+  //   href: "/dashboard/payment",
+  //   icon: CreditCard,
+  // },
   {
     label: "Settings",
     href: "/dashboard/settings",
