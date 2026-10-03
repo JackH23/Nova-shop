@@ -1,7 +1,6 @@
 "use client";
 
 import { useReducer } from "react";
-import { useRouter } from "next/navigation";
 
 import {
   verifyResetCodeReducer,
@@ -11,15 +10,18 @@ import {
 import { authService } from "@/services/authService";
 import { validation } from "@/validations/validation";
 
-export function useVerifyResetCode(email: string) {
-  const router = useRouter();
-
+export function useVerifyResetCode(
+  email: string,
+  onSuccess?: () => void,
+) {
   const [state, dispatch] = useReducer(
     verifyResetCodeReducer,
     initialVerifyResetCodeState,
   );
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
 
     dispatch({
@@ -27,7 +29,10 @@ export function useVerifyResetCode(email: string) {
       value: "",
     });
 
-    const codeError = validation.required(state.code, "Verification code");
+    const codeError = validation.required(
+      state.code,
+      "Verification code",
+    );
 
     if (codeError) {
       dispatch({
@@ -49,9 +54,9 @@ export function useVerifyResetCode(email: string) {
         code: state.code.trim(),
       });
 
-      router.push(
-        `/reset-password?email=${encodeURIComponent(email.trim())}&code=${encodeURIComponent(state.code.trim())}`,
-      );
+      // Verification succeeded.
+      // Open ResetPasswordModal instead of navigating to a page.
+      onSuccess?.();
     } catch (error) {
       dispatch({
         type: "SET_ERROR",

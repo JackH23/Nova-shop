@@ -5,6 +5,7 @@ import RegisterModal from "@/components/auth/modals/RegisterModal";
 import ForgotPasswordModal from "@/components/auth/modals/ForgotPasswordModal";
 import ResetPasswordModal from "@/components/auth/modals/ResetPasswordModal";
 import VerifyEmailModal from "@/components/auth/modals/VerifyEmailModal";
+import VerifyResetCodeModal from "@/components/auth/modals/VerifyResetCodeModal";
 
 import ConfirmModal from "@/components/common/ConfirmModal";
 
@@ -38,6 +39,7 @@ export default function AuthModalManager({
         open={auth.authModal === "forgot-password"}
         onClose={auth.closeAuth}
         onOpenLogin={auth.openLogin}
+        onSuccess={auth.openVerifyResetCode}
       />
 
       <ResetPasswordModal
@@ -52,6 +54,14 @@ export default function AuthModalManager({
         onClose={auth.closeAuth}
         onOpenRegister={auth.openRegister}
         onOpenLogin={auth.openLogin}
+      />
+
+      <VerifyResetCodeModal
+        open={auth.authModal === "verify-reset-code"}
+        email={auth.resetEmail}
+        onClose={auth.closeAuth}
+        onBack={auth.openForgotPassword}
+        onSuccess={auth.openResetPassword}
       />
 
       <ConfirmModal

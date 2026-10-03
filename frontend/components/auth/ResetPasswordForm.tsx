@@ -1,22 +1,26 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import PasswordInput from "@/components/auth/PasswordInput";
 import SubmitButton from "@/components/auth/SubmitButton";
-import { useResetPassword } from "@/composables/useResetPassword";
 import FormError from "@/components/auth/FormError";
+import { useResetPassword } from "@/composables/useResetPassword";
 
-export default function ResetPasswordForm() {
-  const searchParams = useSearchParams();
+type ResetPasswordFormProps = {
+  email: string;
+  code: string;
+  onSuccess?: () => void;
+};
 
-  const email = searchParams.get("email") || "";
-  const code = searchParams.get("code") || "";
-
+export default function ResetPasswordForm({
+  email,
+  code,
+  onSuccess,
+}: ResetPasswordFormProps) {
   const {
     state,
     dispatch,
     handleSubmit,
-  } = useResetPassword(email, code);
+  } = useResetPassword(email, code, onSuccess);
 
   return (
     <form

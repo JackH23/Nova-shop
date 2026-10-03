@@ -6,6 +6,7 @@ export type AuthModalType =
   | "login"
   | "register"
   | "forgot-password"
+  | "verify-reset-code"
   | "reset-password"
   | "verify-email"
   | null;
@@ -22,7 +23,11 @@ export function useAuthModal(
   const [authModal, setAuthModal] =
     useState<AuthModalType>(null);
 
+  // Registration verification email
   const [verifyEmail, setVerifyEmail] = useState("");
+
+  // Forgot-password email
+  const [resetEmail, setResetEmail] = useState("");
 
   const [showLoginSuccess, setShowLoginSuccess] =
     useState(false);
@@ -50,10 +55,21 @@ export function useAuthModal(
     setAuthModal("forgot-password");
   }, []);
 
+  // Forgot password -> Verify reset code
+  const openVerifyResetCode = useCallback(
+    (email: string) => {
+      setResetEmail(email);
+      setAuthModal("verify-reset-code");
+    },
+    [],
+  );
+
+  // Verify reset code -> Reset password
   const openResetPassword = useCallback(() => {
     setAuthModal("reset-password");
   }, []);
 
+  // Register -> Verify email
   const openVerifyEmail = useCallback(
     (email: string) => {
       setVerifyEmail(email);
@@ -75,7 +91,11 @@ export function useAuthModal(
 
   return {
     authModal,
+
+    // Emails
     verifyEmail,
+    resetEmail,
+
     showLoginSuccess,
 
     openAuth,
@@ -84,6 +104,7 @@ export function useAuthModal(
     openLogin,
     openRegister,
     openForgotPassword,
+    openVerifyResetCode,
     openResetPassword,
     openVerifyEmail,
 
