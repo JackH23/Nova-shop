@@ -6,18 +6,14 @@ import ForgotPasswordModal from "@/components/auth/modals/ForgotPasswordModal";
 import ResetPasswordModal from "@/components/auth/modals/ResetPasswordModal";
 import VerifyEmailModal from "@/components/auth/modals/VerifyEmailModal";
 import VerifyResetCodeModal from "@/components/auth/modals/VerifyResetCodeModal";
-
 import ConfirmModal from "@/components/common/ConfirmModal";
-
 import type { useAuthModal } from "@/composables/useAuthModal";
 
 type AuthModalManagerProps = {
   auth: ReturnType<typeof useAuthModal>;
 };
 
-export default function AuthModalManager({
-  auth,
-}: AuthModalManagerProps) {
+export default function AuthModalManager({ auth }: AuthModalManagerProps) {
   return (
     <>
       <LoginModal
@@ -44,6 +40,8 @@ export default function AuthModalManager({
 
       <ResetPasswordModal
         open={auth.authModal === "reset-password"}
+        email={auth.resetEmail}
+        code={auth.resetCode}
         onClose={auth.closeAuth}
         onOpenLogin={auth.openLogin}
       />
