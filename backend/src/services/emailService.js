@@ -126,6 +126,23 @@ const sendVerificationEmail = async (email, code) => {
   });
 };
 
+const sendPasswordResetEmail = async (email, code) => {
+  return sendEmail({
+    to: email,
+    subject: "Reset your NovaShop password",
+    html: `
+      <h2>Reset your password</h2>
+      <p>Your password reset code is:</p>
+      <h1>${escapeHtml(code)}</h1>
+      <p>This code expires in 10 minutes.</p>
+      <p>
+        If you didn't request a password reset,
+        you can ignore this email.
+      </p>
+    `,
+  });
+};
+
 const sendAdminOrderNotification = async ({ order, payment, customer }) => {
   const adminEmail = process.env.ADMIN_EMAIL?.trim();
 
@@ -172,5 +189,6 @@ const sendAdminOrderNotification = async ({ order, payment, customer }) => {
 
 module.exports = {
   sendVerificationEmail,
+  sendPasswordResetEmail,
   sendAdminOrderNotification,
 };
