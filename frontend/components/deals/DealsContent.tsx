@@ -10,6 +10,7 @@ import { useProductFilters } from "@/composables/useProductFilters";
 import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartToast } from "@/composables/useCartToast";
 import { useCategories } from "@/composables/useCategories";
+import PageHeader from "@/components/common/PageHeader";
 
 export default function DealsContent() {
   const [cartError, setCartError] = useState("");
@@ -39,22 +40,10 @@ export default function DealsContent() {
     <>
       <PageContainer>
         {/* Breadcrumb */}
-        <div className="mb-4 flex items-center gap-2 text-xs text-slate-500">
-          <span>Home</span>
-          <span>/</span>
-          <span className="text-slate-900">Deals</span>
-        </div>
-
-        {/* Page heading */}
-        <div>
-          <h1 className="text-3xl font-bold text-slate-950">
-            Deals
-          </h1>
-
-          <p className="mt-2 text-sm text-slate-500">
-            Save more on products you love.
-          </p>
-        </div>
+        <PageHeader
+          title="Deals"
+          breadcrumb="Home / Deals"
+        />
 
         {/* Deals hero */}
         <DealsHero />

@@ -17,17 +17,17 @@ export default function PaymentMethod({
 }: PaymentMethodProps) {
   return (
     <div>
-      <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-6 text-lg font-semibold text-slate-900">
+      <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <h2 className="mb-6 text-lg font-semibold text-slate-900 dark:text-white">
           Payment Method
         </h2>
 
         <div className="space-y-3">
           <label
-            className={`flex cursor-pointer items-center justify-between rounded-md border p-4 ${
+            className={`flex cursor-pointer items-center justify-between rounded-md border p-4 transition ${
               paymentMethod === "CREDIT_CARD"
-                ? "border-indigo-600 ring-1 ring-indigo-600"
-                : "border-slate-300"
+                ? "border-indigo-600 ring-1 ring-indigo-600 dark:border-indigo-500 dark:ring-indigo-500"
+                : "border-slate-300 dark:border-slate-700"
             }`}
           >
             <div className="flex items-center gap-3">
@@ -36,19 +36,25 @@ export default function PaymentMethod({
                 name="payment"
                 checked={paymentMethod === "CREDIT_CARD"}
                 onChange={() => onPaymentMethodChange("CREDIT_CARD")}
+                className="accent-indigo-600"
               />
 
-              <span className="text-sm font-medium">Credit Card</span>
+              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                Credit Card
+              </span>
             </div>
 
-            <CreditCard size={18} />
+            <CreditCard
+              size={18}
+              className="text-slate-500 dark:text-slate-400"
+            />
           </label>
 
           <label
-            className={`flex cursor-pointer items-center rounded-md border p-4 ${
+            className={`flex cursor-pointer items-center rounded-md border p-4 transition ${
               paymentMethod === "PAYPAL"
-                ? "border-indigo-600 ring-1 ring-indigo-600"
-                : "border-slate-300"
+                ? "border-indigo-600 ring-1 ring-indigo-600 dark:border-indigo-500 dark:ring-indigo-500"
+                : "border-slate-300 dark:border-slate-700"
             }`}
           >
             <input
@@ -56,15 +62,18 @@ export default function PaymentMethod({
               name="payment"
               checked={paymentMethod === "PAYPAL"}
               onChange={() => onPaymentMethodChange("PAYPAL")}
+              className="accent-indigo-600"
             />
 
-            <span className="ml-3 text-sm font-medium">PayPal</span>
+            <span className="ml-3 text-sm font-medium text-slate-900 dark:text-slate-100">
+              PayPal
+            </span>
           </label>
         </div>
 
         {paymentMethod === "CREDIT_CARD" && (
           <div className="mt-6">
-            <div className="rounded-md border border-slate-200 p-4">
+            <div className="rounded-md border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
               <PaymentElement />
             </div>
           </div>
@@ -74,7 +83,7 @@ export default function PaymentMethod({
       <button
         type="button"
         onClick={onBack}
-        className="mt-4 text-sm font-medium text-indigo-600 transition hover:text-indigo-700"
+        className="mt-4 cursor-pointer text-sm font-medium text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
       >
         ← Back to Delivery
       </button>

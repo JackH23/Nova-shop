@@ -9,6 +9,7 @@ import { useProductFilters } from "@/composables/useProductFilters";
 import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartToast } from "@/composables/useCartToast";
 import { useCategories } from "@/composables/useCategories";
+import PageHeader from "@/components/common/PageHeader";
 
 function NewArrivalsContent() {
   const [cartError, setCartError] = useState("");
@@ -37,13 +38,11 @@ function NewArrivalsContent() {
   return (
     <>
       <PageContainer>
-        <h1 className="text-3xl font-bold text-slate-950">
-          New Arrivals
-        </h1>
-
-        <p className="mt-2 text-sm text-slate-500">
-          Discover the latest products added to NovaShop.
-        </p>
+        <PageHeader
+          title="New Arrivals"
+          breadcrumb="Home / New Arrivals"
+          description="Discover the latest products added to NovaShop."
+        />
 
         <div className="mt-10 flex flex-col gap-10 md:flex-row">
           <CategoryFilters

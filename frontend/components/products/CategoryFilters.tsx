@@ -83,10 +83,12 @@ export default function CategoryFilters({
 
   return (
     <aside className="w-full shrink-0 md:w-[220px]">
-      <div className="rounded-md border border-slate-200 bg-white p-5">
+      <div className="rounded-md border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-950">Filters</h2>
+          <h2 className="text-sm font-semibold text-slate-950 dark:text-white">
+            Filters
+          </h2>
 
           <button
             type="button"
@@ -110,20 +112,20 @@ export default function CategoryFilters({
 
         {/* Category */}
         <div className="mt-5">
-          <h3 className="text-xs font-semibold text-slate-900">Category</h3>
+          <h3 className="text-xs font-semibold text-slate-900 dark:text-slate-100">Category</h3>
 
           <div className="mt-3 space-y-3">
             {/* All */}
             <button
               type="button"
-              className="flex w-full items-center gap-2 text-xs text-slate-600 cursor-pointer"
+              className="flex w-full items-center gap-2 text-xs text-slate-600 dark:text-slate-300 cursor-pointer"
               onClick={() => onCategoryChange?.(null)}
             >
               <span
                 className={`flex h-4 w-4 items-center justify-center rounded-sm border ${
                   activeCategoryId === null
                     ? "border-indigo-600 bg-indigo-600 text-white"
-                    : "border-slate-300 bg-white"
+                    : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800"
                 }`}
               >
                 {activeCategoryId === null && (
@@ -147,14 +149,14 @@ export default function CategoryFilters({
                 <button
                   key={category.id}
                   type="button"
-                  className="flex w-full items-center gap-2 text-xs text-slate-600"
+                  className="flex w-full items-center gap-2 text-xs text-slate-600 dark:text-slate-300"
                   onClick={() => onCategoryChange?.(category.id)}
                 >
                   <span
                     className={`flex h-4 w-4 items-center justify-center rounded-sm border ${
                       activeCategoryId === category.id
                         ? "border-indigo-600 bg-indigo-600 text-white"
-                        : "border-slate-300 bg-white"
+                        : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800"
                     }`}
                   >
                     {activeCategoryId === category.id && (
@@ -168,11 +170,11 @@ export default function CategoryFilters({
           </div>
         </div>
 
-        <div className="my-5 border-t border-slate-200" />
+        <div className="my-5 border-t border-slate-200 dark:border-slate-700" />
 
         {/* Price Range */}
         <div>
-          <h3 className="text-xs font-semibold text-slate-900">Price Range</h3>
+          <h3 className="text-xs font-semibold text-slate-900 dark:text-slate-100">Price Range</h3>
 
           <div className="mt-4 space-y-2">
             {/* Minimum price */}
@@ -209,11 +211,11 @@ export default function CategoryFilters({
           </div>
 
           <div className="mt-2 flex justify-between">
-            <span className="rounded border border-slate-200 px-2 py-1 text-[10px]">
+            <span className="rounded border border-slate-200 bg-white px-2 py-1 text-[10px] text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
               ${minPrice}
             </span>
 
-            <span className="rounded border border-slate-200 px-2 py-1 text-[10px]">
+            <span className="rounded border border-slate-200 bg-white px-2 py-1 text-[10px] text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
               ${maxPrice}
             </span>
           </div>
@@ -222,15 +224,15 @@ export default function CategoryFilters({
         {/* Availability */}
         {showAvailability && (
           <>
-            <div className="my-5 border-t border-slate-200" />
+            <div className="my-5 border-t border-slate-200 dark:border-slate-700" />
 
             <div>
-              <h3 className="text-xs font-semibold text-slate-900">
+              <h3 className="text-xs font-semibold text-slate-900 dark:text-slate-100">
                 Availability
               </h3>
 
               {/* In Stock */}
-              <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
+              <label className="mt-3 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
                 <input
                   type="checkbox"
                   checked={inStock}
@@ -249,7 +251,7 @@ export default function CategoryFilters({
               </label>
 
               {/* On Sale */}
-              <label className="mt-3 flex items-center gap-2 text-xs text-slate-600">
+              <label className="mt-3 flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
                 <input
                   type="checkbox"
                   checked={onSale}
@@ -273,16 +275,16 @@ export default function CategoryFilters({
         {/* Discount */}
         {showDiscount && (
           <>
-            <div className="my-5 border-t border-slate-200" />
+            <div className="my-5 border-t border-slate-200 dark:border-slate-700" />
 
             <div>
-              <h3 className="text-xs font-semibold text-slate-900">Discount</h3>
+              <h3 className="text-xs font-semibold text-slate-900 dark:text-slate-100">Discount</h3>
 
               <div className="mt-3 space-y-3">
                 {discounts.map((discount) => (
                   <label
                     key={discount.value}
-                    className="flex items-center gap-2 text-xs text-slate-600"
+                    className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300"
                   >
                     <input
                       type="radio"
@@ -303,16 +305,16 @@ export default function CategoryFilters({
         {/* Rating */}
         {showRating && (
           <>
-            <div className="my-5 border-t border-slate-200" />
+            <div className="my-5 border-t border-slate-200 dark:border-slate-700" />
 
             <div>
-              <h3 className="text-xs font-semibold text-slate-900">Rating</h3>
+              <h3 className="text-xs font-semibold text-slate-900 dark:text-slate-100">Rating</h3>
 
               <div className="mt-3 space-y-3">
                 {ratings.map((rating) => (
                   <label
                     key={rating.value}
-                    className="flex items-center gap-2 text-xs text-slate-600"
+                    className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300"
                   >
                     <input
                       type="radio"

@@ -6,7 +6,9 @@ import ProfileSettings from "@/components/dashboard/ProfileSettings";
 import SecuritySettings from "@/components/dashboard/SecuritySettings";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { useSettingsModal } from "@/composables/useSettingsModal";
-
+import PageHeader from "@/components/common/PageHeader";
+import LoadingState from "@/components/common/LoadingState";
+import ErrorState from "@/components/common/ErrorState";
 import { useSettingsContent } from "@/composables/useSettingsContent";
 
 export default function SettingsContent() {
@@ -42,8 +44,8 @@ export default function SettingsContent() {
   if (loading) {
     return (
       <PageContainer>
-        <div className="py-8 text-sm text-slate-500">
-          Loading account settings...
+        <div className="py-8">
+          <LoadingState message="Loading account settings..." />
         </div>
       </PageContainer>
     );
@@ -57,22 +59,16 @@ export default function SettingsContent() {
 
           <div className="min-w-0">
             {/* Header */}
-            <div>
-              <h1 className="text-3xl font-bold text-slate-950">
-                Account Settings
-              </h1>
-
-              <p className="mt-2 text-sm text-slate-500">
-                Manage your profile and account security.
-              </p>
-            </div>
-
-            <div className="mt-4 border-t border-slate-200" />
+            <PageHeader
+              title="Account Settings"
+              breadcrumb="Home / Dashboard / Settings"
+              description="Manage your profile and account security."
+            />
 
             {/* Error */}
             {error && (
-              <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-                {error}
+              <div className="mt-4">
+                <ErrorState message={error} />
               </div>
             )}
 

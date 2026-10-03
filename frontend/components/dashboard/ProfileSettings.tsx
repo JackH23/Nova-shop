@@ -4,6 +4,7 @@ import { Camera } from "lucide-react";
 
 import type { SettingsUser, UpdateProfileData } from "@/lib/settings";
 import { useProfileSettings } from "@/composables/useProfileSettings";
+import AuthInput from "@/components/auth/AuthInput";
 
 type ProfileSettingsProps = {
   user: SettingsUser;
@@ -101,40 +102,26 @@ export default function ProfileSettings({
       <form onSubmit={handleSubmit}>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {/* Full name */}
-          <div>
-            <label
-              htmlFor="fullName"
-              className="text-xs font-medium text-slate-700"
-            >
-              Full Name
-            </label>
-
-            <input
-              id="fullName"
-              type="text"
-              value={fullName}
-              onChange={(event) => setFullName(event.target.value)}
-              className="mt-2 w-full rounded-md border border-slate-200 px-3 py-2.5 text-sm outline-none transition focus:border-[#3324d8]"
-            />
-          </div>
+          <AuthInput
+            id="fullName"
+            name="fullName"
+            label="Full Name"
+            type="text"
+            placeholder="Enter your full name"
+            value={fullName}
+            onChange={(event) => setFullName(event.target.value)}
+          />
 
           {/* Email */}
-          <div>
-            <label
-              htmlFor="email"
-              className="text-xs font-medium text-slate-700"
-            >
-              Email Address
-            </label>
-
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="mt-2 w-full rounded-md border border-slate-200 px-3 py-2.5 text-sm outline-none transition focus:border-[#3324d8]"
-            />
-          </div>
+          <AuthInput
+            id="email"
+            name="email"
+            label="Email Address"
+            type="email"
+            placeholder="Enter your email address"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
         </div>
 
         {/* Save */}

@@ -62,53 +62,57 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
 
   return (
     <>
-      <div className="h-fit rounded-lg border border-slate-200 bg-white p-5">
-        <h2 className="text-sm font-semibold text-slate-900">Order Summary</h2>
+      <div className="h-fit rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+          Order Summary
+        </h2>
 
         <div className="mt-5 space-y-3 text-xs">
           <div className="flex justify-between">
-            <span className="text-slate-500">
+            <span className="text-slate-500 dark:text-slate-400">
               Subtotal ({order.items.length} items)
             </span>
 
-            <span className="text-slate-900">
+            <span className="text-slate-900 dark:text-slate-100">
               ${Number(order.subtotal).toFixed(2)}
             </span>
           </div>
 
           <div className="flex justify-between">
-            <span className="text-slate-500">Shipping</span>
+            <span className="text-slate-500 dark:text-slate-400">Shipping</span>
 
-            <span className="text-slate-900">
+            <span className="text-slate-900 dark:text-slate-100">
               ${Number(order.shipping_fee).toFixed(2)}
             </span>
           </div>
 
           <div className="flex justify-between">
-            <span className="text-slate-500">Tax</span>
+            <span className="text-slate-500 dark:text-slate-400">Tax</span>
 
-            <span className="text-slate-900">
+            <span className="text-slate-900 dark:text-slate-100">
               ${Number(order.tax).toFixed(2)}
             </span>
           </div>
 
           {Number(order.discount_amount) > 0 && (
             <div className="flex justify-between">
-              <span className="text-slate-500">Discount</span>
+              <span className="text-slate-500 dark:text-slate-400">Discount</span>
 
-              <span className="text-indigo-600">
+              <span className="text-indigo-600 dark:text-indigo-400">
                 -${Number(order.discount_amount).toFixed(2)}
               </span>
             </div>
           )}
         </div>
 
-        <div className="my-5 border-t border-slate-200" />
+        <div className="my-5 border-t border-slate-200 dark:border-slate-700" />
 
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-slate-950">Total</span>
+          <span className="text-sm font-bold text-slate-950 dark:text-white">
+            Total
+          </span>
 
-          <span className="text-base font-bold text-slate-950">
+          <span className="text-base font-bold text-slate-950 dark:text-white">
             ${Number(order.total_amount).toFixed(2)}
           </span>
         </div>
@@ -125,7 +129,7 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
           <button
             type="button"
             onClick={handleReturnItem}
-            className="mt-2 w-full cursor-pointer rounded-md border border-slate-200 py-2.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+            className="mt-2 w-full cursor-pointer rounded-md border border-slate-200 py-2.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
           >
             Return Item
           </button>

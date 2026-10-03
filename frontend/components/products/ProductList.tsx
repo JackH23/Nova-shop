@@ -9,6 +9,7 @@ import ProductSort from "./ProductSort";
 import LoadingState from "@/components/common/LoadingState";
 import ErrorState from "@/components/common/ErrorState";
 import EmptyState from "@/components/common/EmptyState";
+import PageHeader from "@/components/common/PageHeader";
 
 type ProductListProps = {
   minPrice?: number;
@@ -78,20 +79,15 @@ export default function ProductList({
   return (
     <div className="flex-1">
       {/* Top section */}
-      <div className="mb-5 flex items-end justify-between">
-        <div>
-          {/* Breadcrumb */}
-          <p className="mb-1 text-[10px] text-slate-400">Home / Shop</p>
-
-          {/* Title */}
-          <h1 className="text-2xl font-bold text-slate-950">
-            {categoryName ?? "Shop Products"}
-          </h1>
-        </div>
-
-        {/* Sort */}
-        <ProductSort value={sortBy} onChange={setSortBy} />
-      </div>
+      <PageHeader
+        title={categoryName ?? "Shop Products"}
+        breadcrumb="Home / Shop"
+      >
+        <ProductSort
+          value={sortBy}
+          onChange={setSortBy}
+        />
+      </PageHeader>
 
       {/* Empty state / Product cards */}
       {paginatedProducts.length === 0 ? (
