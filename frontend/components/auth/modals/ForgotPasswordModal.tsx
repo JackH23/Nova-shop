@@ -18,11 +18,11 @@ export default function ForgotPasswordModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 dark:bg-black/60"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-[395px] rounded-xl border border-[#d9dbea] bg-white px-7 py-7 shadow-xl"
+        className="relative w-full max-w-[395px] rounded-xl border border-[#d9dbea] bg-white px-7 py-7 shadow-xl transition-colors dark:border-slate-700 dark:bg-slate-900"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close */}
@@ -30,23 +30,23 @@ export default function ForgotPasswordModal({
           type="button"
           onClick={onClose}
           aria-label="Close forgot password"
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+          className="absolute right-4 top-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-white"
         >
           <X size={20} />
         </button>
 
         {/* Icon */}
-        <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+        <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400">
           <KeyIcon />
         </div>
 
         {/* Header */}
         <div className="mb-5">
-          <h1 className="text-xl font-bold text-slate-900">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">
             Forgot password?
           </h1>
 
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             No worries, we&apos;ll send you reset instructions.
           </p>
         </div>
@@ -59,7 +59,7 @@ export default function ForgotPasswordModal({
           <button
             type="button"
             onClick={onOpenLogin}
-            className="inline-flex items-center gap-2 text-xs font-medium text-slate-600 transition hover:text-indigo-600"
+            className="inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-slate-600 transition hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
           >
             <span>←</span>
             Back to Sign In

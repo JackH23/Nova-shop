@@ -13,8 +13,10 @@ export default function DashboardRecentOrder({
 }: DashboardRecentOrderProps) {
   if (!recentOrder) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <p className="text-sm text-slate-500">No recent order found.</p>
+      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-slate-700 dark:bg-slate-900">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          No recent order found.
+        </p>
       </div>
     );
   }
@@ -24,24 +26,26 @@ export default function DashboardRecentOrder({
   const productImage = firstItem?.product?.image ?? null;
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition-colors dark:border-slate-700 dark:bg-slate-900">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-slate-900">Recent Order</h2>
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+          Recent Order
+        </h2>
 
         <Link
           href="/dashboard/orders"
-          className="text-xs font-medium text-indigo-600 hover:underline"
+          className="text-xs font-medium text-indigo-600 transition hover:underline dark:text-indigo-400"
         >
           View All Orders
         </Link>
       </div>
 
       {/* Order */}
-      <div className="mt-4 rounded-md border border-slate-200 p-4">
+      <div className="mt-4 rounded-md border border-slate-200 p-4 dark:border-slate-700">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
-            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
               <ProductImage
                 image={productImage}
                 name={firstItem?.product_name ?? "Product"}
@@ -50,38 +54,39 @@ export default function DashboardRecentOrder({
             </div>
 
             <div className="min-w-0">
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">
                 Order #{recentOrder.order_no}
               </p>
 
-              <p className="mt-1 truncate text-sm font-semibold text-slate-900">
+              <p className="mt-1 truncate text-sm font-semibold text-slate-900 dark:text-white">
                 {firstItem?.product_name ?? "Order"}
               </p>
 
-              <p className="mt-2 text-xs text-slate-500">
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                 {recentOrder.items.length} item(s)
               </p>
 
-              <p className="mt-1 text-xs font-semibold text-slate-900">
+              <p className="mt-1 text-xs font-semibold text-slate-900 dark:text-slate-100">
                 ${Number(recentOrder.total_amount).toFixed(2)}
               </p>
             </div>
           </div>
 
-          <span className="shrink-0 rounded-full bg-amber-100 px-3 py-1 text-[10px] font-medium text-amber-700">
+          <span className="shrink-0 rounded-full bg-amber-100 px-3 py-1 text-[10px] font-medium text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
             {recentOrder.status}
           </span>
         </div>
 
         <div className="mt-4">
-          <p className="text-xs text-slate-500">
-            Ordered on {new Date(recentOrder.created_at).toLocaleDateString()}
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Ordered on{" "}
+            {new Date(recentOrder.created_at).toLocaleDateString()}
           </p>
         </div>
 
         <Link
           href={`/dashboard/orders/${recentOrder.id}`}
-          className="mt-4 inline-block text-xs font-medium text-indigo-600 hover:underline"
+          className="mt-4 inline-block text-xs font-medium text-indigo-600 transition hover:underline dark:text-indigo-400"
         >
           View Order
         </Link>

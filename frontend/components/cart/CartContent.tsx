@@ -35,9 +35,11 @@ export default function CartContent() {
   return (
     <>
       <PageContainer>
-        <h1 className="text-3xl font-bold text-slate-950">Your Cart</h1>
+        <h1 className="text-3xl font-bold text-slate-950 dark:text-white">
+          Your Cart
+        </h1>
 
-        <p className="mt-2 text-sm text-slate-500">
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           Review your items and proceed to checkout.
         </p>
 
@@ -78,7 +80,7 @@ export default function CartContent() {
 
                 <Link
                   href="/products"
-                  className="mt-8 inline-block text-sm font-medium text-indigo-600"
+                  className="mt-8 inline-block text-sm font-medium text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
                 >
                   ← Continue Shopping
                 </Link>

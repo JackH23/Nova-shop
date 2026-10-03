@@ -13,7 +13,6 @@ type RegisterFormProps = {
 export default function RegisterForm({
   onSuccess,
 }: RegisterFormProps) {
-
   const {
     state,
     dispatch,
@@ -110,7 +109,9 @@ export default function RegisterForm({
 
       {/* Error */}
       {error && (
-        <p className="text-sm text-red-500">{error}</p>
+        <p className="text-sm text-red-500 dark:text-red-400">
+          {error}
+        </p>
       )}
 
       {/* Submit */}

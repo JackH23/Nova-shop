@@ -15,7 +15,6 @@ export default function LoginForm({
   onSuccess,
   onForgotPassword,
 }: LoginFormProps) {
-
   const {
     state,
     dispatch,
@@ -27,7 +26,6 @@ export default function LoginForm({
       className="space-y-4"
       onSubmit={handleSubmit}
     >
-
       {/* Error message */}
       <FormError message={state.error} />
 
@@ -53,7 +51,7 @@ export default function LoginForm({
         <div className="mb-1 flex items-center justify-between">
           <label
             htmlFor="password"
-            className="text-xs font-semibold text-slate-800"
+            className="text-xs font-semibold text-slate-800 dark:text-slate-200"
           >
             Password
           </label>
@@ -61,7 +59,7 @@ export default function LoginForm({
           <button
             type="button"
             onClick={onForgotPassword}
-            className="text-xs text-indigo-600 hover:underline"
+            className="cursor-pointer text-xs text-indigo-600 transition hover:underline dark:text-indigo-400"
           >
             Forgot password?
           </button>
@@ -80,24 +78,6 @@ export default function LoginForm({
           }
         />
       </div>
-
-      {/* Remember me */}
-      {/* <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-700">
-        <input
-          type="checkbox"
-          name="remember"
-          checked={state.rememberMe}
-          onChange={(event) =>
-            dispatch({
-              type: "SET_REMEMBER_ME",
-              value: event.target.checked,
-            })
-          }
-          className="h-4 w-4 rounded border-slate-300 accent-indigo-600"
-        />
-
-        <span>Remember me for 30 days</span>
-      </label> */}
 
       {/* Submit */}
       <SubmitButton>

@@ -31,8 +31,8 @@ export default function OrderProgress({
   );
 
   return (
-    <section className="mt-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-900">
+    <section className="mt-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-colors dark:border-slate-700 dark:bg-slate-900">
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
         Order Progress
       </h2>
 
@@ -50,10 +50,10 @@ export default function OrderProgress({
               {/* Step */}
               <div className="flex flex-col items-center">
                 <div
-                  className={`flex h-9 w-9 items-center justify-center rounded-full border-2 ${
+                  className={`flex h-9 w-9 items-center justify-center rounded-full border-2 transition-colors ${
                     isActive
-                      ? "border-indigo-600 bg-indigo-600 text-white"
-                      : "border-slate-300 bg-white text-slate-400"
+                      ? "border-indigo-600 bg-indigo-600 text-white dark:border-indigo-500 dark:bg-indigo-500"
+                      : "border-slate-300 bg-white text-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400"
                   }`}
                 >
                   {isCompleted ? (
@@ -68,10 +68,10 @@ export default function OrderProgress({
                 <p
                   className={`mt-2 whitespace-nowrap text-xs font-medium ${
                     isCurrent
-                      ? "text-indigo-600"
+                      ? "text-indigo-600 dark:text-indigo-400"
                       : isCompleted
-                        ? "text-slate-900"
-                        : "text-slate-400"
+                        ? "text-slate-900 dark:text-slate-200"
+                        : "text-slate-400 dark:text-slate-500"
                   }`}
                 >
                   {step.label}
@@ -81,10 +81,10 @@ export default function OrderProgress({
               {/* Connecting line */}
               {index < steps.length - 1 && (
                 <div
-                  className={`mt-4 h-0.5 flex-1 ${
+                  className={`mt-4 h-0.5 flex-1 transition-colors ${
                     index < currentStepIndex
-                      ? "bg-indigo-600"
-                      : "bg-slate-200"
+                      ? "bg-indigo-600 dark:bg-indigo-500"
+                      : "bg-slate-200 dark:bg-slate-700"
                   }`}
                 />
               )}

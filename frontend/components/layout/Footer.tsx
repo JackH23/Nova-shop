@@ -54,7 +54,7 @@ export default function Footer({ variant = "home" }: FooterProps) {
   }
 
   return (
-    <footer className="mt-auto border-t border-slate-200 bg-[#eef0f2]">
+    <footer className="mt-auto border-t border-slate-200 bg-[#eef0f2] transition-colors dark:border-slate-800 dark:bg-slate-950">
       <div className="mx-auto max-w-[1440px] px-10 pb-5 pt-8">
         {/* Footer columns */}
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">

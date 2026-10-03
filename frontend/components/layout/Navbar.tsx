@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useNavbar } from "@/composables/useNavbar";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useProductList } from "@/composables/useProductList";
 import { useCart } from "@/composables/useCart";
 import { Search, Heart, ShoppingCart, UserRound } from "lucide-react";
@@ -26,6 +26,25 @@ export default function Navbar() {
 
   const { user, refreshUser } = useMe();
   const profileImageUrl = getFileUrl(user?.profileImage);
+
+  useEffect(() => {
+    const handleProfileUpdated = () => {
+      refreshUser();
+    };
+
+    window.addEventListener(
+      "profile-updated",
+      handleProfileUpdated,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "profile-updated",
+        handleProfileUpdated,
+      );
+    };
+  }, [refreshUser]);
+
   const { cartCount } = useCart();
   const { isVisible, isProfileOpen, toggleProfile, closeProfile } = useNavbar();
 
@@ -39,7 +58,7 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 w-full bg-white transition-all duration-300 ease-in-out ${
+        className={`sticky top-0 z-50 w-full bg-white text-slate-900 transition-all duration-300 ease-in-out dark:bg-slate-950 dark:text-white ${
           isVisible
             ? "translate-y-0 opacity-100"
             : "-translate-y-full opacity-0"
@@ -54,7 +73,7 @@ export default function Navbar() {
         </div>
 
         {/* Main navbar */}
-        <div className="border-b border-slate-200">
+        <div className="border-b border-slate-200 dark:border-slate-800">
           <div className="mx-auto flex h-[70px] max-w-[1440px] items-center px-9">
             {/* Logo */}
             <Link href="/home" prefetch={false} className="text-[18px] font-bold text-[#3324d8]">
@@ -63,7 +82,7 @@ export default function Navbar() {
 
             {/* Navigation */}
             {/* Navigation */}
-            <nav className="ml-[135px] flex h-full items-center gap-7 text-[11px] text-slate-800">
+            <nav className="ml-[135px] flex h-full items-center gap-7 text-[11px]">
               {/* Shop */}
               <Link
                 href="/products"
@@ -71,7 +90,7 @@ export default function Navbar() {
                 className={`flex h-full items-center border-b-2 transition ${
                   pathname.startsWith("/products")
                     ? "border-[#4b3cf0] text-[#3324d8]"
-                    : "border-transparent text-slate-800 hover:text-[#3324d8]"
+                    : "border-transparent text-slate-800 hover:text-[#3324d8] dark:text-slate-200 dark:hover:text-indigo-400"
                 }`}
               >
                 Shop
@@ -84,7 +103,7 @@ export default function Navbar() {
                 className={`flex h-full items-center border-b-2 transition ${
                   pathname.startsWith("/categories")
                     ? "border-[#4b3cf0] text-[#3324d8]"
-                    : "border-transparent text-slate-800 hover:text-[#3324d8]"
+                    : "border-transparent text-slate-800 hover:text-[#3324d8] dark:text-slate-200 dark:hover:text-indigo-400"
                 }`}
               >
                 Categories
@@ -97,7 +116,7 @@ export default function Navbar() {
                 className={`flex h-full items-center border-b-2 transition ${
                   pathname.startsWith("/deals")
                     ? "border-[#4b3cf0] text-[#3324d8]"
-                    : "border-transparent text-slate-800 hover:text-[#3324d8]"
+                    : "border-transparent text-slate-800 hover:text-[#3324d8] dark:text-slate-200 dark:hover:text-indigo-400"
                 }`}
               >
                 Deals
@@ -110,7 +129,7 @@ export default function Navbar() {
                 className={`flex h-full items-center border-b-2 transition ${
                   pathname.startsWith("/new-arrivals")
                     ? "border-[#4b3cf0] text-[#3324d8]"
-                    : "border-transparent text-slate-800 hover:text-[#3324d8]"
+                    : "border-transparent text-slate-800 hover:text-[#3324d8] dark:text-slate-200 dark:hover:text-indigo-400"
                 }`}
               >
                 New Arrivals
@@ -121,26 +140,26 @@ export default function Navbar() {
             <div className="ml-auto flex items-center gap-4">
               {/* Search */}
               <div className="relative">
-                <div className="flex h-[42px] w-[180px] items-center rounded-full bg-[#f4f5f7] px-5">
+                <div className="flex h-[42px] w-[180px] items-center rounded-full bg-[#f4f5f7] px-5 transition-colors dark:bg-slate-800">
                   <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search..."
-                    className="w-full bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-500"
+                    className="w-full bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-500 dark:text-slate-100 dark:placeholder:text-slate-400"
                   />
 
                   <Search
                     size={17}
                     strokeWidth={1.8}
-                    className="shrink-0 text-slate-700"
+                    className="shrink-0 text-slate-700 dark:text-slate-300"
                   />
                 </div>
 
                 {search.trim() && (
-                  <div className="absolute right-0 top-[48px] z-50 w-[320px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
+                  <div className="absolute right-0 top-[48px] z-50 w-[320px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900">
                     {searching ? (
-                      <p className="p-4 text-xs text-slate-500">Searching...</p>
+                      <p className="p-4 text-xs text-slate-500 dark:text-slate-400">Searching...</p>
                     ) : searchResults.length > 0 ? (
                       searchResults.slice(0, 5).map((product) => (
                         <Link
@@ -150,7 +169,7 @@ export default function Navbar() {
                           onClick={() => {
                             setSearch("");
                           }}
-                          className="flex items-center gap-3 border-b border-slate-100 p-3 last:border-b-0 hover:bg-slate-50"
+                          className="flex items-center gap-3 border-b border-slate-100 p-3 last:border-b-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
                         >
                           <img
                             src={
@@ -165,7 +184,7 @@ export default function Navbar() {
                           />
 
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-slate-900">
+                            <p className="truncate text-sm font-medium text-slate-900 dark:text-white">
                               {product.name}
                             </p>
 
@@ -176,7 +195,7 @@ export default function Navbar() {
                         </Link>
                       ))
                     ) : (
-                      <p className="p-4 text-xs text-slate-500">
+                      <p className="p-4 text-xs text-slate-500 dark:text-slate-400">
                         No products found.
                       </p>
                     )}
@@ -222,7 +241,7 @@ export default function Navbar() {
                       <img
                         src={profileImageUrl}
                         alt={user.fullName}
-                        className="h-8 w-8 rounded-full border border-slate-200 object-cover"
+                        className="h-8 w-8 rounded-full border border-slate-200 object-cover dark:border-slate-700"
                       />
                     ) : (
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3324d8] text-xs font-semibold text-white">
@@ -230,7 +249,7 @@ export default function Navbar() {
                       </div>
                     )}
 
-                    <span className="text-xs font-medium text-slate-800">
+                    <span className="text-xs font-medium text-slate-800 dark:text-slate-200">
                       {user.fullName}
                     </span>
                   </button>

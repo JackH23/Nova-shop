@@ -13,7 +13,7 @@ export default function ProductSort({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="rounded border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none"
+      className="rounded border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none transition-colors focus:border-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
     >
       <option value="featured">
         Sort by: Featured

@@ -92,6 +92,9 @@ export function useSettingsContent() {
         },
       });
 
+      // Tell Navbar to fetch the updated user
+      window.dispatchEvent(new Event("profile-updated"));
+
       return true;
     } catch (error) {
       if (
@@ -144,6 +147,9 @@ export function useSettingsContent() {
         type: "UPDATE_PROFILE_IMAGE",
         value: response.user.profileImage,
       });
+
+      // Tell Navbar to fetch the updated user
+      window.dispatchEvent(new Event("profile-updated"));
 
       // Clear the uploading state before reporting success.
       dispatch({

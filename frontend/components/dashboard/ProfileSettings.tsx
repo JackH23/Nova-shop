@@ -40,14 +40,14 @@ export default function ProfileSettings({
   });
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-6">
+    <div className="rounded-lg border border-slate-200 bg-white p-6 transition-colors dark:border-slate-700 dark:bg-slate-900">
       {/* Header */}
       <div>
-        <h2 className="text-base font-semibold text-slate-950">
+        <h2 className="text-base font-semibold text-slate-950 dark:text-white">
           Profile Information
         </h2>
 
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
           Update your personal information.
         </p>
       </div>
@@ -59,7 +59,7 @@ export default function ProfileSettings({
             <img
               src={displayImageUrl}
               alt={user.fullName}
-              className="h-20 w-20 rounded-full border border-slate-200 object-cover"
+              className="h-20 w-20 rounded-full border border-slate-200 object-cover dark:border-slate-700"
             />
           ) : (
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#3324d8] text-2xl font-semibold text-white">
@@ -71,7 +71,7 @@ export default function ProfileSettings({
             type="button"
             disabled={updatingImage}
             onClick={handleOpenFilePicker}
-            className="absolute -bottom-1 -right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[#3324d8] text-white transition hover:bg-[#271bb7] disabled:cursor-not-allowed disabled:opacity-50"
+            className="absolute -bottom-1 -right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[#3324d8] text-white transition hover:bg-[#271bb7] disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-900"
           >
             <Camera size={15} />
           </button>
@@ -86,14 +86,18 @@ export default function ProfileSettings({
         </div>
 
         <div>
-          <p className="text-sm font-medium text-slate-900">Profile Photo</p>
+          <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+            Profile Photo
+          </p>
 
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             JPG, PNG or WEBP. Maximum 5MB.
           </p>
 
           {updatingImage && (
-            <p className="mt-1 text-xs text-[#3324d8]">Uploading...</p>
+            <p className="mt-1 text-xs text-[#3324d8] dark:text-indigo-400">
+              Uploading...
+            </p>
           )}
         </div>
       </div>
@@ -101,7 +105,6 @@ export default function ProfileSettings({
       {/* Profile form */}
       <form onSubmit={handleSubmit}>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {/* Full name */}
           <AuthInput
             id="fullName"
             name="fullName"
@@ -112,7 +115,6 @@ export default function ProfileSettings({
             onChange={(event) => setFullName(event.target.value)}
           />
 
-          {/* Email */}
           <AuthInput
             id="email"
             name="email"

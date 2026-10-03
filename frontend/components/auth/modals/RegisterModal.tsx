@@ -21,18 +21,19 @@ export default function RegisterModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 dark:bg-black/60"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-[430px] overflow-hidden rounded-xl border border-[#dfe3f0] bg-white shadow-xl"
+        className="relative w-full max-w-[430px] overflow-hidden rounded-xl border border-[#dfe3f0] bg-white shadow-xl transition-colors dark:border-slate-700 dark:bg-slate-900"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close */}
         <button
           type="button"
           onClick={onClose}
           aria-label="Close register"
-          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+          className="absolute right-4 top-4 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-white"
         >
           <X size={20} />
         </button>
@@ -41,7 +42,7 @@ export default function RegisterModal({
         <div className="px-5 pb-5 pt-6 sm:px-7">
           {/* Logo */}
           <div className="mb-3 flex justify-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-indigo-50 text-indigo-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400">
               <svg
                 width="23"
                 height="23"
@@ -62,38 +63,41 @@ export default function RegisterModal({
 
           {/* Heading */}
           <div className="mb-5 text-center">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               Create an account
             </h1>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Join SaaSPlatform to start building today.
             </p>
           </div>
 
+          {/* Google */}
           <GoogleButton />
 
+          {/* Divider */}
           <div className="my-5 flex items-center gap-3">
-            <div className="h-px flex-1 bg-slate-200" />
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
 
-            <span className="text-[11px] font-medium uppercase text-slate-500">
+            <span className="text-[11px] font-medium uppercase text-slate-500 dark:text-slate-400">
               Or register with email
             </span>
 
-            <div className="h-px flex-1 bg-slate-200" />
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
           </div>
 
+          {/* Register form */}
           <RegisterForm onSuccess={onOpenVerifyEmail} />
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-200 bg-indigo-50/40 px-5 py-4 text-center">
-          <p className="text-xs text-slate-500">
+        <div className="border-t border-slate-200 bg-indigo-50/40 px-5 py-4 text-center dark:border-slate-700 dark:bg-slate-800/50">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Already have an account?{" "}
             <button
               type="button"
               onClick={onOpenLogin}
-              className="font-medium text-indigo-600 hover:underline"
+              className="cursor-pointer font-medium text-indigo-600 hover:underline dark:text-indigo-400"
             >
               Sign In
             </button>

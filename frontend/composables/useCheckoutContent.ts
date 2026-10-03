@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useCheckout } from "@/composables/useCheckout";
@@ -33,6 +33,8 @@ export function useCheckoutContent() {
 
   const [creatingPayment, setCreatingPayment] =
     useState(false);
+
+  const orderCompletedRef = useRef(false);
 
   const [shippingData, setShippingData] =
     useState<ShippingData>({
@@ -126,6 +128,10 @@ export function useCheckoutContent() {
   // ========================================
 
   useEffect(() => {
+    if (orderCompletedRef.current) {
+      return;
+    }
+
     if (step !== "payment") {
       return;
     }
@@ -141,6 +147,10 @@ export function useCheckoutContent() {
     let cancelled = false;
 
     const createStripePayment = async () => {
+      if (orderCompletedRef.current) {
+        return;
+      }
+
       try {
         setCreatingPayment(true);
 
@@ -149,13 +159,13 @@ export function useCheckoutContent() {
             deliveryMethod,
           );
 
-        if (cancelled) {
+        if (cancelled || orderCompletedRef.current) {
           return;
         }
 
         setClientSecret(response.clientSecret);
       } catch (error) {
-        if (!cancelled) {
+        if (!cancelled && !orderCompletedRef.current) {
           console.error(
             "Failed to create Stripe payment:",
             error,
@@ -200,9 +210,23 @@ export function useCheckoutContent() {
         response.order,
       );
 
+      // Order successfully created.
+      // Prevent another PaymentIntent from being created.
+      orderCompletedRef.current = true;
+
       // PaymentIntent has already succeeded.
       // Never reuse its clientSecret.
       setClientSecret(null);
+
+      // Refresh navbar cart count
+      window.dispatchEvent(new Event("cart-updated"));
+
+      router.replace(
+        `/checkout/success?orderId=${response.order.id}`,
+      );
+
+      // Refresh navbar cart count
+      window.dispatchEvent(new Event("cart-updated"));
 
       router.replace(
         `/checkout/success?orderId=${response.order.id}`,

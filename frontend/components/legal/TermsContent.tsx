@@ -1,8 +1,8 @@
 export default function TermsContent() {
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 text-slate-600 dark:text-slate-400">
       <section>
-        <h3 className="font-semibold text-slate-900">
+        <h3 className="font-semibold text-slate-900 dark:text-slate-100">
           1. Acceptance of Terms
         </h3>
 
@@ -13,7 +13,7 @@ export default function TermsContent() {
       </section>
 
       <section>
-        <h3 className="font-semibold text-slate-900">
+        <h3 className="font-semibold text-slate-900 dark:text-slate-100">
           2. User Accounts
         </h3>
 
@@ -24,7 +24,7 @@ export default function TermsContent() {
       </section>
 
       <section>
-        <h3 className="font-semibold text-slate-900">
+        <h3 className="font-semibold text-slate-900 dark:text-slate-100">
           3. Use of Service
         </h3>
 

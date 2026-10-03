@@ -41,20 +41,20 @@ export default function ProfileModal({
   return (
     <div
       ref={modalRef}
-      className="absolute right-0 top-11 z-50 w-64 rounded-lg border border-slate-200 bg-white p-4 shadow-lg"
+      className="absolute right-0 top-11 z-50 w-64 rounded-lg border border-slate-200 bg-white p-4 shadow-lg dark:border-slate-700 dark:bg-slate-900"
     >
       {/* User */}
       <Link
         href="/dashboard/settings"
         prefetch={false}
         onClick={onClose}
-        className="flex items-center gap-3 rounded-md p-2 transition hover:bg-slate-50"
+        className="flex items-center gap-3 rounded-md p-2 transition hover:bg-slate-50 dark:hover:bg-slate-800"
       >
         {profileImage ? (
           <img
             src={profileImage}
             alt={fullName}
-            className="h-10 w-10 rounded-full border border-slate-200 object-cover"
+            className="h-10 w-10 rounded-full border border-slate-200 object-cover dark:border-slate-700"
           />
         ) : (
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#3324d8] font-semibold text-white">
@@ -62,20 +62,24 @@ export default function ProfileModal({
           </div>
         )}
 
-        <div>
-          <p className="text-sm font-semibold text-slate-900">{fullName}</p>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+            {fullName}
+          </p>
 
-          <p className="text-xs text-slate-500">{email}</p>
+          <p className="truncate text-xs text-slate-500 dark:text-slate-400">
+            {email}
+          </p>
         </div>
       </Link>
 
       {/* Menu */}
-      <div className="mt-4 border-t border-slate-100 pt-3">
+      <div className="mt-4 border-t border-slate-100 pt-3 dark:border-slate-700">
         <Link
           href="/dashboard/orders"
           prefetch={false}
           onClick={onClose}
-          className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-50"
+          className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
         >
           <Package size={16} />
           My Orders
@@ -84,7 +88,7 @@ export default function ProfileModal({
         <button
           type="button"
           onClick={onLogout}
-          className="mt-1 flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-red-600 transition hover:bg-red-50"
+          className="mt-1 flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
         >
           <LogOut size={16} />
           Logout
