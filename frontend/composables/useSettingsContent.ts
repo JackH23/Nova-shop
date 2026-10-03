@@ -127,17 +127,17 @@ export function useSettingsContent() {
   // ================================
 
   const handleUpdateProfileImage = async (file: File) => {
+    dispatch({
+      type: "SET_UPDATING_IMAGE",
+      value: true,
+    });
+
+    dispatch({
+      type: "SET_ERROR",
+      value: "",
+    });
+
     try {
-      dispatch({
-        type: "SET_UPDATING_IMAGE",
-        value: true,
-      });
-
-      dispatch({
-        type: "SET_ERROR",
-        value: "",
-      });
-
       const response = await settingsService.updateProfileImage(file);
 
       dispatch({
@@ -145,8 +145,19 @@ export function useSettingsContent() {
         value: response.user.profileImage,
       });
 
+      // Clear the uploading state before reporting success.
+      dispatch({
+        type: "SET_UPDATING_IMAGE",
+        value: false,
+      });
+
       return true;
     } catch (error) {
+      dispatch({
+        type: "SET_UPDATING_IMAGE",
+        value: false,
+      });
+
       if (
         error instanceof Error &&
         error.message === "Authentication required."
@@ -169,11 +180,6 @@ export function useSettingsContent() {
       });
 
       return false;
-    } finally {
-      dispatch({
-        type: "SET_UPDATING_IMAGE",
-        value: false,
-      });
     }
   };
 
