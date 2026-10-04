@@ -1,16 +1,38 @@
 "use client";
 
-import { useCallback, useEffect, useReducer } from "react";
+import {
+  useCallback,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
+
 import { dashboardService } from "@/services/dashboardService";
+
 import {
   dashboardReducer,
   initialDashboardState,
 } from "@/reducers/dashboardReducer";
 
-export function useOrderDetail(orderId: number | null) {
+import type {
+  DashboardOrderPagination,
+} from "@/lib/dashboard";
+
+export function useOrderDetail(
+  orderId: number | null,
+  page: number = 1,
+  limit: number = 5,
+) {
   const [state, dispatch] = useReducer(
     dashboardReducer,
     initialDashboardState,
+  );
+
+  const [
+    pagination,
+    setPagination,
+  ] = useState<DashboardOrderPagination | null>(
+    null,
   );
 
   const getOrder = useCallback(async () => {
@@ -28,14 +50,25 @@ export function useOrderDetail(orderId: number | null) {
       });
 
       const response =
-        await dashboardService.getOrderById(orderId);
+        await dashboardService.getOrderById(
+          orderId,
+          page,
+          limit,
+        );
 
       dispatch({
         type: "SET_ORDER",
         value: response.order,
       });
+
+      setPagination(
+        response.pagination,
+      );
     } catch (error) {
-      console.error("Failed to fetch order:", error);
+      console.error(
+        "Failed to fetch order:",
+        error,
+      );
 
       dispatch({
         type: "SET_ERROR",
@@ -50,7 +83,11 @@ export function useOrderDetail(orderId: number | null) {
         value: false,
       });
     }
-  }, [orderId]);
+  }, [
+    orderId,
+    page,
+    limit,
+  ]);
 
   useEffect(() => {
     getOrder();
@@ -58,6 +95,7 @@ export function useOrderDetail(orderId: number | null) {
 
   return {
     order: state.order,
+    pagination,
     loading: state.loading,
     error: state.error,
     getOrder,

@@ -45,6 +45,16 @@ export type DashboardPayment = {
   updated_at: string;
 };
 
+// Return request summary
+export type DashboardReturnRequest = {
+  id: number;
+  status:
+    | "REQUESTED"
+    | "APPROVED"
+    | "REJECTED"
+    | "REFUNDED";
+};
+
 // Order
 export type DashboardOrder = {
   id: number;
@@ -65,12 +75,25 @@ export type DashboardOrder = {
   items: DashboardOrderItem[];
   delivery: DashboardDelivery | null;
   payment: DashboardPayment | null;
+
+  // Return information
+  has_return_request: boolean;
+  return_request: DashboardReturnRequest | null;
+};
+
+// Order item pagination
+export type DashboardOrderPagination = {
+  page: number;
+  limit: number;
+  totalItems: number;
+  totalPages: number;
 };
 
 // GET /dashboard/orders/:id
 export type DashboardOrderResponse = {
   message: string;
   order: DashboardOrder;
+  pagination: DashboardOrderPagination;
 };
 
 // Shipping Address

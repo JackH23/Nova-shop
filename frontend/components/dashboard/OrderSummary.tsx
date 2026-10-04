@@ -1,64 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { cartService } from "@/services/cartService";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import { useOrderSummary } from "@/composables/useOrderSummary";
 import type { DashboardOrder } from "@/lib/dashboard";
 
 type OrderSummaryProps = {
   order: DashboardOrder;
 };
 
-export default function OrderSummary({ order }: OrderSummaryProps) {
-  const router = useRouter();
-  const [buyAgainError, setBuyAgainError] = useState("");
-
-  const handleBuyAgainErrorConfirm = () => {
-    setBuyAgainError("");
-
-    // Refresh navbar cart count
-    window.dispatchEvent(new Event("cart-updated"));
-
-    // Go to cart
-    router.push("/cart");
-  };
-
-  const handleBuyAgain = async () => {
-    try {
-      await Promise.all(
-        order.items.map((item) =>
-          cartService.addToCart(
-            item.product_id,
-            item.variant_id,
-            item.quantity,
-          ),
-        ),
-      );
-
-      // Refresh Navbar cart count
-      window.dispatchEvent(new Event("cart-updated"));
-
-      // Everything succeeded
-      router.push("/cart");
-    } catch (error: any) {
-      console.error("Failed to buy again:", error);
-
-      // Some requests may have succeeded,
-      // so update Navbar count
-      window.dispatchEvent(new Event("cart-updated"));
-
-      setBuyAgainError(
-        error?.response?.data?.message ||
-          error?.message ||
-          "Unable to add these items to your cart.",
-      );
-    }
-  };
-
-  const handleReturnItem = () => {
-    router.push(`/dashboard/orders/${order.id}/return`);
-  };
+export default function OrderSummary({
+  order,
+}: OrderSummaryProps) {
+  const {
+    buyAgainError,
+    buyAgainLoading,
+    canReturn,
+    returnButtonText,
+    handleBuyAgain,
+    handleBuyAgainErrorConfirm,
+    handleCloseBuyAgainError,
+    handleReturnItem,
+  } = useOrderSummary(order);
 
   return (
     <>
@@ -79,7 +41,9 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
           </div>
 
           <div className="flex justify-between">
-            <span className="text-slate-500 dark:text-slate-400">Shipping</span>
+            <span className="text-slate-500 dark:text-slate-400">
+              Shipping
+            </span>
 
             <span className="text-slate-900 dark:text-slate-100">
               ${Number(order.shipping_fee).toFixed(2)}
@@ -87,7 +51,9 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
           </div>
 
           <div className="flex justify-between">
-            <span className="text-slate-500 dark:text-slate-400">Tax</span>
+            <span className="text-slate-500 dark:text-slate-400">
+              Tax
+            </span>
 
             <span className="text-slate-900 dark:text-slate-100">
               ${Number(order.tax).toFixed(2)}
@@ -96,10 +62,15 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
 
           {Number(order.discount_amount) > 0 && (
             <div className="flex justify-between">
-              <span className="text-slate-500 dark:text-slate-400">Discount</span>
+              <span className="text-slate-500 dark:text-slate-400">
+                Discount
+              </span>
 
               <span className="text-indigo-600 dark:text-indigo-400">
-                -${Number(order.discount_amount).toFixed(2)}
+                -$
+                {Number(
+                  order.discount_amount,
+                ).toFixed(2)}
               </span>
             </div>
           )}
@@ -120,18 +91,36 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
         <button
           type="button"
           onClick={handleBuyAgain}
-          className="mt-5 w-full cursor-pointer rounded-md bg-[#3324d8] py-2.5 text-xs font-semibold text-white transition hover:bg-[#271bb7]"
+          disabled={buyAgainLoading}
+          className="mt-5 w-full cursor-pointer rounded-md bg-[#3324d8] py-2.5 text-xs font-semibold text-white transition hover:bg-[#271bb7] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Buy Again
+          {buyAgainLoading
+            ? "Adding to Cart..."
+            : "Buy Again"}
         </button>
 
         {order.status === "DELIVERED" && (
           <button
             type="button"
             onClick={handleReturnItem}
-            className="mt-2 w-full cursor-pointer rounded-md border border-slate-200 py-2.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            disabled={!canReturn}
+            className="
+              mt-2 w-full rounded-md border border-slate-200 py-2.5
+              text-xs font-medium text-slate-700 transition
+              hover:bg-slate-50
+              disabled:cursor-not-allowed
+              disabled:bg-slate-100
+              disabled:text-slate-400
+              disabled:hover:bg-slate-100
+              dark:border-slate-700
+              dark:text-slate-300
+              dark:hover:bg-slate-800
+              dark:disabled:bg-slate-800
+              dark:disabled:text-slate-500
+              dark:disabled:hover:bg-slate-800
+            "
           >
-            Return Item
+            {returnButtonText}
           </button>
         )}
       </div>
@@ -143,7 +132,7 @@ export default function OrderSummary({ order }: OrderSummaryProps) {
         confirmText="OK"
         cancelText="Close"
         onConfirm={handleBuyAgainErrorConfirm}
-        onCancel={() => setBuyAgainError("")}
+        onCancel={handleCloseBuyAgainError}
       />
     </>
   );

@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const sequelize = require("../config/database");
 
 const Order = require("../models/Order");
@@ -63,14 +64,39 @@ const createReturn = async (req, res) => {
       });
     }
 
+    // ========================================
+    // Only one return request per order
+    // ========================================
+
+    const existingReturn = await Return.findOne({
+      where: {
+        order_id,
+        user_id: userId,
+      },
+      transaction,
+    });
+
+    if (existingReturn) {
+      await transaction.rollback();
+
+      return res.status(409).json({
+        message: "A return request has already been submitted for this order",
+      });
+    }
+
     let refundAmount = 0;
 
     const returnItemsData = [];
 
+    // ========================================
     // Validate every selected item
+    // Prevent duplicate / excessive returns
+    // ========================================
+
     for (const item of items) {
       const orderItem = order.items.find(
-        (orderItem) => orderItem.id === Number(item.order_item_id),
+        (orderItem) =>
+          orderItem.id === Number(item.order_item_id),
       );
 
       if (!orderItem) {
@@ -83,11 +109,7 @@ const createReturn = async (req, res) => {
 
       const quantity = Number(item.quantity);
 
-      if (
-        !Number.isInteger(quantity) ||
-        quantity < 1 ||
-        quantity > orderItem.quantity
-      ) {
+      if (!Number.isInteger(quantity) || quantity < 1) {
         await transaction.rollback();
 
         return res.status(400).json({
@@ -95,15 +117,14 @@ const createReturn = async (req, res) => {
         });
       }
 
-      const itemRefundAmount = Number(orderItem.unit_price) * quantity;
+      const itemRefundAmount =
+        Number(orderItem.unit_price) * quantity;
 
       refundAmount += itemRefundAmount;
 
       returnItemsData.push({
         order_item_id: orderItem.id,
-
         quantity,
-
         refund_amount: itemRefundAmount,
       });
     }

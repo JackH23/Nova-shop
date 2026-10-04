@@ -19,13 +19,18 @@ export const dashboardService = {
     );
   },
 
-  // GET one order
+  // GET one order with item pagination
   getOrderById: (
     orderId: number,
+    page: number = 1,
+    limit: number = 5,
   ): Promise<DashboardOrderResponse> => {
-    return apiRequest(`/dashboard/orders/${orderId}`, {
-      method: "GET",
-    });
+    return apiRequest(
+      `/dashboard/orders/${orderId}?page=${page}&limit=${limit}`,
+      {
+        method: "GET",
+      },
+    );
   },
 
   // GET dashboard summary

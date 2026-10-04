@@ -11,8 +11,8 @@ import { useReturnDetail } from "@/composables/useReturnDetail";
 
 import ReturnStatusBadge from "./ReturnStatusBadge";
 
-const PRODUCT_IMAGE_URL =
-  process.env.NEXT_PUBLIC_PRODUCT_IMAGE_URL || "";
+const ADMIN_UPLOAD_URL =
+  process.env.NEXT_PUBLIC_ADMIN_UPLOAD_URL;
 
 function resolveAdminImageUrl(imageUrl: string) {
   if (!imageUrl) return "";
@@ -24,8 +24,18 @@ function resolveAdminImageUrl(imageUrl: string) {
     return imageUrl;
   }
 
-  const baseUrl = PRODUCT_IMAGE_URL.replace(/\/$/, "");
-  const path = imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`;
+  if (!ADMIN_UPLOAD_URL) {
+    console.error(
+      "NEXT_PUBLIC_ADMIN_UPLOAD_URL is not defined",
+    );
+    return "";
+  }
+
+  const baseUrl = ADMIN_UPLOAD_URL.replace(/\/$/, "");
+
+  const path = imageUrl.startsWith("/")
+    ? imageUrl
+    : `/${imageUrl}`;
 
   return `${baseUrl}${path}`;
 }

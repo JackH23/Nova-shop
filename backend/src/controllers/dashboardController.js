@@ -5,6 +5,7 @@ const Product = require("../models/Product");
 const Delivery = require("../models/Delivery");
 const Payment = require("../models/Payment");
 const ShippingAddress = require("../models/ShippingAddress");
+const Return = require("../models/Return");
 
 // Get all orders for logged-in user
 const getOrders = async (req, res) => {
@@ -171,27 +172,33 @@ const getDashboardSummary = async (req, res) => {
 const getOrderById = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user.id;
 
+    // ========================================
+    // Pagination
+    // ========================================
+    const page = Math.max(
+      Number(req.query.page) || 1,
+      1,
+    );
+
+    const limit = Math.max(
+      Number(req.query.limit) || 5,
+      1,
+    );
+
+    const offset = (page - 1) * limit;
+
+    // ========================================
+    // Get order
+    // ========================================
     const order = await Order.findOne({
       where: {
         id,
-        user_id: req.user.id,
+        user_id: userId,
       },
 
       include: [
-        {
-          model: OrderItem,
-          as: "items",
-          required: false,
-          include: [
-            {
-              model: Product,
-              as: "product",
-              required: false,
-              attributes: ["id", "image"],
-            },
-          ],
-        },
         {
           model: Delivery,
           as: "delivery",
@@ -211,12 +218,92 @@ const getOrderById = async (req, res) => {
       });
     }
 
+    // ========================================
+    // Get paginated order items
+    // ========================================
+    const {
+      count: totalItems,
+      rows: items,
+    } = await OrderItem.findAndCountAll({
+      where: {
+        order_id: order.id,
+      },
+
+      include: [
+        {
+          model: Product,
+          as: "product",
+          required: false,
+          attributes: ["id", "image"],
+        },
+      ],
+
+      order: [["id", "ASC"]],
+
+      limit,
+      offset,
+    });
+
+    const totalPages = Math.ceil(
+      totalItems / limit,
+    );
+
+    // ========================================
+    // Check existing return
+    // ========================================
+    const existingReturn =
+      await Return.findOne({
+        where: {
+          order_id: order.id,
+          user_id: userId,
+        },
+
+        attributes: [
+          "id",
+          "status",
+        ],
+      });
+
+    const orderData = order.toJSON();
+
+    // ========================================
+    // Response
+    // ========================================
     return res.status(200).json({
-      message: "Order fetched successfully",
-      order,
+      message:
+        "Order fetched successfully",
+
+      order: {
+        ...orderData,
+
+        // Current page items only
+        items,
+
+        has_return_request:
+          Boolean(existingReturn),
+
+        return_request:
+          existingReturn
+            ? {
+                id: existingReturn.id,
+                status:
+                  existingReturn.status,
+              }
+            : null,
+      },
+
+      pagination: {
+        page,
+        limit,
+        totalItems,
+        totalPages,
+      },
     });
   } catch (error) {
-    console.error("Get dashboard order error:", error);
+    console.error(
+      "Get dashboard order error:",
+      error,
+    );
 
     return res.status(500).json({
       message: "Internal server error",
