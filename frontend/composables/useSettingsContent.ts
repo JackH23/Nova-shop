@@ -92,6 +92,9 @@ export function useSettingsContent() {
         },
       });
 
+      // Tell Navbar to fetch the updated user
+      window.dispatchEvent(new Event("profile-updated"));
+
       return true;
     } catch (error) {
       if (
@@ -127,17 +130,17 @@ export function useSettingsContent() {
   // ================================
 
   const handleUpdateProfileImage = async (file: File) => {
+    dispatch({
+      type: "SET_UPDATING_IMAGE",
+      value: true,
+    });
+
+    dispatch({
+      type: "SET_ERROR",
+      value: "",
+    });
+
     try {
-      dispatch({
-        type: "SET_UPDATING_IMAGE",
-        value: true,
-      });
-
-      dispatch({
-        type: "SET_ERROR",
-        value: "",
-      });
-
       const response = await settingsService.updateProfileImage(file);
 
       dispatch({
@@ -145,8 +148,22 @@ export function useSettingsContent() {
         value: response.user.profileImage,
       });
 
-      return response.user;
+      // Tell Navbar to fetch the updated user
+      window.dispatchEvent(new Event("profile-updated"));
+
+      // Clear the uploading state before reporting success.
+      dispatch({
+        type: "SET_UPDATING_IMAGE",
+        value: false,
+      });
+
+      return true;
     } catch (error) {
+      dispatch({
+        type: "SET_UPDATING_IMAGE",
+        value: false,
+      });
+
       if (
         error instanceof Error &&
         error.message === "Authentication required."
@@ -157,7 +174,7 @@ export function useSettingsContent() {
         });
 
         openLogin();
-        throw error;
+        return false;
       }
 
       dispatch({
@@ -168,12 +185,7 @@ export function useSettingsContent() {
             : "Failed to update profile image",
       });
 
-      throw error;
-    } finally {
-      dispatch({
-        type: "SET_UPDATING_IMAGE",
-        value: false,
-      });
+      return false;
     }
   };
 

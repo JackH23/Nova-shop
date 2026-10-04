@@ -1,11 +1,24 @@
+"use client";
+
 import Link from "next/link";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import VerifyEmailForm from "@/components/auth/VerifyEmailForm";
 
 export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<VerifyEmailPageFallback />}>
+      <VerifyEmailPageContent />
+    </Suspense>
+  );
+}
+
+function VerifyEmailPageContent() {
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email") ?? "";
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-[#f8f9ff] px-4">
-      {/* Brand */}
       <div className="mt-8 flex items-center gap-2 text-indigo-600">
         <div className="h-5 w-5 rotate-45 rounded-sm bg-indigo-600" />
 
@@ -14,14 +27,11 @@ export default function VerifyEmailPage() {
         </span>
       </div>
 
-      {/* Card */}
       <div className="mt-7 w-full max-w-[395px] rounded-xl border border-[#d9dbea] bg-white px-7 py-7 shadow-sm">
-        {/* Icon */}
         <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
           <MailIcon />
         </div>
 
-        {/* Header */}
         <div className="mb-6">
           <h1 className="text-xl font-bold text-slate-900">
             Verify your email
@@ -33,10 +43,8 @@ export default function VerifyEmailPage() {
           </p>
         </div>
 
-        {/* Verify email form */}
-        <VerifyEmailForm />
+        <VerifyEmailForm email={email} />
 
-        {/* Back */}
         <div className="mt-5 text-center">
           <Link
             href="/register"
@@ -46,6 +54,14 @@ export default function VerifyEmailPage() {
           </Link>
         </div>
       </div>
+    </main>
+  );
+}
+
+function VerifyEmailPageFallback() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-[#f8f9ff] px-4">
+      <p className="text-sm text-slate-500">Loading verification...</p>
     </main>
   );
 }

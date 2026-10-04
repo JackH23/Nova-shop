@@ -2,11 +2,15 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { OAuth2Client } = require("google-auth-library");
-const { sendVerificationEmail } = require("../services/emailService");
+const {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+} = require("../services/emailService");
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const register = async (req, res) => {
+  let registrationStage = "validation";
   try {
     const { fullName, email, password, confirmPassword, acceptTerms } =
       req.body;
@@ -33,6 +37,7 @@ const register = async (req, res) => {
     }
 
     // Check if email already exists
+    registrationStage = "find-user";
     const existingUser = await User.findOne({
       where: { email },
     });
@@ -44,6 +49,7 @@ const register = async (req, res) => {
     }
 
     // Hash password before saving
+    registrationStage = "hash-password";
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Generate 6-digit verification code
@@ -55,6 +61,7 @@ const register = async (req, res) => {
     const verificationCodeExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     // Create user
+    registrationStage = "create-user";
     const user = await User.create({
       fullName,
       email,
@@ -64,7 +71,11 @@ const register = async (req, res) => {
       termsAcceptedAt: new Date(),
     });
 
+    registrationStage = "send-verification-email";
+    console.log("Registration: user created; sending verification email");
     await sendVerificationEmail(user.email, verificationCode);
+    console.log("Registration: verification email sent");
+    registrationStage = "respond";
 
     return res.status(201).json({
       message: "Registration successful. Please verify your email.",
@@ -77,7 +88,18 @@ const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Register error:", error);
+    console.error("Register failure stage:", registrationStage);
+    console.error(
+      "Register error details:",
+      JSON.stringify({
+        name: error?.name,
+        message: error?.message ?? String(error),
+        code: error?.code,
+        command: error?.command,
+        responseCode: error?.responseCode,
+        cause: error?.cause?.message,
+      }),
+    );
 
     return res.status(500).json({
       message: "Internal server error",
@@ -87,7 +109,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password, rememberMe } = req.body;
+    const { email, password } = req.body;
 
     // Check required fields
     if (!email || !password) {
@@ -133,7 +155,7 @@ const login = async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1m",
+        expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
       },
     );
 
@@ -145,7 +167,7 @@ const login = async (req, res) => {
       },
       process.env.JWT_REFRESH_SECRET,
       {
-        expiresIn: rememberMe === true ? "30d" : "1d",
+        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
       },
     );
 
@@ -198,7 +220,7 @@ const refreshToken = async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1m",
+        expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
       },
     );
 
@@ -217,18 +239,9 @@ const refreshToken = async (req, res) => {
 
 const me = async (req, res) => {
   try {
-    const user = await User.findByPk(
-      req.user.id,
-      {
-        attributes: [
-          "id",
-          "fullName",
-          "email",
-          "profileImage",
-          "isVerified",
-        ],
-      },
-    );
+    const user = await User.findByPk(req.user.id, {
+      attributes: ["id", "fullName", "email", "profileImage", "isVerified"],
+    });
 
     if (!user) {
       return res.status(404).json({
@@ -240,10 +253,7 @@ const me = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error(
-      "Get current user error:",
-      error,
-    );
+    console.error("Get current user error:", error);
 
     return res.status(500).json({
       message: "Internal server error",
@@ -407,10 +417,10 @@ const forgotPassword = async (req, res) => {
 
     await user.save();
 
-    console.log("Password reset code:", resetCode);
+    await sendPasswordResetEmail(user.email, resetCode);
 
     return res.status(200).json({
-      message: "Password reset code generated successfully",
+      message: "Password reset code sent successfully",
     });
   } catch (error) {
     console.error("Forgot password error:", error);
@@ -538,7 +548,7 @@ const resetPassword = async (req, res) => {
 
 const googleLogin = async (req, res) => {
   try {
-    const { credential, rememberMe } = req.body;
+    const { credential } = req.body;
 
     if (!credential) {
       return res.status(400).json({
@@ -615,7 +625,7 @@ const googleLogin = async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1m",
+        expiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
       },
     );
 
@@ -627,7 +637,7 @@ const googleLogin = async (req, res) => {
       },
       process.env.JWT_REFRESH_SECRET,
       {
-        expiresIn: rememberMe === true ? "30d" : "1d",
+        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
       },
     );
 

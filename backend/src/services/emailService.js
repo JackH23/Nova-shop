@@ -1,29 +1,137 @@
 const nodemailer = require("nodemailer");
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
+async function getTransporter() {
+  const user = process.env.EMAIL_USER?.trim();
+  const pass = process.env.EMAIL_APP_PASSWORD?.replace(/\s/g, "");
 
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD,
-  },
-});
+  if (!user || !pass) {
+    throw new Error("EMAIL_USER and EMAIL_APP_PASSWORD are required");
+  }
+
+  const host = "smtp.gmail.com";
+  const port = 587;
+
+  console.log("SMTP connection target:", {
+    worker: process.env.CLOUDFLARE_WORKER,
+    host,
+    port,
+  });
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: false,
+    requireTLS: true,
+    tls: {
+      servername: "smtp.gmail.com",
+    },
+    auth: { user, pass },
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000,
+  });
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+async function sendWithGmailApi(options) {
+  const names = ["EMAIL_USER", "GMAIL_CLIENT_ID", "GMAIL_CLIENT_SECRET", "GMAIL_REFRESH_TOKEN"];
+  const settings = Object.fromEntries(names.map(name => [name, process.env[name]?.trim()]));
+  for (const name of names) {
+    if (!settings[name]) throw new Error(name + " is required for Gmail API");
+  }
+
+  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: settings.GMAIL_CLIENT_ID,
+      client_secret: settings.GMAIL_CLIENT_SECRET,
+      refresh_token: settings.GMAIL_REFRESH_TOKEN,
+      grant_type: "refresh_token",
+    }),
+    signal: AbortSignal.timeout(15000),
+  });
+  const token = await tokenResponse.json();
+  if (!tokenResponse.ok || !token.access_token) {
+    throw new Error("Gmail OAuth token refresh failed: " + (token.error || tokenResponse.status));
+  }
+
+  // Nodemailer only builds the MIME message here; it opens no SMTP connection.
+  const composer = nodemailer.createTransport({
+    streamTransport: true,
+    buffer: true,
+    newline: "windows",
+  });
+  const message = await composer.sendMail({
+    ...options,
+    from: { name: "NovaShop", address: settings.EMAIL_USER },
+  });
+  const response = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token.access_token,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ raw: message.message.toString("base64url") }),
+    signal: AbortSignal.timeout(20000),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error("Gmail API send failed: " + response.status + " " + (result.error?.status || ""));
+  }
+  console.log("Gmail API: email accepted");
+  return result;
+}
+
+async function sendEmail(options) {
+  if (process.env.CLOUDFLARE_WORKER === "true") {
+    return sendWithGmailApi(options);
+  }
+
+  const transporter = await getTransporter();
+
+  try {
+    const result = await transporter.sendMail({
+      from: `"NovaShop" <${process.env.EMAIL_USER.trim()}>`,
+      ...options,
+    });
+
+    console.log("SMTP email accepted:", {
+      messageId: result.messageId,
+      accepted: result.accepted,
+      rejected: result.rejected,
+      response: result.response,
+    });
+
+    if (!result.accepted?.length) {
+      throw new Error("SMTP server did not accept the recipient");
+    }
+
+    return result;
+  } finally {
+    transporter.close();
+  }
+}
 
 const sendVerificationEmail = async (email, code) => {
-  await transporter.sendMail({
-    from: `"NovaShop" <${process.env.EMAIL_USER}>`,
+  return sendEmail({
     to: email,
-    subject: "Verify your NovaShop account",
-
+    subject: "Your NovaShop verification code",
+    text: `Your NovaShop verification code is: ${code}. This code expires in 10 minutes.`,
     html: `
       <h2>Verify your email</h2>
-
       <p>Your verification code is:</p>
-
-      <h1>${code}</h1>
-
+      <h1>${escapeHtml(code)}</h1>
       <p>This code expires in 10 minutes.</p>
-
       <p>
         If you didn't create a NovaShop account,
         you can ignore this email.
@@ -32,55 +140,63 @@ const sendVerificationEmail = async (email, code) => {
   });
 };
 
-// Admin notification after customer places an order
-const sendAdminOrderNotification = async ({
-  order,
-  payment,
-  customer,
-}) => {
-  await transporter.sendMail({
-    from: `"NovaShop" <${process.env.EMAIL_USER}>`,
+const sendPasswordResetEmail = async (email, code) => {
+  return sendEmail({
+    to: email,
+    subject: "Your NovaShop password reset code",
+    text: `Your NovaShop password reset code is: ${code}. This code expires in 10 minutes.`,
+    html: `
+      <h2>Reset your password</h2>
+      <p>Your password reset code is:</p>
+      <h1>${escapeHtml(code)}</h1>
+      <p>This code expires in 10 minutes.</p>
+      <p>
+        If you didn't request a password reset,
+        you can ignore this email.
+      </p>
+    `,
+  });
+};
 
-    to: process.env.ADMIN_EMAIL,
+const sendAdminOrderNotification = async ({ order, payment, customer }) => {
+  const adminEmail = process.env.ADMIN_EMAIL?.trim();
 
+  if (!adminEmail) {
+    throw new Error("ADMIN_EMAIL is required for order notifications");
+  }
+
+  return sendEmail({
+    to: adminEmail,
     subject: `New Order - ${order.order_no}`,
-
     html: `
       <h2>New Order Received</h2>
-
       <p>
         <strong>Order Number:</strong>
-        ${order.order_no}
+        ${escapeHtml(order.order_no)}
       </p>
-
       <p>
         <strong>Customer:</strong>
-        ${customer.fullName}
+        ${escapeHtml(customer.fullName)}
       </p>
-
       <p>
         <strong>Customer Email:</strong>
-        ${customer.email}
+        ${escapeHtml(customer.email)}
       </p>
-
       <p>
         <strong>Total:</strong>
         $${Number(order.total_amount).toFixed(2)}
       </p>
-
       <p>
         <strong>Payment Method:</strong>
-        ${payment.payment_method}
+        ${escapeHtml(payment.payment_method)}
       </p>
-
       <p>
         <strong>Payment Status:</strong>
-        ${payment.status}
+        ${escapeHtml(payment.status)}
       </p>
-
       <p>
         <strong>Transaction ID:</strong>
-        ${payment.transaction_id ?? "N/A"}
+        ${escapeHtml(payment.transaction_id ?? "N/A")}
       </p>
     `,
   });
@@ -88,5 +204,6 @@ const sendAdminOrderNotification = async ({
 
 module.exports = {
   sendVerificationEmail,
+  sendPasswordResetEmail,
   sendAdminOrderNotification,
 };

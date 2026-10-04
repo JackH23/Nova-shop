@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import PageContainer from "@/components/common/PageContainer";
 import CategoryFilters from "@/components/products/CategoryFilters";
 import ProductList from "@/components/products/ProductList";
@@ -9,8 +9,9 @@ import { useProductFilters } from "@/composables/useProductFilters";
 import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartToast } from "@/composables/useCartToast";
 import { useCategories } from "@/composables/useCategories";
+import PageHeader from "@/components/common/PageHeader";
 
-export default function NewArrivalsPage() {
+function NewArrivalsContent() {
   const [cartError, setCartError] = useState("");
 
   const {
@@ -37,17 +38,13 @@ export default function NewArrivalsPage() {
   return (
     <>
       <PageContainer>
-        <h1 className="text-3xl font-bold text-slate-950">
-          New Arrivals
-        </h1>
+        <PageHeader
+          title="New Arrivals"
+          breadcrumb="Home / New Arrivals"
+          description="Discover the latest products added to NovaShop."
+        />
 
-        <p className="mt-2 text-sm text-slate-500">
-          Discover the latest products added to NovaShop.
-        </p>
-
-        {/* Filters + Product list */}
         <div className="mt-10 flex flex-col gap-10 md:flex-row">
-          {/* Left */}
           <CategoryFilters
             activeCategoryId={categoryId}
             onCategoryChange={setCategoryId}
@@ -61,7 +58,6 @@ export default function NewArrivalsPage() {
             onRatingChange={setMinRating}
           />
 
-          {/* Right */}
           <ProductList
             minPrice={minPrice}
             maxPrice={maxPrice}
@@ -75,7 +71,6 @@ export default function NewArrivalsPage() {
         </div>
       </PageContainer>
 
-      {/* Success modal */}
       {addedProducts.map((toast, index) => (
         <AddToCartModal
           key={toast.id}
@@ -85,7 +80,6 @@ export default function NewArrivalsPage() {
         />
       ))}
 
-      {/* Error modal */}
       <ConfirmModal
         open={!!cartError}
         title="Unable to Add to Cart"
@@ -96,5 +90,13 @@ export default function NewArrivalsPage() {
         onCancel={() => setCartError("")}
       />
     </>
+  );
+}
+
+export default function NewArrivalsPage() {
+  return (
+    <Suspense fallback={<div>Loading new arrivals...</div>}>
+      <NewArrivalsContent />
+    </Suspense>
   );
 }

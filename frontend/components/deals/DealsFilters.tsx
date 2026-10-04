@@ -29,7 +29,7 @@ export default function DealsFilters({
 }: DealsFiltersProps) {
   return (
     <aside className="w-full shrink-0 md:w-[220px]">
-      <div className="rounded-md border border-slate-200 bg-white p-5">
+      <div className="rounded-md border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-slate-950">Filters</h2>
@@ -69,7 +69,7 @@ export default function DealsFilters({
           </div>
         </div>
 
-        <div className="my-5 border-t border-slate-200" />
+        <div className="my-5 border-t border-slate-200 dark:border-slate-700" />
 
         {/* Price Range */}
         <div>
@@ -110,17 +110,17 @@ export default function DealsFilters({
           </div>
 
           <div className="mt-2 flex justify-between">
-            <span className="rounded border border-slate-200 px-2 py-1 text-[10px]">
+            <span className="rounded border border-slate-200 bg-white px-2 py-1 text-[10px] text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
               ${minPrice}
             </span>
 
-            <span className="rounded border border-slate-200 px-2 py-1 text-[10px]">
+            <span className="rounded border border-slate-200 bg-white px-2 py-1 text-[10px] text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
               ${maxPrice}
             </span>
           </div>
         </div>
 
-        <div className="my-5 border-t border-slate-200" />
+        <div className="my-5 border-t border-slate-200 dark:border-slate-700" />
 
         {/* Discount */}
         <div>
@@ -130,7 +130,7 @@ export default function DealsFilters({
             {discounts.map((discount) => (
               <label
                 key={discount}
-                className="flex cursor-pointer items-center gap-2 text-xs text-slate-600"
+                className="flex cursor-pointer items-center gap-2 text-xs text-slate-600 dark:text-slate-300"
               >
                 <input
                   type="radio"

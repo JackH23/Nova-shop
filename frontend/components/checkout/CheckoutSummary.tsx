@@ -29,8 +29,8 @@ export default function CheckoutSummary({
   const total = checkout.subtotal + checkout.tax + shippingFee;
 
   return (
-    <aside className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:sticky lg:top-24">
-      <h2 className="mb-5 text-lg font-semibold text-slate-900">
+    <aside className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 lg:sticky lg:top-24">
+      <h2 className="mb-5 text-lg font-semibold text-slate-900 dark:text-white">
         Order Summary
       </h2>
 
@@ -41,62 +41,77 @@ export default function CheckoutSummary({
             className="flex items-start justify-between gap-4"
           >
             <div>
-              <p className="text-sm font-medium text-slate-900">
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
                 {item.productName}
               </p>
 
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Quantity: {item.quantity}
               </p>
             </div>
 
-            <span className="text-sm font-semibold">
+            <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
               ${item.lineTotal.toFixed(2)}
             </span>
           </div>
         ))}
       </div>
 
-      <div className="my-6 border-t border-slate-200" />
+      <div className="my-6 border-t border-slate-200 dark:border-slate-700" />
 
       {/* Discount */}
       <div className="flex gap-2">
         <input
           type="text"
           placeholder="Discount code"
-          className="h-10 min-w-0 flex-1 rounded-md border border-slate-300 px-3 text-sm outline-none focus:border-indigo-500"
+          className="h-10 min-w-0 flex-1 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
         />
 
         <button
           type="button"
-          className="rounded-md border border-slate-300 px-4 text-sm font-medium hover:bg-slate-50"
+          className="rounded-md border border-slate-300 px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
         >
           Apply
         </button>
       </div>
 
-      <div className="my-6 border-t border-slate-200" />
+      <div className="my-6 border-t border-slate-200 dark:border-slate-700" />
 
       <div className="space-y-3 text-sm">
         <div className="flex justify-between">
-          <span className="text-slate-600">Subtotal</span>
-          <span>${checkout.subtotal.toFixed(2)}</span>
+          <span className="text-slate-600 dark:text-slate-400">
+            Subtotal
+          </span>
+
+          <span className="text-slate-900 dark:text-slate-100">
+            ${checkout.subtotal.toFixed(2)}
+          </span>
         </div>
 
         <div className="flex justify-between">
-          <span className="text-slate-600">Shipping</span>
-          <span>${shippingFee.toFixed(2)}</span>
+          <span className="text-slate-600 dark:text-slate-400">
+            Shipping
+          </span>
+
+          <span className="text-slate-900 dark:text-slate-100">
+            ${shippingFee.toFixed(2)}
+          </span>
         </div>
 
         <div className="flex justify-between">
-          <span className="text-slate-600">Taxes</span>
-          <span>${checkout.tax.toFixed(2)}</span>
+          <span className="text-slate-600 dark:text-slate-400">
+            Taxes
+          </span>
+
+          <span className="text-slate-900 dark:text-slate-100">
+            ${checkout.tax.toFixed(2)}
+          </span>
         </div>
       </div>
 
-      <div className="my-4 border-t border-slate-200" />
+      <div className="my-4 border-t border-slate-200 dark:border-slate-700" />
 
-      <div className="flex justify-between text-lg font-bold">
+      <div className="flex justify-between text-lg font-bold text-slate-950 dark:text-white">
         <span>Total</span>
         <span>${total.toFixed(2)}</span>
       </div>
@@ -129,7 +144,7 @@ export default function CheckoutSummary({
         </button>
       )}
 
-      <p className="mt-3 text-center text-xs text-slate-500">
+      <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400">
         256-bit encryption for secure payment
       </p>
     </aside>

@@ -17,10 +17,9 @@ export default function DeliveryMethod({
   onBack,
   onContinue,
 }: DeliveryMethodProps) {
-
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-6 text-lg font-semibold text-slate-900">
+    <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <h2 className="mb-6 text-lg font-semibold text-slate-900 dark:text-white">
         Delivery Method
       </h2>
 
@@ -29,8 +28,8 @@ export default function DeliveryMethod({
         <label
           className={`flex cursor-pointer items-center justify-between rounded-md border p-4 transition ${
             deliveryMethod === "STANDARD"
-              ? "border-indigo-600 ring-1 ring-indigo-600"
-              : "border-slate-300"
+              ? "border-indigo-600 ring-1 ring-indigo-600 dark:border-indigo-400 dark:ring-indigo-400"
+              : "border-slate-300 dark:border-slate-600"
           }`}
         >
           <div className="flex items-center gap-3">
@@ -42,20 +41,21 @@ export default function DeliveryMethod({
               onChange={() =>
                 onDeliveryMethodChange("STANDARD")
               }
+              className="accent-indigo-600"
             />
 
             <div>
-              <p className="text-sm font-medium text-slate-900">
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
                 Standard Shipping
               </p>
 
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 5–7 business days
               </p>
             </div>
           </div>
 
-          <span className="text-sm font-semibold text-slate-900">
+          <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
             $5.00
           </span>
         </label>
@@ -64,8 +64,8 @@ export default function DeliveryMethod({
         <label
           className={`flex cursor-pointer items-center justify-between rounded-md border p-4 transition ${
             deliveryMethod === "EXPRESS"
-              ? "border-indigo-600 ring-1 ring-indigo-600"
-              : "border-slate-300"
+              ? "border-indigo-600 ring-1 ring-indigo-600 dark:border-indigo-400 dark:ring-indigo-400"
+              : "border-slate-300 dark:border-slate-600"
           }`}
         >
           <div className="flex items-center gap-3">
@@ -77,20 +77,21 @@ export default function DeliveryMethod({
               onChange={() =>
                 onDeliveryMethodChange("EXPRESS")
               }
+              className="accent-indigo-600"
             />
 
             <div>
-              <p className="text-sm font-medium text-slate-900">
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
                 Express Shipping
               </p>
 
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 2–3 business days
               </p>
             </div>
           </div>
 
-          <span className="text-sm font-semibold text-slate-900">
+          <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
             $15.00
           </span>
         </label>
@@ -101,7 +102,7 @@ export default function DeliveryMethod({
         <button
           type="button"
           onClick={onBack}
-          className="text-sm font-medium text-indigo-600 transition hover:text-indigo-700"
+          className="cursor-pointer text-sm font-medium text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
         >
           ← Back to Shipping
         </button>
@@ -109,7 +110,7 @@ export default function DeliveryMethod({
         <button
           type="button"
           onClick={onContinue}
-          className="rounded-md bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          className="cursor-pointer rounded-md bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
         >
           Continue to Payment →
         </button>

@@ -55,7 +55,7 @@ export default function GoogleButton({
       client_id: clientId,
 
       callback: async (response) => {
-        const success = await handleGoogleLogin(response.credential, false);
+        const success = await handleGoogleLogin(response.credential);
 
         if (success) {
           onSuccess?.();

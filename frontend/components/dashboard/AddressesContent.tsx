@@ -4,17 +4,22 @@ import ConfirmModal from "@/components/common/ConfirmModal";
 import PageContainer from "@/components/common/PageContainer";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import AddressCard from "@/components/dashboard/address/AddressCard";
-import { useAddressContent } from "@/composables/useAddressContent";
-import { useAddressForm } from "@/composables/useAddressForm";
 import AddressForm from "@/components/dashboard/address/AddressForm";
 import Pagination from "@/components/common/Pagination";
+import PageHeader from "@/components/common/PageHeader";
+import LoadingState from "@/components/common/LoadingState";
+import ErrorState from "@/components/common/ErrorState";
+import EmptyState from "@/components/common/EmptyState";
+
+import { useAddressContent } from "@/composables/useAddressContent";
+import { useAddressForm } from "@/composables/useAddressForm";
 import { useRemoveConfirm } from "@/composables/useRemoveConfirm";
 import { useAddressModal } from "@/composables/useAddressModal";
+import { usePaginationScroll } from "@/composables/usePaginationScroll";
 
 export default function AddressesContent() {
   const {
     addresses,
-    total,
     loading,
     error,
     currentPage,
@@ -25,6 +30,11 @@ export default function AddressesContent() {
     handleRemoveAddress,
     handleSetDefaultAddress,
   } = useAddressContent();
+
+  const {
+    targetRef: addressListRef,
+    handlePageChange,
+  } = usePaginationScroll(setCurrentPage);
 
   const {
     handleOpenRemoveConfirm,
@@ -72,17 +82,11 @@ export default function AddressesContent() {
 
           <div className="min-w-0">
             {/* Header */}
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-bold text-slate-950">
-                  Your Addresses
-                </h1>
-
-                <p className="mt-2 text-sm text-slate-500">
-                  Manage your shipping addresses.
-                </p>
-              </div>
-
+            <PageHeader
+              title="Your Addresses"
+              breadcrumb="Home / Dashboard / Addresses"
+              description="Manage your shipping addresses."
+            >
               <button
                 type="button"
                 onClick={handleOpenForm}
@@ -90,13 +94,38 @@ export default function AddressesContent() {
               >
                 + Add New Address
               </button>
-            </div>
+            </PageHeader>
 
-            <div className="mt-4 border-t border-slate-200" />
+            {/* Loading */}
+            {loading && !showAddForm && (
+              <div className="mt-8">
+                <LoadingState message="Loading addresses..." />
+              </div>
+            )}
+
+            {/* Error */}
+            {!loading && error && !showAddForm && (
+              <div className="mt-8">
+                <ErrorState message={error} />
+              </div>
+            )}
+
+            {/* Empty */}
+            {!loading && !error && addresses.length === 0 && (
+              <div className="mt-8">
+                <EmptyState
+                  title="No addresses yet"
+                  description="Add an address to make checkout faster."
+                />
+              </div>
+            )}
 
             {/* Address list */}
-            {addresses.length > 0 ? (
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {!loading && !error && addresses.length > 0 && (
+              <div
+                ref={addressListRef}
+                className="mt-6 scroll-mt-28 grid gap-4 md:grid-cols-2"
+              >
                 {addresses.map((address) => (
                   <AddressCard
                     key={address.id}
@@ -107,16 +136,6 @@ export default function AddressesContent() {
                   />
                 ))}
               </div>
-            ) : (
-              <div className="mt-6 rounded-lg border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
-                <p className="text-sm font-semibold text-slate-900">
-                  No addresses yet
-                </p>
-
-                <p className="mt-1 text-xs text-slate-500">
-                  Add an address to make checkout faster.
-                </p>
-              </div>
             )}
 
             {/* Pagination */}
@@ -124,10 +143,11 @@ export default function AddressesContent() {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                onPageChange={setCurrentPage}
+                onPageChange={handlePageChange}
               />
             )}
 
+            {/* Address form */}
             {showAddForm && (
               <AddressForm
                 form={form}

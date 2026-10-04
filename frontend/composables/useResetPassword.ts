@@ -1,7 +1,6 @@
 "use client";
 
 import { useReducer } from "react";
-import { useRouter } from "next/navigation";
 
 import {
   resetPasswordReducer,
@@ -14,9 +13,8 @@ import { validation } from "@/validations/validation";
 export function useResetPassword(
   email: string,
   code: string,
+  onSuccess?: () => void,
 ) {
-  const router = useRouter();
-
   const [state, dispatch] = useReducer(
     resetPasswordReducer,
     initialResetPasswordState,
@@ -54,6 +52,15 @@ export function useResetPassword(
       return;
     }
 
+    if (!email.trim() || !code.trim()) {
+      dispatch({
+        type: "SET_ERROR",
+        value: "Reset password session is invalid. Please request a new code.",
+      });
+
+      return;
+    }
+
     dispatch({
       type: "SET_LOADING",
       value: true,
@@ -67,7 +74,9 @@ export function useResetPassword(
         confirmPassword: state.confirmPassword,
       });
 
-      router.push("/login");
+      // Password reset successful.
+      // Open LoginModal instead of navigating to /login.
+      onSuccess?.();
     } catch (error) {
       dispatch({
         type: "SET_ERROR",

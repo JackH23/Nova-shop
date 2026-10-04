@@ -21,6 +21,10 @@ type UseSettingsModalProps = {
     data: UpdateProfileData,
   ) => Promise<boolean>;
 
+  onUpdateProfileImage: (
+    file: File,
+  ) => Promise<boolean>;
+
   onDeleteAccount: () => Promise<unknown>;
 };
 
@@ -28,6 +32,7 @@ export function useSettingsModal({
   onChangePassword,
   onUpdateProfile,
   onDeleteAccount,
+  onUpdateProfileImage
 }: UseSettingsModalProps) {
   const [modalType, setModalType] =
     useState<ModalType>(null);
@@ -48,6 +53,16 @@ export function useSettingsModal({
     data: UpdateProfileData,
   ) => {
     const success = await onUpdateProfile(data);
+
+    if (success) {
+      setModalType("profile-success");
+    }
+
+    return success;
+  };
+
+  const handleProfileImageUpload = async (file: File) => {
+    const success = await onUpdateProfileImage(file);
 
     if (success) {
       setModalType("profile-success");
@@ -77,6 +92,7 @@ export function useSettingsModal({
 
     handlePasswordChange,
     handleProfileUpdate,
+    handleProfileImageUpload,
     handleOpenDelete,
     handleCloseModal,
     handleConfirmModal,

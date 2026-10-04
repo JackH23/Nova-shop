@@ -5,12 +5,18 @@ import SubmitButton from "@/components/auth/SubmitButton";
 import FormError from "@/components/auth/FormError";
 import { useForgotPassword } from "@/composables/useForgotPassword";
 
-export default function ForgotPasswordForm() {
+type ForgotPasswordFormProps = {
+  onSuccess?: (email: string) => void;
+};
+
+export default function ForgotPasswordForm({
+  onSuccess,
+}: ForgotPasswordFormProps) {
   const {
     state,
     dispatch,
     handleSubmit,
-  } = useForgotPassword();
+  } = useForgotPassword(onSuccess);
 
   return (
     <form

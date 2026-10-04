@@ -21,16 +21,18 @@ type OrderItemsProps = {
 
 export default function OrderItems({ items }: OrderItemsProps) {
   return (
-    <section className="mt-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="mt-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-colors dark:border-slate-700 dark:bg-slate-900">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900">Order Items</h2>
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+          Order Items
+        </h2>
 
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-slate-500 dark:text-slate-400">
           {items.length} {items.length === 1 ? "item" : "items"}
         </span>
       </div>
 
-      <div className="mt-5 divide-y divide-slate-200">
+      <div className="mt-5 divide-y divide-slate-200 dark:divide-slate-700">
         {items.map((item) => (
           <div
             key={item.id}
@@ -38,7 +40,7 @@ export default function OrderItems({ items }: OrderItemsProps) {
           >
             {/* Product */}
             <div className="flex min-w-0 items-center gap-4">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
                 <ProductImage
                   image={item.product?.image}
                   name={item.product_name}
@@ -47,20 +49,22 @@ export default function OrderItems({ items }: OrderItemsProps) {
               </div>
 
               <div className="min-w-0">
-                <p className="font-medium text-slate-900">
+                <p className="font-medium text-slate-900 dark:text-slate-100">
                   {item.product_name}
                 </p>
 
-                <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500">
+                <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
                   <span>Qty: {item.quantity}</span>
 
-                  <span>${Number(item.unit_price).toFixed(2)} each</span>
+                  <span>
+                    ${Number(item.unit_price).toFixed(2)} each
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Price */}
-            <p className="shrink-0 font-semibold text-slate-900">
+            <p className="shrink-0 font-semibold text-slate-900 dark:text-white">
               ${Number(item.line_total).toFixed(2)}
             </p>
           </div>

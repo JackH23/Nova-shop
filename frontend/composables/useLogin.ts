@@ -34,7 +34,6 @@ export function useLogin(onSuccess?: () => void) {
       const response = await authService.login({
         email: state.email.trim(),
         password: state.password,
-        rememberMe: state.rememberMe,
       });
 
       localStorage.setItem("accessToken", response.accessToken);

@@ -21,6 +21,26 @@ const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 
+// Scope database connections to the HTTP request, before any route runs.
+if (process.env.CLOUDFLARE_WORKER === "true") {
+  const sequelize = require("./config/database");
+  app.use((req, res, next) => {
+    sequelize.withRequestDatabase((database) => {
+      let closed = false;
+      const cleanup = () => {
+        if (closed) return;
+        closed = true;
+        database.close().catch((error) => {
+          console.error("Database cleanup error:", error.name, error.message);
+        });
+      };
+      res.once("finish", cleanup);
+      res.once("close", cleanup);
+      next();
+    });
+  });
+}
+
 app.use(cors());
 
 app.use((req, res, next) => {
@@ -50,7 +70,19 @@ app.use((req, res, next) => {
 // provide a persistent local filesystem, so production uploads should move to
 // object storage (for example, R2) before relying on this route in production.
 if (process.env.CLOUDFLARE_WORKER !== "true") {
-  app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+  // Customer uploads, including customer profile images
+  app.use(
+    "/uploads",
+    express.static(path.join(__dirname, "../uploads")),
+  );
+
+  // Product images uploaded through admin
+  app.use(
+    "/uploads/products",
+    express.static(
+      "D:/pull from git/Nova-shop-admin/backend/uploads/products",
+    ),
+  );
 }
 
 app.use("/api/auth", authRoutes);

@@ -17,9 +17,17 @@ export const returnService = {
     });
   },
 
-  // GET logged-in user's returns
-  getReturns: (): Promise<ReturnsResponse> => {
-    return apiRequest("/returns", {
+  // GET logged-in user's returns with pagination
+  getReturns: (
+    page = 1,
+    limit = 6,
+  ): Promise<ReturnsResponse> => {
+    const query = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    });
+
+    return apiRequest(`/returns?${query.toString()}`, {
       method: "GET",
     });
   },

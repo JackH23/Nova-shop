@@ -6,6 +6,7 @@ import DashboardStats from "@/components/dashboard/DashboardStats";
 import DashboardRecentOrder from "@/components/dashboard/DashboardRecentOrder";
 import DashboardDefaultAddress from "@/components/dashboard/DashboardDefaultAddress";
 import { useDashboard } from "@/composables/useDashboard";
+import PageHeader from "@/components/common/PageHeader";
 
 export default function DashboardContent() {
   const { summary, loading, error } = useDashboard();
@@ -16,13 +17,11 @@ export default function DashboardContent() {
         <DashboardSidebar />
 
         <div className="min-w-0">
-          <h1 className="text-3xl font-bold text-slate-900">
-            Hello! Welcome back.
-          </h1>
-
-          <p className="mt-2 text-sm text-slate-500">
-            Here is an overview of your recent activity and account status.
-          </p>
+          <PageHeader
+            title="Hello! Welcome back."
+            breadcrumb="Home / Dashboard"
+            description="Here is an overview of your recent activity and account status."
+          />
 
           <DashboardStats
             totalOrders={summary?.totalOrders ?? 0}

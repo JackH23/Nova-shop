@@ -20,13 +20,13 @@ export default function TermsCheckbox({
 
   return (
     <>
-      <label className="flex cursor-pointer items-start gap-2 text-xs text-slate-500">
+      <label className="flex cursor-pointer items-start gap-2 text-xs text-slate-500 dark:text-slate-400">
         <input
           type="checkbox"
           name="terms"
           checked={checked}
           onChange={onChange}
-          className="mt-[1px] h-4 w-4 rounded border-slate-300 accent-indigo-600"
+          className="mt-[1px] h-4 w-4 cursor-pointer rounded border-slate-300 accent-indigo-600 dark:border-slate-600 dark:accent-indigo-500"
         />
 
         <span>
@@ -34,7 +34,7 @@ export default function TermsCheckbox({
           <button
             type="button"
             onClick={() => setLegalModal("terms")}
-            className="text-indigo-600 hover:underline"
+            className="cursor-pointer text-indigo-600 transition hover:underline dark:text-indigo-400"
           >
             Terms of Service
           </button>{" "}
@@ -42,7 +42,7 @@ export default function TermsCheckbox({
           <button
             type="button"
             onClick={() => setLegalModal("privacy")}
-            className="text-indigo-600 hover:underline"
+            className="cursor-pointer text-indigo-600 transition hover:underline dark:text-indigo-400"
           >
             Privacy Policy
           </button>

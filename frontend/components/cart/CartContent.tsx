@@ -9,6 +9,9 @@ import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartContent } from "@/composables/useCartContent";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import LoadingState from "@/components/common/LoadingState";
+import ErrorState from "@/components/common/ErrorState";
+import { usePaginationScroll } from "@/composables/usePaginationScroll";
 
 export default function CartContent() {
   const {
@@ -30,21 +33,28 @@ export default function CartContent() {
     removeToast,
   } = useCartContent();
 
+  const {
+    targetRef: cartListRef,
+    handlePageChange,
+  } = usePaginationScroll(setCurrentPage);
+
   return (
     <>
       <PageContainer>
-        <h1 className="text-3xl font-bold text-slate-950">Your Cart</h1>
+        <h1 className="text-3xl font-bold text-slate-950 dark:text-white">
+          Your Cart
+        </h1>
 
-        <p className="mt-2 text-sm text-slate-500">
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           Review your items and proceed to checkout.
         </p>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
           <div>
             {loading ? (
-              <p>Loading cart...</p>
+              <LoadingState message="Loading cart..." />
             ) : error ? (
-              <p className="text-red-600">{error}</p>
+              <ErrorState message={error} />
             ) : cart.length === 0 ? (
               <EmptyState
                 title="Your cart is empty"
@@ -54,7 +64,10 @@ export default function CartContent() {
               />
             ) : (
               <>
-                <div className="space-y-4">
+                <div
+                  ref={cartListRef}
+                  className="scroll-mt-28 space-y-4"
+                >
                   {cart.map((item) => (
                     <CartItem
                       key={item.id}
@@ -70,13 +83,13 @@ export default function CartContent() {
                   <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
-                    onPageChange={setCurrentPage}
+                    onPageChange={handlePageChange}
                   />
                 )}
 
                 <Link
                   href="/products"
-                  className="mt-8 inline-block text-sm font-medium text-indigo-600"
+                  className="mt-8 inline-block text-sm font-medium text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
                 >
                   ← Continue Shopping
                 </Link>

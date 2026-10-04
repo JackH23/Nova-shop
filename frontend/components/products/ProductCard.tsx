@@ -44,10 +44,10 @@ export default function ProductCard({
         )
       : 0;
   return (
-    <div className="group overflow-hidden bg-white">
+    <div className="group overflow-hidden rounded-lg bg-white transition-colors dark:bg-slate-900">
       {/* Product image */}
       <Link href={`/products/${id}`}>
-        <div className="relative h-[220px] cursor-pointer overflow-hidden rounded-md bg-[#f5f5f5]">
+        <div className="relative h-[220px] cursor-pointer overflow-hidden rounded-md bg-slate-100 dark:bg-slate-800">
           <ProductImage
             image={image}
             name={name}
@@ -89,20 +89,20 @@ export default function ProductCard({
       </Link>
 
       {/* Product information */}
-      <div className="pt-3">
+      <div className="p-3">
         <Link href={`/products/${id}`}>
-          <h3 className="truncate text-sm font-semibold text-slate-950 transition hover:text-[#3324d8]">
+          <h3 className="truncate text-sm font-semibold text-slate-950 transition hover:text-[#3324d8] dark:text-white dark:hover:text-indigo-400">
             {name}
           </h3>
         </Link>
 
-        <p className="mt-1 line-clamp-2 min-h-[36px] text-xs leading-[18px] text-slate-500">
+        <p className="mt-1 line-clamp-2 min-h-[36px] text-xs leading-[18px] text-slate-500 dark:text-slate-400">
           {description}
         </p>
 
         {/* Price + Add */}
         <div className="mt-3 flex items-center justify-between">
-          <span className="text-sm font-bold text-slate-950">
+          <span className="text-sm font-bold text-slate-950 dark:text-white">
             ${priceNumber.toFixed(2)}
           </span>
 

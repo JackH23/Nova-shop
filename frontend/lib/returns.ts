@@ -158,12 +158,24 @@ export type CreateReturnResponse = {
 };
 
 // ========================================
+// Returns Pagination
+// ========================================
+
+export type ReturnsPagination = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+// ========================================
 // Returns Response
 // ========================================
 
 export type ReturnsResponse = {
   message: string;
   returns: ReturnRequest[];
+  pagination: ReturnsPagination;
 };
 
 // ========================================

@@ -25,6 +25,7 @@ export default function FooterColumn({
           <Link
             key={link.href}
             href={link.href}
+            prefetch={false}
             className="transition hover:text-[#3324d8]"
           >
             {link.label}

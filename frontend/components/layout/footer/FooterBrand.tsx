@@ -11,6 +11,7 @@ export default function FooterBrand({
     <div>
       <Link
         href="/dashboard"
+        prefetch={false}
         className="text-sm font-bold text-slate-950"
       >
         NovaShop

@@ -205,7 +205,7 @@ export async function apiRequest<T = any>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const accessToken = getStoredToken("accessToken");
+  let accessToken = getStoredToken("accessToken");
 
   const storedRefreshToken = getStoredToken("refreshToken");
 
@@ -216,6 +216,29 @@ export async function apiRequest<T = any>(
 
   if (storedRefreshToken && !refreshToken) {
     clearAuthTokens();
+  }
+
+  // Refresh BEFORE sending the request if access token already expired
+  if (
+    accessToken &&
+    isTokenExpired(accessToken) &&
+    refreshToken
+  ) {
+    try {
+      if (!refreshPromise) {
+        refreshPromise = refreshAccessToken().finally(() => {
+          refreshPromise = null;
+        });
+      }
+
+      accessToken = await refreshPromise;
+    } catch {
+      clearAuthTokens();
+
+      throw new Error(
+        "Your session has expired. Please login again.",
+      );
+    }
   }
 
   // ========================================

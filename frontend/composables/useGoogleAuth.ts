@@ -9,7 +9,6 @@ export function useGoogleAuth() {
 
   const handleGoogleLogin = async (
     credential: string,
-    rememberMe = false,
   ) => {
     setError("");
     setLoading(true);
@@ -18,7 +17,6 @@ export function useGoogleAuth() {
       const response =
         await authService.googleLogin({
           credential,
-          rememberMe,
         });
 
       // Always store authentication tokens

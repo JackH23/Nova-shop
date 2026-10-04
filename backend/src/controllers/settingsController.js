@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
+const { randomUUID } = require("node:crypto");
 
 const User = require("../models/User");
 
@@ -120,59 +121,77 @@ const updateProfile = async (req, res) => {
  * PUT /api/settings/profile-image
  * Update profile image
  */
+// Only remove images managed by this profile upload endpoint.
+async function removeProfileImage(req, image) {
+  const match = /^\/uploads\/profiles\/([a-zA-Z0-9_.-]+)$/.exec(image || "");
+  if (!match || match[1] === "undefined") return;
+  if (process.env.CLOUDFLARE_WORKER === "true") {
+    if (!req.workerEnv?.UPLOADS) throw new Error("UPLOADS R2 binding is required");
+    await req.workerEnv.UPLOADS.delete("profiles/" + match[1]);
+  } else {
+    const filename = path.join(__dirname, "../../uploads/profiles", match[1]);
+    await fs.promises.rm(filename, { force: true });
+  }
+}
+
 const updateProfileImage = async (req, res) => {
+  let newImage;
+  let saved = false;
+
+  const startedAt = Date.now();
+
+  const logTime = (step) => {
+    console.log(
+      `[profile-image] ${step}: ${Date.now() - startedAt}ms`,
+    );
+  };
   try {
-    const userId = req.user.id;
+    if (!req.file?.buffer) {
+      return res.status(400).json({ message: "Profile image is required" });
+    }
+    const extensions = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+    const extension = extensions[req.file.mimetype];
+    if (!extension || req.file.buffer.length > 5 * 1024 * 1024) {
+      return res.status(400).json({ message: "Use JPG, PNG or WEBP up to 5MB" });
+    }
+    const user = await User.findByPk(req.user.id);
+    logTime("user fetched");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    const oldImage = user.profileImage;
+    const filename = user.id + "-" + randomUUID() + "." + extension;
+    newImage = "/uploads/profiles/" + filename;
 
-    if (!req.file) {
-      return res.status(400).json({
-        message: "Profile image is required",
+    if (process.env.CLOUDFLARE_WORKER === "true") {
+      const bucket = req.workerEnv?.UPLOADS;
+      if (!bucket) throw new Error("UPLOADS R2 binding is required");
+      await bucket.put("profiles/" + filename, req.file.buffer, {
+        httpMetadata: { contentType: req.file.mimetype },
       });
+    } else {
+      const directory = path.join(__dirname, "../../uploads/profiles");
+      await fs.promises.mkdir(directory, { recursive: true });
+      await fs.promises.writeFile(path.join(directory, filename), req.file.buffer);
     }
 
-    const user = await User.findByPk(userId);
+    logTime("image stored");
 
-    if (!user) {
-      // Delete newly uploaded image if user doesn't exist
-      if (req.file.path && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    /**
-     * Delete old profile image
-     */
-    if (user.profileImage) {
-      const oldImagePath = path.join(
-        process.cwd(),
-        user.profileImage.replace(/^\/+/, "")
-      );
-
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
-      }
-    }
-
-    /**
-     * Store relative image path in database
-     *
-     * Example:
-     * /uploads/profiles/1757939000000-12345.jpg
-     */
-    const profileImage =
-      `/uploads/profiles/${req.file.filename}`;
-
-    user.profileImage = profileImage;
+    user.profileImage = newImage;
 
     await user.save();
 
+    logTime("database updated");
+
+    saved = true;
+
+    // Cleanup old image without delaying the successful response.
+    removeProfileImage(req, oldImage).catch(error => {
+      console.error("Old profile image cleanup failed:", error.message);
+    });
+
+    logTime("sending response");
+
     return res.status(200).json({
       message: "Profile image updated successfully",
-
       user: {
         id: user.id,
         fullName: user.fullName,
@@ -181,16 +200,13 @@ const updateProfileImage = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Update profile image error:", error);
-
-    // Remove uploaded image if DB update fails
-    if (req.file?.path && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
+    console.error("Update profile image error:", error.name, error.message);
+    if (newImage && !saved) {
+      await removeProfileImage(req, newImage).catch(cleanupError => {
+        console.error("Failed upload cleanup error:", cleanupError.message);
+      });
     }
-
-    return res.status(500).json({
-      message: "Failed to update profile image",
-    });
+    return res.status(500).json({ message: "Failed to update profile image" });
   }
 };
 
@@ -301,21 +317,11 @@ const deleteAccount = async (req, res) => {
       });
     }
 
-    /**
-     * Delete profile image before deleting user
-     */
-    if (user.profileImage) {
-      const imagePath = path.join(
-        process.cwd(),
-        user.profileImage.replace(/^\/+/, "")
-      );
-
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-    }
-
+    const oldImage = user.profileImage;
     await user.destroy();
+    await removeProfileImage(req, oldImage).catch(error => {
+      console.error("Deleted account image cleanup failed:", error.message);
+    });
 
     return res.status(200).json({
       message: "Account deleted successfully",

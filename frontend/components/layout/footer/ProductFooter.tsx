@@ -48,6 +48,7 @@ export default function ProductFooter() {
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={false}
                 className="text-[10px] text-slate-600 transition hover:text-[#3324d8]"
               >
                 {link.label}

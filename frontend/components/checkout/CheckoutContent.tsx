@@ -48,17 +48,17 @@ export default function CheckoutContent() {
 
   if (placingOrder) {
     return (
-      <main className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
         <PageContainer>
           <div className="flex min-h-[600px] items-center justify-center">
             <div className="text-center">
-              <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600" />
+              <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600 dark:border-slate-700 dark:border-t-indigo-400" />
 
-              <h2 className="mt-4 text-lg font-semibold text-slate-900">
+              <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white">
                 Creating your order...
               </h2>
 
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                 Please don't close or refresh this page.
               </p>
             </div>
@@ -92,7 +92,7 @@ export default function CheckoutContent() {
         {step === "payment" && (
           <>
             {creatingPayment && (
-              <div className="rounded-lg border border-slate-200 bg-white p-6">
+              <div className="rounded-lg border border-slate-200 bg-white p-6 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
                 Loading payment...
               </div>
             )}
@@ -124,7 +124,7 @@ export default function CheckoutContent() {
 
   return (
     <>
-      <main className="min-h-screen bg-slate-50">
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
         <PageContainer>
           {/* Checkout steps */}
           <CheckoutSteps step={step} />
@@ -140,7 +140,7 @@ export default function CheckoutContent() {
                 {checkoutGrid}
               </Elements>
             ) : (
-              <div className="rounded-lg border border-slate-200 bg-white p-6">
+              <div className="rounded-lg border border-slate-200 bg-white p-6 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
                 Loading payment...
               </div>
             )
