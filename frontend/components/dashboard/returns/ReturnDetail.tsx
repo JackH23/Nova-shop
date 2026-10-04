@@ -11,6 +11,25 @@ import { useReturnDetail } from "@/composables/useReturnDetail";
 
 import ReturnStatusBadge from "./ReturnStatusBadge";
 
+const PRODUCT_IMAGE_URL =
+  process.env.NEXT_PUBLIC_PRODUCT_IMAGE_URL || "";
+
+function resolveAdminImageUrl(imageUrl: string) {
+  if (!imageUrl) return "";
+
+  if (
+    imageUrl.startsWith("http://") ||
+    imageUrl.startsWith("https://")
+  ) {
+    return imageUrl;
+  }
+
+  const baseUrl = PRODUCT_IMAGE_URL.replace(/\/$/, "");
+  const path = imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`;
+
+  return `${baseUrl}${path}`;
+}
+
 type ReturnDetailProps = {
   returnId: number;
 };
@@ -224,21 +243,27 @@ export default function ReturnDetail({ returnId }: ReturnDetailProps) {
                         </p>
 
                         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                          {returnRequest.admin_images.map((image) => (
+                          {returnRequest.admin_images.map((image) => {
+                            const imageUrl = resolveAdminImageUrl(
+                              image.image_url,
+                            );
+
+                            return (
                             <a
                               key={image.id}
-                              href={image.image_url}
+                              href={imageUrl}
                               target="_blank"
                               rel="noreferrer"
                               className="overflow-hidden rounded-lg border border-red-200 bg-white"
                             >
                               <img
-                                src={image.image_url}
+                                src={imageUrl}
                                 alt="Admin evidence"
                                 className="aspect-square h-full w-full object-cover transition hover:scale-105"
                               />
                             </a>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
