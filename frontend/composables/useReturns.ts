@@ -9,39 +9,48 @@ import {
 import type { ReturnRequest } from "@/lib/returns";
 import { returnService } from "@/services/returnService";
 
+const RETURNS_PER_PAGE = 6;
+
 export function useReturns() {
-  const [returns, setReturns] = useState<
-    ReturnRequest[]
-  >([]);
+  const [returns, setReturns] = useState<ReturnRequest[]>([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  const [error, setError] =
-    useState("");
+  // State
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const getReturns = useCallback(
-    async () => {
-      try {
-        setLoading(true);
-        setError("");
+  // Get returns
+  const getReturns = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-        const response =
-          await returnService.getReturns();
+      const response = await returnService.getReturns(
+        currentPage,
+        RETURNS_PER_PAGE,
+      );
 
-        setReturns(response.returns);
-      } catch (error) {
-        setError(
-          error instanceof Error
-            ? error.message
-            : "Failed to load returns",
-        );
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
+      setReturns(response.returns);
+
+      // Pagination response
+      setTotal(response.pagination.total);
+      setTotalPages(response.pagination.totalPages);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to load returns";
+
+      setError(message);
+      setReturns([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage]);
 
   useEffect(() => {
     getReturns();
@@ -49,8 +58,18 @@ export function useReturns() {
 
   return {
     returns,
+
+    // Pagination
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    total,
+
+    // State
     loading,
     error,
+
+    // Actions
     getReturns,
   };
 }

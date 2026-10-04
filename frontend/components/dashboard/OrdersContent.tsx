@@ -9,10 +9,16 @@ import PageHeader from "@/components/common/PageHeader";
 import LoadingState from "@/components/common/LoadingState";
 import ErrorState from "@/components/common/ErrorState";
 import EmptyState from "@/components/common/EmptyState";
+import { usePaginationScroll } from "@/composables/usePaginationScroll";
 
 export default function OrdersContent() {
   const { orders, currentPage, setCurrentPage, totalPages, loading, error } =
     useOrders();
+
+  const {
+    targetRef: ordersListRef,
+    handlePageChange,
+  } = usePaginationScroll(setCurrentPage);
 
   return (
     <PageContainer>
@@ -52,7 +58,10 @@ export default function OrdersContent() {
           )}
 
           {!loading && !error && orders.length > 0 && (
-            <div className="mt-8 space-y-4">
+            <div
+              ref={ordersListRef}
+              className="mt-8 scroll-mt-28 space-y-4"
+            >
               {orders.map((order) => (
                 <div
                   key={order.id}
@@ -121,7 +130,7 @@ export default function OrdersContent() {
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          onPageChange={handlePageChange}
         />
       )}
     </PageContainer>

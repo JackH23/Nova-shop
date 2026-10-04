@@ -4,16 +4,18 @@ import ConfirmModal from "@/components/common/ConfirmModal";
 import PageContainer from "@/components/common/PageContainer";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import AddressCard from "@/components/dashboard/address/AddressCard";
-import { useAddressContent } from "@/composables/useAddressContent";
-import { useAddressForm } from "@/composables/useAddressForm";
 import AddressForm from "@/components/dashboard/address/AddressForm";
 import Pagination from "@/components/common/Pagination";
-import { useRemoveConfirm } from "@/composables/useRemoveConfirm";
-import { useAddressModal } from "@/composables/useAddressModal";
 import PageHeader from "@/components/common/PageHeader";
 import LoadingState from "@/components/common/LoadingState";
 import ErrorState from "@/components/common/ErrorState";
 import EmptyState from "@/components/common/EmptyState";
+
+import { useAddressContent } from "@/composables/useAddressContent";
+import { useAddressForm } from "@/composables/useAddressForm";
+import { useRemoveConfirm } from "@/composables/useRemoveConfirm";
+import { useAddressModal } from "@/composables/useAddressModal";
+import { usePaginationScroll } from "@/composables/usePaginationScroll";
 
 export default function AddressesContent() {
   const {
@@ -28,6 +30,11 @@ export default function AddressesContent() {
     handleRemoveAddress,
     handleSetDefaultAddress,
   } = useAddressContent();
+
+  const {
+    targetRef: addressListRef,
+    handlePageChange,
+  } = usePaginationScroll(setCurrentPage);
 
   const {
     handleOpenRemoveConfirm,
@@ -115,7 +122,10 @@ export default function AddressesContent() {
 
             {/* Address list */}
             {!loading && !error && addresses.length > 0 && (
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <div
+                ref={addressListRef}
+                className="mt-6 scroll-mt-28 grid gap-4 md:grid-cols-2"
+              >
                 {addresses.map((address) => (
                   <AddressCard
                     key={address.id}
@@ -133,10 +143,11 @@ export default function AddressesContent() {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                onPageChange={setCurrentPage}
+                onPageChange={handlePageChange}
               />
             )}
 
+            {/* Address form */}
             {showAddForm && (
               <AddressForm
                 form={form}

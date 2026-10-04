@@ -6,17 +6,20 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useProductList } from "@/composables/useProductList";
 import { useCart } from "@/composables/useCart";
-import { Search, Heart, ShoppingCart, UserRound } from "lucide-react";
 import { useMe } from "@/composables/useMe";
-import ProfileModal from "./ProfileModal";
 import { useLogout } from "@/composables/useLogout";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { useAuth } from "@/components/shared/auth/AuthModalProvider";
 import { getFileUrl } from "@/lib/fileUrl";
+import MobileNavigation from "./MobileNavigation";
+import NavbarRightSection from "./NavbarRightSection";
+import NavbarNavigation from "./NavbarNavigation";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [search, setSearch] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const auth = useAuth();
 
   const { filteredProducts: searchResults, loading: searching } =
@@ -57,6 +60,16 @@ export default function Navbar() {
 
   return (
     <>
+      {/* Mobile menu backdrop */}
+      {mobileMenuOpen && (
+        <button
+          type="button"
+          aria-label="Close navigation menu"
+          onClick={() => setMobileMenuOpen(false)}
+          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+        />
+      )}
+
       <header
         className={`sticky top-0 z-50 w-full bg-white text-slate-900 transition-all duration-300 ease-in-out dark:bg-slate-950 dark:text-white ${
           isVisible
@@ -74,209 +87,48 @@ export default function Navbar() {
 
         {/* Main navbar */}
         <div className="border-b border-slate-200 dark:border-slate-800">
-          <div className="mx-auto flex h-[70px] max-w-[1440px] items-center px-9">
+          <div className="mx-auto flex h-16 max-w-[1440px] items-center px-4 sm:px-6 lg:h-[70px] lg:px-9">
             {/* Logo */}
             <Link href="/home" prefetch={false} className="text-[18px] font-bold text-[#3324d8]">
               NovaShop
             </Link>
 
             {/* Navigation */}
-            {/* Navigation */}
-            <nav className="ml-[135px] flex h-full items-center gap-7 text-[11px]">
-              {/* Shop */}
-              <Link
-                href="/products"
-                prefetch={false}
-                className={`flex h-full items-center border-b-2 transition ${
-                  pathname.startsWith("/products")
-                    ? "border-[#4b3cf0] text-[#3324d8]"
-                    : "border-transparent text-slate-800 hover:text-[#3324d8] dark:text-slate-200 dark:hover:text-indigo-400"
-                }`}
-              >
-                Shop
-              </Link>
-
-              {/* Categories */}
-              <Link
-                href="/categories"
-                prefetch={false}
-                className={`flex h-full items-center border-b-2 transition ${
-                  pathname.startsWith("/categories")
-                    ? "border-[#4b3cf0] text-[#3324d8]"
-                    : "border-transparent text-slate-800 hover:text-[#3324d8] dark:text-slate-200 dark:hover:text-indigo-400"
-                }`}
-              >
-                Categories
-              </Link>
-
-              {/* Deals */}
-              <Link
-                href="/deals"
-                prefetch={false}
-                className={`flex h-full items-center border-b-2 transition ${
-                  pathname.startsWith("/deals")
-                    ? "border-[#4b3cf0] text-[#3324d8]"
-                    : "border-transparent text-slate-800 hover:text-[#3324d8] dark:text-slate-200 dark:hover:text-indigo-400"
-                }`}
-              >
-                Deals
-              </Link>
-
-              {/* New Arrivals */}
-              <Link
-                href="/new-arrivals"
-                prefetch={false}
-                className={`flex h-full items-center border-b-2 transition ${
-                  pathname.startsWith("/new-arrivals")
-                    ? "border-[#4b3cf0] text-[#3324d8]"
-                    : "border-transparent text-slate-800 hover:text-[#3324d8] dark:text-slate-200 dark:hover:text-indigo-400"
-                }`}
-              >
-                New Arrivals
-              </Link>
-            </nav>
+            <NavbarNavigation pathname={pathname} />
 
             {/* Right section */}
-            <div className="ml-auto flex items-center gap-4">
-              {/* Search */}
-              <div className="relative">
-                <div className="flex h-[42px] w-[180px] items-center rounded-full bg-[#f4f5f7] px-5 transition-colors dark:bg-slate-800">
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search..."
-                    className="w-full bg-transparent text-xs text-slate-700 outline-none placeholder:text-slate-500 dark:text-slate-100 dark:placeholder:text-slate-400"
-                  />
-
-                  <Search
-                    size={17}
-                    strokeWidth={1.8}
-                    className="shrink-0 text-slate-700 dark:text-slate-300"
-                  />
-                </div>
-
-                {search.trim() && (
-                  <div className="absolute right-0 top-[48px] z-50 w-[320px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900">
-                    {searching ? (
-                      <p className="p-4 text-xs text-slate-500 dark:text-slate-400">Searching...</p>
-                    ) : searchResults.length > 0 ? (
-                      searchResults.slice(0, 5).map((product) => (
-                        <Link
-                          key={product.id}
-                          href={`/products/${product.id}`}
-                          prefetch={false}
-                          onClick={() => {
-                            setSearch("");
-                          }}
-                          className="flex items-center gap-3 border-b border-slate-100 p-3 last:border-b-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
-                        >
-                          <img
-                            src={
-                              product.image
-                                ? product.image.startsWith("http")
-                                  ? product.image
-                                  : `${process.env.NEXT_PUBLIC_PRODUCT_IMAGE_URL}${product.image}`
-                                : "/placeholder.png"
-                            }
-                            alt={product.name}
-                            className="h-12 w-12 rounded-md object-cover"
-                          />
-
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-slate-900 dark:text-white">
-                              {product.name}
-                            </p>
-
-                            <p className="text-xs font-semibold text-[#3324d8]">
-                              ${Number(product.price).toFixed(2)}
-                            </p>
-                          </div>
-                        </Link>
-                      ))
-                    ) : (
-                      <p className="p-4 text-xs text-slate-500 dark:text-slate-400">
-                        No products found.
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Wishlist */}
-              <Link
-                href="/dashboard/wishlist"
-                prefetch={false}
-                className="text-[#3324d8] transition hover:opacity-70"
-                aria-label="Wishlist"
-              >
-                <Heart size={19} strokeWidth={1.8} />
-              </Link>
-
-              {/* Cart */}
-              <Link
-                href="/cart"
-                prefetch={false}
-                className="relative text-[#3324d8] transition hover:opacity-70"
-                aria-label="Cart"
-              >
-                <ShoppingCart size={20} strokeWidth={1.8} />
-
-                {cartCount > 0 && (
-                  <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-
-              {/* User */}
-              {user ? (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={toggleProfile}
-                    className="flex items-center gap-2"
-                  >
-                    {profileImageUrl ? (
-                      <img
-                        src={profileImageUrl}
-                        alt={user.fullName}
-                        className="h-8 w-8 rounded-full border border-slate-200 object-cover dark:border-slate-700"
-                      />
-                    ) : (
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3324d8] text-xs font-semibold text-white">
-                        {user.fullName.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-
-                    <span className="text-xs font-medium text-slate-800 dark:text-slate-200">
-                      {user.fullName}
-                    </span>
-                  </button>
-
-                  {isProfileOpen && (
-                    <ProfileModal
-                      fullName={user.fullName}
-                      email={user.email}
-                      profileImage={profileImageUrl}
-                      onClose={closeProfile}
-                      onLogout={openConfirm}
-                    />
-                  )}
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={auth.openLogin}
-                  className="flex items-center gap-1.5 text-[#3324d8] transition hover:opacity-70"
-                >
-                  <UserRound size={18} strokeWidth={1.8} />
-
-                  <span className="text-xs font-medium">Login</span>
-                </button>
-              )}
-            </div>
+            <NavbarRightSection
+              search={search}
+              searching={searching}
+              searchResults={searchResults}
+              user={user}
+              profileImageUrl={profileImageUrl}
+              cartCount={cartCount}
+              isProfileOpen={isProfileOpen}
+              mobileMenuOpen={mobileMenuOpen}
+              onSearchChange={setSearch}
+              onToggleProfile={toggleProfile}
+              onCloseProfile={closeProfile}
+              onOpenLogoutConfirm={openConfirm}
+              onOpenLogin={auth.openLogin}
+              onToggleMobileMenu={() =>
+                setMobileMenuOpen((prev) => !prev)
+              }
+            />
           </div>
+
+          {/* Mobile navigation overlay */}
+          <MobileNavigation
+            open={mobileMenuOpen}
+            search={search}
+            searching={searching}
+            searchResults={searchResults}
+            onSearchChange={setSearch}
+            onClose={() => {
+              setSearch("");
+              setMobileMenuOpen(false);
+            }}
+          />
         </div>
       </header>
 

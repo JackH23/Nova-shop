@@ -16,15 +16,17 @@ export default function PaymentMethod({
   onBack,
 }: PaymentMethodProps) {
   return (
-    <div>
-      <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-        <h2 className="mb-6 text-lg font-semibold text-slate-900 dark:text-white">
+    <div className="min-w-0">
+      <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6 dark:border-slate-700 dark:bg-slate-900">
+        <h2 className="mb-5 text-lg font-semibold text-slate-900 sm:mb-6 dark:text-white">
           Payment Method
         </h2>
 
+        {/* Payment type */}
         <div className="space-y-3">
+          {/* Credit Card */}
           <label
-            className={`flex cursor-pointer items-center justify-between rounded-md border p-4 transition ${
+            className={`flex cursor-pointer items-center justify-between rounded-md border p-3 transition sm:p-4 ${
               paymentMethod === "CREDIT_CARD"
                 ? "border-indigo-600 ring-1 ring-indigo-600 dark:border-indigo-500 dark:ring-indigo-500"
                 : "border-slate-300 dark:border-slate-700"
@@ -35,7 +37,9 @@ export default function PaymentMethod({
                 type="radio"
                 name="payment"
                 checked={paymentMethod === "CREDIT_CARD"}
-                onChange={() => onPaymentMethodChange("CREDIT_CARD")}
+                onChange={() =>
+                  onPaymentMethodChange("CREDIT_CARD")
+                }
                 className="accent-indigo-600"
               />
 
@@ -46,12 +50,13 @@ export default function PaymentMethod({
 
             <CreditCard
               size={18}
-              className="text-slate-500 dark:text-slate-400"
+              className="shrink-0 text-slate-500 dark:text-slate-400"
             />
           </label>
 
+          {/* PayPal */}
           <label
-            className={`flex cursor-pointer items-center rounded-md border p-4 transition ${
+            className={`flex cursor-pointer items-center rounded-md border p-3 transition sm:p-4 ${
               paymentMethod === "PAYPAL"
                 ? "border-indigo-600 ring-1 ring-indigo-600 dark:border-indigo-500 dark:ring-indigo-500"
                 : "border-slate-300 dark:border-slate-700"
@@ -61,7 +66,9 @@ export default function PaymentMethod({
               type="radio"
               name="payment"
               checked={paymentMethod === "PAYPAL"}
-              onChange={() => onPaymentMethodChange("PAYPAL")}
+              onChange={() =>
+                onPaymentMethodChange("PAYPAL")
+              }
               className="accent-indigo-600"
             />
 
@@ -71,11 +78,19 @@ export default function PaymentMethod({
           </label>
         </div>
 
+        {/* Stripe */}
         {paymentMethod === "CREDIT_CARD" && (
           <div className="mt-6">
-            <div className="rounded-md border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
-              <PaymentElement />
-            </div>
+            <PaymentElement
+              options={{
+                layout: {
+                  type: "accordion",
+                  defaultCollapsed: false,
+                  radios: "never",
+                  spacedAccordionItems: false,
+                },
+              }}
+            />
           </div>
         )}
       </section>

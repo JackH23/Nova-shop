@@ -10,6 +10,7 @@ import LoadingState from "@/components/common/LoadingState";
 import ErrorState from "@/components/common/ErrorState";
 import EmptyState from "@/components/common/EmptyState";
 import PageHeader from "@/components/common/PageHeader";
+import { usePaginationScroll } from "@/composables/usePaginationScroll";
 
 type ProductListProps = {
   minPrice?: number;
@@ -38,6 +39,7 @@ export default function ProductList({
   onProductAdded,
   onCartError,
 }: ProductListProps) {
+
   const {
     currentPage,
     setCurrentPage,
@@ -57,6 +59,11 @@ export default function ProductList({
     minDiscount,
     minRating,
   });
+
+  const {
+    targetRef: productGridRef,
+    handlePageChange,
+  } = usePaginationScroll(setCurrentPage);
 
   const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
 
@@ -98,7 +105,10 @@ export default function ProductList({
       ) : (
         <>
           {/* Product cards */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div
+            ref={productGridRef}
+            className="scroll-mt-28 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+          >
             {paginatedProducts.map((product) => (
               <ProductCard
                 key={product.id}
@@ -119,7 +129,7 @@ export default function ProductList({
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={setCurrentPage}
+              onPageChange={handlePageChange}
             />
           )}
         </>

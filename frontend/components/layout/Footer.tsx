@@ -48,23 +48,42 @@ type FooterProps = {
   variant?: "home" | "product";
 };
 
-export default function Footer({ variant = "home" }: FooterProps) {
+export default function Footer({
+  variant = "home",
+}: FooterProps) {
   if (variant === "product") {
     return <ProductFooter />;
   }
 
   return (
     <footer className="mt-auto border-t border-slate-200 bg-[#eef0f2] transition-colors dark:border-slate-800 dark:bg-slate-950">
-      <div className="mx-auto max-w-[1440px] px-10 pb-5 pt-8">
-        {/* Footer columns */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
-          <FooterBrand />
+      <div className="mx-auto w-full max-w-[1440px] px-4 pb-5 pt-7 sm:px-6 sm:pt-8 lg:px-10">
+        {/* Footer content */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4 md:gap-8">
+          {/* Brand */}
+          <div className="col-span-2 md:col-span-1">
+            <FooterBrand />
+          </div>
 
-          <FooterColumn title="Company" links={companyLinks} />
+          {/* Company */}
+          <FooterColumn
+            title="Company"
+            links={companyLinks}
+          />
 
-          <FooterColumn title="Support" links={supportLinks} />
+          {/* Support */}
+          <FooterColumn
+            title="Support"
+            links={supportLinks}
+          />
 
-          <FooterColumn title="Legal" links={legalLinks} />
+          {/* Legal */}
+          <div className="col-span-2 sm:col-span-1">
+            <FooterColumn
+              title="Legal"
+              links={legalLinks}
+            />
+          </div>
         </div>
 
         <FooterCopyright />

@@ -198,7 +198,13 @@ const createReturn = async (req, res) => {
 
 const getReturns = async (req, res) => {
   try {
-    const returns = await Return.findAll({
+    // Pagination
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const limit = Math.max(Number(req.query.limit) || 6, 1);
+
+    const offset = (page - 1) * limit;
+
+    const { count, rows: returns } = await Return.findAndCountAll({
       where: {
         user_id: req.user.id,
       },
@@ -234,12 +240,26 @@ const getReturns = async (req, res) => {
       ],
 
       order: [["created_at", "DESC"]],
+
+      distinct: true,
+
+      limit,
+      offset,
     });
+
+    const totalPages = Math.ceil(count / limit);
 
     return res.status(200).json({
       message: "Returns fetched successfully",
 
       returns,
+
+      pagination: {
+        total: count,
+        page,
+        limit,
+        totalPages,
+      },
     });
   } catch (error) {
     console.error("Get returns error:", error);
