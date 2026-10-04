@@ -41,6 +41,11 @@ const Return = sequelize.define(
       allowNull: true,
     },
 
+    rejection_reason: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
     refund_amount: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
