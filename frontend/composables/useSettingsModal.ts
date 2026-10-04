@@ -9,7 +9,7 @@ import type {
 type ModalType =
   | "delete"
   | "password-success"
-  | "profile-success"
+  | "profile-image-success"
   | null;
 
 type UseSettingsModalProps = {
@@ -31,16 +31,21 @@ type UseSettingsModalProps = {
 export function useSettingsModal({
   onChangePassword,
   onUpdateProfile,
+  onUpdateProfileImage,
   onDeleteAccount,
-  onUpdateProfileImage
 }: UseSettingsModalProps) {
   const [modalType, setModalType] =
     useState<ModalType>(null);
 
+  // ========================================
+  // Change password
+  // ========================================
+
   const handlePasswordChange = async (
     data: ChangePasswordData,
   ) => {
-    const success = await onChangePassword(data);
+    const success =
+      await onChangePassword(data);
 
     if (success) {
       setModalType("password-success");
@@ -49,27 +54,43 @@ export function useSettingsModal({
     return success;
   };
 
+  // ========================================
+  // Update profile information
+  // No success modal
+  // ========================================
+
   const handleProfileUpdate = async (
     data: UpdateProfileData,
   ) => {
-    const success = await onUpdateProfile(data);
+    const success =
+      await onUpdateProfile(data);
+
+    return success;
+  };
+
+  // ========================================
+  // Update profile image
+  // Show success modal
+  // ========================================
+
+  const handleProfileImageUpload = async (
+    file: File,
+  ) => {
+    const success =
+      await onUpdateProfileImage(file);
 
     if (success) {
-      setModalType("profile-success");
+      setModalType(
+        "profile-image-success",
+      );
     }
 
     return success;
   };
 
-  const handleProfileImageUpload = async (file: File) => {
-    const success = await onUpdateProfileImage(file);
-
-    if (success) {
-      setModalType("profile-success");
-    }
-
-    return success;
-  };
+  // ========================================
+  // Delete account
+  // ========================================
 
   const handleOpenDelete = () => {
     setModalType("delete");

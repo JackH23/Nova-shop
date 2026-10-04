@@ -103,14 +103,14 @@ export default function SettingsContent() {
             ? "Delete Account"
             : modalType === "password-success"
               ? "Password Changed"
-              : "Profile Updated"
+              : "Profile Image Updated"
         }
         message={
           modalType === "delete"
             ? "Are you sure you want to permanently delete your account? This action cannot be undone."
             : modalType === "password-success"
               ? "Your password has been changed successfully."
-              : "Your profile information has been updated successfully."
+              : "Your profile image has been updated successfully."
         }
         confirmText={
           modalType === "delete"
