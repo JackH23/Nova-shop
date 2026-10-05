@@ -1,62 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { useNavbar } from "@/composables/useNavbar";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useProductList } from "@/composables/useProductList";
-import { useCart } from "@/composables/useCart";
-import { useMe } from "@/composables/useMe";
-import { useLogout } from "@/composables/useLogout";
-import ConfirmModal from "@/components/common/ConfirmModal";
-import { useAuth } from "@/components/shared/auth/AuthModalProvider";
-import { getFileUrl } from "@/lib/fileUrl";
+import { useNavbarContent } from "@/composables/useNavbarContent";
 import MobileNavigation from "./MobileNavigation";
 import NavbarRightSection from "./NavbarRightSection";
 import NavbarNavigation from "./NavbarNavigation";
+import ConfirmModal from "@/components/common/ConfirmModal";
+import Image from "next/image";
 
 export default function Navbar() {
-  const pathname = usePathname();
-  const [search, setSearch] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const auth = useAuth();
-
-  const { filteredProducts: searchResults, loading: searching } =
-    useProductList({
-      search,
-    });
-
-  const { user, refreshUser } = useMe();
-  const profileImageUrl = getFileUrl(user?.profileImage);
-
-  useEffect(() => {
-    const handleProfileUpdated = () => {
-      refreshUser();
-    };
-
-    window.addEventListener(
-      "profile-updated",
-      handleProfileUpdated,
-    );
-
-    return () => {
-      window.removeEventListener(
-        "profile-updated",
-        handleProfileUpdated,
-      );
-    };
-  }, [refreshUser]);
-
-  const { cartCount } = useCart();
-  const { isVisible, isProfileOpen, toggleProfile, closeProfile } = useNavbar();
-
   const {
-    logout,
+    pathname,
+    search,
+    setSearch,
+    searching,
+    searchResults,
+    user,
+    profileImageUrl,
+    cartCount,
+    isVisible,
+    isProfileOpen,
+    mobileMenuOpen,
     showConfirm,
+    toggleProfile,
+    closeProfile,
+    toggleMobileMenu,
+    closeMobileMenu,
+    closeMobileNavigation,
     openConfirm,
     closeConfirm,
-  } = useLogout(refreshUser);
+    logout,
+    openLogin,
+  } = useNavbarContent();
 
   return (
     <>
@@ -65,7 +40,7 @@ export default function Navbar() {
         <button
           type="button"
           aria-label="Close navigation menu"
-          onClick={() => setMobileMenuOpen(false)}
+          onClick={closeMobileMenu}
           className="fixed inset-0 z-40 bg-black/40 lg:hidden"
         />
       )}
@@ -88,9 +63,21 @@ export default function Navbar() {
         {/* Main navbar */}
         <div className="border-b border-slate-200 dark:border-slate-800">
           <div className="mx-auto flex h-16 max-w-[1440px] items-center px-4 sm:px-6 lg:h-[70px] lg:px-9">
+
             {/* Logo */}
-            <Link href="/home" prefetch={false} className="text-[18px] font-bold text-[#3324d8]">
-              NovaShop
+            <Link
+              href="/home"
+              prefetch={false}
+              className="flex shrink-0 items-center"
+            >
+              <Image
+                src="/logo/novaShop.png"
+                alt="NovaShop"
+                width={160}
+                height={50}
+                priority
+                className="h-9 w-auto object-contain lg:h-10"
+              />
             </Link>
 
             {/* Navigation */}
@@ -110,10 +97,8 @@ export default function Navbar() {
               onToggleProfile={toggleProfile}
               onCloseProfile={closeProfile}
               onOpenLogoutConfirm={openConfirm}
-              onOpenLogin={auth.openLogin}
-              onToggleMobileMenu={() =>
-                setMobileMenuOpen((prev) => !prev)
-              }
+              onOpenLogin={openLogin}
+              onToggleMobileMenu={toggleMobileMenu}
             />
           </div>
 
@@ -124,10 +109,7 @@ export default function Navbar() {
             searching={searching}
             searchResults={searchResults}
             onSearchChange={setSearch}
-            onClose={() => {
-              setSearch("");
-              setMobileMenuOpen(false);
-            }}
+            onClose={closeMobileNavigation}
           />
         </div>
       </header>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 type FooterBrandProps = {
   showDescription?: boolean;
@@ -10,11 +11,17 @@ export default function FooterBrand({
   return (
     <div>
       <Link
-        href="/dashboard"
+        href="/home"
         prefetch={false}
-        className="text-sm font-bold text-slate-950"
+        className="inline-flex items-center"
       >
-        NovaShop
+        <Image
+          src="/logo/novaShop.png"
+          alt="NovaShop"
+          width={140}
+          height={44}
+          className="h-8 w-auto object-contain"
+        />
       </Link>
 
       {showDescription && (
