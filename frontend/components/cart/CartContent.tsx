@@ -2,15 +2,13 @@
 
 import Link from "next/link";
 import PageContainer from "@/components/common/PageContainer";
-import EmptyState from "@/components/common/EmptyState";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
 import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartContent } from "@/composables/useCartContent";
 import Pagination from "@/components/common/Pagination";
 import ConfirmModal from "@/components/common/ConfirmModal";
-import LoadingState from "@/components/common/LoadingState";
-import ErrorState from "@/components/common/ErrorState";
+import AsyncState from "@/components/common/AsyncState";
 import { usePaginationScroll } from "@/composables/usePaginationScroll";
 
 export default function CartContent() {
@@ -51,18 +49,16 @@ export default function CartContent() {
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
           <div>
-            {loading ? (
-              <LoadingState message="Loading cart..." />
-            ) : error ? (
-              <ErrorState message={error} />
-            ) : cart.length === 0 ? (
-              <EmptyState
-                title="Your cart is empty"
-                description="Looks like you haven't added anything to your cart yet."
-                actionText="Continue Shopping"
-                actionHref="/products"
-              />
-            ) : (
+            <AsyncState
+              loading={loading}
+              loadingMessage="Loading cart..."
+              error={error}
+              isEmpty={cart.length === 0}
+              emptyTitle="Your cart is empty"
+              emptyDescription="Looks like you haven't added anything to your cart yet."
+              emptyActionText="Continue Shopping"
+              emptyActionHref="/products"
+            >
               <>
                 <div
                   ref={cartListRef}
@@ -94,7 +90,7 @@ export default function CartContent() {
                   ← Continue Shopping
                 </Link>
               </>
-            )}
+            </AsyncState>
           </div>
 
           {!loading && !error && cart.length > 0 && <CartSummary cart={cart} />}

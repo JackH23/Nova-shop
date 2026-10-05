@@ -6,9 +6,7 @@ import ProductCard from "./ProductCard";
 import Pagination from "@/components/common/Pagination";
 import type { Product } from "@/lib/products";
 import ProductSort from "./ProductSort";
-import LoadingState from "@/components/common/LoadingState";
-import ErrorState from "@/components/common/ErrorState";
-import EmptyState from "@/components/common/EmptyState";
+import AsyncState from "@/components/common/AsyncState";
 import PageHeader from "@/components/common/PageHeader";
 import { usePaginationScroll } from "@/composables/usePaginationScroll";
 
@@ -67,22 +65,6 @@ export default function ProductList({
 
   const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
 
-  if (loading) {
-    return (
-      <div className="flex-1">
-        <LoadingState message="Loading products..." />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex-1">
-        <ErrorState message={error} />
-      </div>
-    );
-  }
-
   return (
     <div className="flex-1">
       {/* Top section */}
@@ -96,15 +78,15 @@ export default function ProductList({
         />
       </PageHeader>
 
-      {/* Empty state / Product cards */}
-      {paginatedProducts.length === 0 ? (
-        <EmptyState
-          title="No products found"
-          description="Try changing your filters or selecting another category."
-        />
-      ) : (
+      <AsyncState
+        loading={loading}
+        loadingMessage="Loading products..."
+        error={error}
+        isEmpty={paginatedProducts.length === 0}
+        emptyTitle="No products found"
+        emptyDescription="Try changing your filters or selecting another category."
+      >
         <>
-          {/* Product cards */}
           <div
             ref={productGridRef}
             className="scroll-mt-28 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
@@ -124,7 +106,6 @@ export default function ProductList({
             ))}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <Pagination
               currentPage={currentPage}
@@ -133,7 +114,7 @@ export default function ProductList({
             />
           )}
         </>
-      )}
+      </AsyncState>
     </div>
   );
 }

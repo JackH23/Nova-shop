@@ -9,6 +9,8 @@ import DeliveryMethod from "./DeliveryMethod";
 import { useCheckoutContent } from "@/composables/useCheckoutContent";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import LoadingState from "@/components/common/LoadingState";
+import AsyncState from "@/components/common/AsyncState";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
@@ -34,41 +36,19 @@ export default function CheckoutContent() {
     handlePlaceOrder,
   } = useCheckoutContent();
 
-  if (loading) {
-    return <div>Loading checkout...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  if (!checkout) {
-    return null;
-  }
-
-  if (placingOrder) {
+  if (!checkout && !loading && !error) {
     return (
-      <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
-        <PageContainer>
-          <div className="flex min-h-[600px] items-center justify-center">
-            <div className="text-center">
-              <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600 dark:border-slate-700 dark:border-t-indigo-400" />
-
-              <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white">
-                Creating your order...
-              </h2>
-
-              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                Please don't close or refresh this page.
-              </p>
-            </div>
-          </div>
-        </PageContainer>
-      </main>
+      <AsyncState
+        isEmpty
+        emptyTitle="Checkout unavailable"
+        emptyDescription="There are no items available for checkout."
+      >
+        {null}
+      </AsyncState>
     );
   }
 
-  const checkoutGrid = (
+  const checkoutGrid = checkout ? (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
       {/* Left */}
       <div className="space-y-6">
@@ -92,9 +72,7 @@ export default function CheckoutContent() {
         {step === "payment" && (
           <>
             {creatingPayment && (
-              <div className="rounded-lg border border-slate-200 bg-white p-6 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-                Loading payment...
-              </div>
+              <LoadingState message="Loading payment..." />
             )}
 
             {clientSecret && (
@@ -120,10 +98,21 @@ export default function CheckoutContent() {
         />
       </div>
     </div>
-  );
+  ) : null;
 
   return (
-    <>
+    <AsyncState
+      loading={loading || placingOrder}
+      loadingMessage={
+        placingOrder
+          ? "Creating your order..."
+          : "Loading checkout..."
+      }
+      error={error}
+      isEmpty={!checkout}
+      emptyTitle="Checkout unavailable"
+      emptyDescription="There are no items available for checkout."
+    >
       <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
         <PageContainer>
           {/* Checkout steps */}
@@ -140,15 +129,13 @@ export default function CheckoutContent() {
                 {checkoutGrid}
               </Elements>
             ) : (
-              <div className="rounded-lg border border-slate-200 bg-white p-6 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-                Loading payment...
-              </div>
+              <LoadingState message="Loading payment..." />
             )
           ) : (
             checkoutGrid
           )}
         </PageContainer>
       </main>
-    </>
+    </AsyncState>
   );
 }

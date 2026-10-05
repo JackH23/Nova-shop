@@ -7,8 +7,7 @@ import SecuritySettings from "@/components/dashboard/SecuritySettings";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import { useSettingsModal } from "@/composables/useSettingsModal";
 import PageHeader from "@/components/common/PageHeader";
-import LoadingState from "@/components/common/LoadingState";
-import ErrorState from "@/components/common/ErrorState";
+import AsyncState from "@/components/common/AsyncState";
 import { useSettingsContent } from "@/composables/useSettingsContent";
 
 export default function SettingsContent() {
@@ -41,16 +40,6 @@ export default function SettingsContent() {
     onDeleteAccount: handleDeleteAccount,
   });
 
-  if (loading) {
-    return (
-      <PageContainer>
-        <div className="py-8">
-          <LoadingState message="Loading account settings..." />
-        </div>
-      </PageContainer>
-    );
-  }
-
   return (
     <>
       <PageContainer>
@@ -65,33 +54,35 @@ export default function SettingsContent() {
               description="Manage your profile and account security."
             />
 
-            {/* Error */}
-            {error && (
-              <div className="mt-4">
-                <ErrorState message={error} />
-              </div>
-            )}
-
             {/* Settings */}
-            <div className="mt-6 space-y-6">
-              {user && (
-                <ProfileSettings
-                  user={user}
-                  updatingProfile={updatingProfile}
-                  updatingImage={updatingImage}
-                  onUpdateProfile={handleProfileUpdate}
-                  onUpdateProfileImage={handleProfileImageUpload}
-                />
-              )}
+            <AsyncState
+              loading={loading}
+              loadingMessage="Loading account settings..."
+              error={error}
+              isEmpty={!user}
+              emptyTitle="Account not found"
+              emptyDescription="We couldn't load your account information."
+            >
+              <div className="mt-6 space-y-6">
+                {user && (
+                  <ProfileSettings
+                    user={user}
+                    updatingProfile={updatingProfile}
+                    updatingImage={updatingImage}
+                    onUpdateProfile={handleProfileUpdate}
+                    onUpdateProfileImage={handleProfileImageUpload}
+                  />
+                )}
 
-              <SecuritySettings
-                changingPassword={changingPassword}
-                deletingAccount={deletingAccount}
-                error={error}
-                onChangePassword={handlePasswordChange}
-                onDeleteAccount={handleOpenDelete}
-              />
-            </div>
+                <SecuritySettings
+                  changingPassword={changingPassword}
+                  deletingAccount={deletingAccount}
+                  error={error}
+                  onChangePassword={handlePasswordChange}
+                  onDeleteAccount={handleOpenDelete}
+                />
+              </div>
+            </AsyncState>
           </div>
         </div>
       </PageContainer>

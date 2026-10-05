@@ -8,9 +8,7 @@ import PageContainer from "@/components/common/PageContainer";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import PageHeader from "@/components/common/PageHeader";
 import Pagination from "@/components/common/Pagination";
-import LoadingState from "@/components/common/LoadingState";
-import ErrorState from "@/components/common/ErrorState";
-import EmptyState from "@/components/common/EmptyState";
+import AsyncState from "@/components/common/AsyncState";
 
 import ReturnStatusBadge from "./ReturnStatusBadge";
 
@@ -44,34 +42,17 @@ export default function ReturnsContent() {
             description="View and track your return requests."
           />
 
-          {/* Loading */}
-          {loading && (
-            <div className="mt-8">
-              <LoadingState message="Loading returns..." />
-            </div>
-          )}
-
-          {/* Error */}
-          {!loading && error && (
-            <div className="mt-8">
-              <ErrorState message={error} />
-            </div>
-          )}
-
-          {/* Empty */}
-          {!loading && !error && returns.length === 0 && (
-            <div className="mt-8">
-              <EmptyState
-                title="No returns yet"
-                description="Your return requests will appear here."
-                actionText="View Orders"
-                actionHref="/dashboard/orders"
-              />
-            </div>
-          )}
-
           {/* Return List */}
-          {!loading && !error && returns.length > 0 && (
+          <AsyncState
+            loading={loading}
+            loadingMessage="Loading returns..."
+            error={error}
+            isEmpty={returns.length === 0}
+            emptyTitle="No returns yet"
+            emptyDescription="Your return requests will appear here."
+            emptyActionText="View Orders"
+            emptyActionHref="/dashboard/orders"
+          >
             <>
               <div
                 ref={returnsListRef}
@@ -164,7 +145,7 @@ export default function ReturnsContent() {
                 />
               )}
             </>
-          )}
+          </AsyncState>
         </div>
       </div>
     </PageContainer>

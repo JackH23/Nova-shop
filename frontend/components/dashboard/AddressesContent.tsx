@@ -7,9 +7,7 @@ import AddressCard from "@/components/dashboard/address/AddressCard";
 import AddressForm from "@/components/dashboard/address/AddressForm";
 import Pagination from "@/components/common/Pagination";
 import PageHeader from "@/components/common/PageHeader";
-import LoadingState from "@/components/common/LoadingState";
-import ErrorState from "@/components/common/ErrorState";
-import EmptyState from "@/components/common/EmptyState";
+import AsyncState from "@/components/common/AsyncState";
 
 import { useAddressContent } from "@/composables/useAddressContent";
 import { useAddressForm } from "@/composables/useAddressForm";
@@ -96,55 +94,43 @@ export default function AddressesContent() {
               </button>
             </PageHeader>
 
-            {/* Loading */}
-            {loading && !showAddForm && (
-              <div className="mt-8">
-                <LoadingState message="Loading addresses..." />
-              </div>
-            )}
-
-            {/* Error */}
-            {!loading && error && !showAddForm && (
-              <div className="mt-8">
-                <ErrorState message={error} />
-              </div>
-            )}
-
-            {/* Empty */}
-            {!loading && !error && addresses.length === 0 && (
-              <div className="mt-8">
-                <EmptyState
-                  title="No addresses yet"
-                  description="Add an address to make checkout faster."
-                />
-              </div>
-            )}
-
             {/* Address list */}
-            {!loading && !error && addresses.length > 0 && (
-              <div
-                ref={addressListRef}
-                className="mt-6 scroll-mt-28 grid gap-4 md:grid-cols-2"
+            {!showAddForm && (
+              <AsyncState
+                loading={loading}
+                loadingMessage="Loading addresses..."
+                error={error}
+                isEmpty={addresses.length === 0}
+                emptyTitle="No addresses yet"
+                emptyDescription="Add an address to make checkout faster."
               >
-                {addresses.map((address) => (
-                  <AddressCard
-                    key={address.id}
-                    address={address}
-                    onEdit={handleEditAddress}
-                    onRemove={handleOpenRemove}
-                    onSetDefault={handleSetDefaultAddress}
-                  />
-                ))}
-              </div>
-            )}
+                <>
+                  {/* Address list */}
+                  <div
+                    ref={addressListRef}
+                    className="mt-6 scroll-mt-28 grid gap-4 md:grid-cols-2"
+                  >
+                    {addresses.map((address) => (
+                      <AddressCard
+                        key={address.id}
+                        address={address}
+                        onEdit={handleEditAddress}
+                        onRemove={handleOpenRemove}
+                        onSetDefault={handleSetDefaultAddress}
+                      />
+                    ))}
+                  </div>
 
-            {/* Pagination */}
-            {!loading && !error && totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
+                  )}
+                </>
+              </AsyncState>
             )}
 
             {/* Address form */}

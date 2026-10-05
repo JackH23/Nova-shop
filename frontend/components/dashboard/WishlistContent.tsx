@@ -9,9 +9,7 @@ import Pagination from "@/components/common/Pagination";
 import AddToCartModal from "@/components/cart/AddToCartModal";
 import { useCartToast } from "@/composables/useCartToast";
 import PageHeader from "@/components/common/PageHeader";
-import LoadingState from "@/components/common/LoadingState";
-import ErrorState from "@/components/common/ErrorState";
-import EmptyState from "@/components/common/EmptyState";
+import AsyncState from "@/components/common/AsyncState";
 
 export default function WishlistContent() {
   const {
@@ -52,58 +50,44 @@ export default function WishlistContent() {
               } saved for later.`}
             />
 
-            {/* Loading */}
-            {loading && (
-              <div className="mt-8">
-                <LoadingState message="Loading wishlist..." />
-              </div>
-            )}
-
-            {/* Error */}
-            {!loading && error && (
-              <div className="mt-8">
-                <ErrorState message={error} />
-              </div>
-            )}
-
-            {/* Empty wishlist */}
-            {!loading && !error && wishlist.length === 0 && (
-              <div className="mt-8">
-                <EmptyState
-                  title="Your wishlist is empty"
-                  description="Save products you like and they will appear here."
-                  actionText="Start Shopping"
-                  actionHref="/products"
-                />
-              </div>
-            )}
-
             {/* Wishlist products */}
-            {!loading && !error && wishlist.length > 0 && (
-              <div
-                ref={wishlistGridRef}
-                className="mt-6 scroll-mt-28 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4"
-              >
-                {wishlist.map((item) => (
-                  <ProductCard
-                    key={item.id}
-                    product={item.product}
-                    onProductAdded={handleProductAdded}
-                    isWishlisted={true}
-                    onRemoveWishlist={removeFromWishlist}
-                  />
-                ))}
-              </div>
-            )}
+            <AsyncState
+              loading={loading}
+              loadingMessage="Loading wishlist..."
+              error={error}
+              isEmpty={wishlist.length === 0}
+              emptyTitle="Your wishlist is empty"
+              emptyDescription="Save products you like and they will appear here."
+              emptyActionText="Start Shopping"
+              emptyActionHref="/products"
+            >
+              <>
+                {/* Wishlist products */}
+                <div
+                  ref={wishlistGridRef}
+                  className="mt-6 scroll-mt-28 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4"
+                >
+                  {wishlist.map((item) => (
+                    <ProductCard
+                      key={item.id}
+                      product={item.product}
+                      onProductAdded={handleProductAdded}
+                      isWishlisted={true}
+                      onRemoveWishlist={removeFromWishlist}
+                    />
+                  ))}
+                </div>
 
-            {/* Pagination */}
-            {!loading && !error && totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            )}
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+              </>
+            </AsyncState>
           </div>
         </div>
       </PageContainer>

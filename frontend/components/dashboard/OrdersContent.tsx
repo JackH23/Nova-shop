@@ -6,9 +6,7 @@ import PageContainer from "@/components/common/PageContainer";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import Pagination from "@/components/common/Pagination";
 import PageHeader from "@/components/common/PageHeader";
-import LoadingState from "@/components/common/LoadingState";
-import ErrorState from "@/components/common/ErrorState";
-import EmptyState from "@/components/common/EmptyState";
+import AsyncState from "@/components/common/AsyncState";
 import { usePaginationScroll } from "@/composables/usePaginationScroll";
 
 export default function OrdersContent() {
@@ -34,30 +32,16 @@ export default function OrdersContent() {
             description="View and track your orders."
           />
 
-          {loading && (
-            <div className="mt-8">
-              <LoadingState message="Loading orders..." />
-            </div>
-          )}
-
-          {error && (
-            <div className="mt-8">
-              <ErrorState message={error} />
-            </div>
-          )}
-
-          {!loading && !error && orders.length === 0 && (
-            <div className="mt-8">
-              <EmptyState
-                title="No orders yet"
-                description="You don't have any orders yet."
-                actionText="Start Shopping"
-                actionHref="/products"
-              />
-            </div>
-          )}
-
-          {!loading && !error && orders.length > 0 && (
+          <AsyncState
+            loading={loading}
+            loadingMessage="Loading orders..."
+            error={error}
+            isEmpty={orders.length === 0}
+            emptyTitle="No orders yet"
+            emptyDescription="You don't have any orders yet."
+            emptyActionText="Start Shopping"
+            emptyActionHref="/products"
+          >
             <div
               ref={ordersListRef}
               className="mt-8 scroll-mt-28 space-y-4"
@@ -123,16 +107,17 @@ export default function OrdersContent() {
                 </div>
               ))}
             </div>
-          )}
+
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            )}
+          </AsyncState>
         </div>
       </div>
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      )}
     </PageContainer>
   );
 }
